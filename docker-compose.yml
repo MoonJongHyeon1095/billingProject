@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+    volumes:
+      - hh99mysql:/var/lib/mysql
+
+  api_module:
+    image: api_module:latest
+    depends_on:
+      - mysql
+    ports:
+      - "8080:8080"
+
+  user_module:
+    image: user_module:latest
+    depends_on:
+      - mysql
+    ports:
+      - "8081:8081"
+
+volumes:
+  hh99mysql:

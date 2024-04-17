@@ -1,0 +1,33 @@
+#docker build -f api_module/Dockerfile -t api_module .
+#docker build -f user_module/Dockerfile -t user_module .
+# 1단계: Gradle을 사용하여 스프링 부트 애플리케이션 빌드
+#FROM openjdk:21 AS builder #jdk21 이미지가 아직 이렇다 할게 없음
+FROM gradle:jdk21-alpine AS builder
+WORKDIR /app
+
+# 필수 패키지 설치
+RUN apk add --no-cache findutils
+
+
+# 루트 디렉토리의 build.gradle과 settings.gradle 복사
+COPY ../build.gradle .
+COPY ../settings.gradle .
+
+# 현재 하위 모듈의 build.gradle 복사
+COPY ../build.gradle ./api_module/
+
+# gradlew와 gradle 디렉토리 복사
+COPY ../gradlew .
+COPY ../gradle gradle
+
+# 하위 모듈의 소스 코드 복사
+COPY ../api_module/src ./api_module/src
+
+RUN chmod +x ./gradlew    # gradlew 실행 권한 부여
+RUN ./gradlew bootJar -p ./api_module  # 하위 모듈을 명시적으로 지정
+
+# 2단계: 빌드된 JAR 파일을 실행할 새로운 Docker 이미지 생성
+FROM openjdk:21
+COPY --from=builder /app/api_module/build/libs/*.jar /app/app.jar
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+VOLUME /tmp
