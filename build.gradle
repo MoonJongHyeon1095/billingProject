@@ -5,14 +5,13 @@ plugins {
 }
 
 allprojects {
+	group = 'com.github'
 	version = '0.0.1-SNAPSHOT'
 	sourceCompatibility = '21'
 	repositories {
 		mavenCentral()
 	}
 }
-
-group = 'com.github'
 
 subprojects {
 	apply plugin: 'java'
@@ -24,6 +23,7 @@ subprojects {
 		implementation 'org.springframework.boot:spring-boot-starter-security'
 		implementation 'org.springframework.boot:spring-boot-starter-web'
 		implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
+		implementation 'org.springframework.boot:spring-boot-starter-validation'
 		compileOnly 'org.projectlombok:lombok'
 		runtimeOnly 'com.mysql:mysql-connector-j'
 		annotationProcessor 'org.projectlombok:lombok'
@@ -35,14 +35,14 @@ subprojects {
 
 	//이 설정을 활용할 경우 도커 이미지 빌드에 문제가 있다.
 	//bootJar : dependecies와 클래스 파일을 모두 묶어서 빌드
-	tasks.named('bootJar') {
-		enabled = false
-	}
-
-	//jar : 클래스만 묶어서 빌드
-	tasks.named('jar') {
-		enabled = true
-	}
+//	tasks.named('bootJar') {
+//		enabled = false
+//	}
+//
+//	//jar : 클래스만 묶어서 빌드
+//	tasks.named('jar') {
+//		enabled = true
+//	}
 }
 
 

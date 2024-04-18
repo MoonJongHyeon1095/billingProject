@@ -21,7 +21,6 @@ public class UserController {
 
     @PostMapping("/signup")
     public Response signup(@RequestBody UserDto userDto){
-        System.out.println("11111 " + userDto.getEmail());
         userService.signup(userDto);
         return Response.success();
     }

@@ -9,9 +9,7 @@ import lombok.Setter;
 public class User {
     private Integer userId;  // Integer로 변경하여 null 가능하게 함
 
-    @Setter
     private String email;
 
-    @Setter
     private String password;
 }
