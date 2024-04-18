@@ -1,11 +1,24 @@
 //이 설정을 활용할 경우 도커 이미지 빌드에 문제가 있다.
-//tasks.named('bootJar'){ // bootJar 세팅을 켜기
-//    enabled = true
+tasks.named('bootJar'){ // bootJar 세팅을 켜기
+    enabled = true
+}
+
+tasks.named('jar'){ // jar 설정은 끄기
+    enabled = false
+}
+
+//plugins {
+//    id 'application' // Application 플러그인 추가
 //}
-//
-//tasks.named('jar'){ // jar 설정은 끄기
-//    enabled = false
+
+//application {
+//    mainClass = 'com.github.api_module.ApiModuleApplication'
 //}
+
+
+group = 'com.github.api_module'
+
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
