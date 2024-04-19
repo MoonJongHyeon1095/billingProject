@@ -19,7 +19,7 @@ public class VideoController {
     public ResponseBodyEmitter streamVideo() {
 
         System.out.println("111111");
-        return videoService.streamVideo();
+        return videoService.streamVideoWithExecutor();
     }
 
 }
