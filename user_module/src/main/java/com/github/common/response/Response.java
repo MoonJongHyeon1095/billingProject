@@ -4,12 +4,12 @@ import lombok.Getter;
 
 @Getter
 public class Response<T> {
-    private String message;
+    private String description;
     private String code;
     private T data;
 
     public Response(final ResponseCode responseCode, final T data) {
-        this.message = responseCode.getMessage();
+        this.description = responseCode.getDescription();
         this.code = responseCode.getCode();
         this.data = data;
     }

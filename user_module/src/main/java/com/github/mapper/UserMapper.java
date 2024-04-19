@@ -21,4 +21,19 @@ public interface UserMapper {
      * @return The user if found, null otherwise.
      */
     Optional<User> findUserByEmail(@Param("email") String email);
+
+    /**
+     * 이메일로 유저 조회
+     * @param userId The email to search for.
+     * @return The user if found, null otherwise.
+     */
+    Optional<User> findUserById(@Param("userId") int userId);
+
+
+    /**
+     * 리프레시 토큰 갱신
+     * @param userId
+     * @param refreshToken
+     */
+    void updateRefreshToken(@Param("userId") int userId, @Param("refreshToken") String refreshToken);
 }

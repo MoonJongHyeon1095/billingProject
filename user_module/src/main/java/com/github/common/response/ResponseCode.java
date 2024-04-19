@@ -7,11 +7,11 @@ public enum ResponseCode {
     SUCCESS("success", "0000"),
     FAILURE("failure", "9000");
 
-    private final String message;
+    private final String description;
     private final String code;
 
-    ResponseCode(final String message, final String code) {
-        this.message = message;
+    ResponseCode(final String description, final String code) {
+        this.description = description;
         this.code = code;
     }
 }
