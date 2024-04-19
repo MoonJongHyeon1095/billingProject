@@ -2,6 +2,7 @@ package com.github.service;
 
 import com.github.controller.response.LoginResponse;
 import com.github.domain.User;
+import com.github.domain.UserSignupValidation;
 import com.github.dto.UserDto;
 import com.github.exception.UserErrorCode;
 import com.github.exception.UserException;
@@ -35,12 +36,22 @@ public class UserService {
 
     @Transactional
     public void signup(UserDto userDto) {
+        //이메일과 비밀번호 형식 검증
+        UserSignupValidation validator = UserSignupValidation.builder()
+                .email(userDto.getEmail())
+                .password(userDto.getPassword())
+                .build();
+        validator.validateEmail();
+        validator.validatePassword();
+
+        //DB조회 이메일 중복검사
+        validateDuplicatedEmail(userDto.getEmail());
+
         String encodedPassword = passwordEncoder.encode(userDto.getPassword());
         final User user = User.builder()
                 .email(userDto.getEmail())
                 .password(encodedPassword)
                 .build();
-        System.out.println(userDto.getEmail());
 
         userMapper.insertUser(user);
     }
@@ -48,6 +59,13 @@ public class UserService {
     private User findUserByEmail(final String email){
         return userMapper.findUserByEmail(email)
                 .orElseThrow(() -> new UserException.UserNotFoundException(UserErrorCode.USER_NOT_FOUND));
+    }
+
+    private void validateDuplicatedEmail(final String email){
+        userMapper.findUserByEmail(email)
+                .ifPresent((present) -> {
+                    throw new UserException.UserDuplicatedException(UserErrorCode.USER_DUPLICATED);
+                });
     }
 
     private void validatePassword(final String password, final User user){

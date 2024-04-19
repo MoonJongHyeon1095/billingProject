@@ -13,6 +13,11 @@ public class UserException extends GlobalException {
         }
     }
 
+    public static class InvalidEmailException extends UserException {
+        public InvalidEmailException(final UserErrorCode errorCode){
+            super(errorCode);}
+    }
+
     public static class UserDuplicatedException extends UserException {
         public UserDuplicatedException(final UserErrorCode errorCode) {
             super(errorCode);
