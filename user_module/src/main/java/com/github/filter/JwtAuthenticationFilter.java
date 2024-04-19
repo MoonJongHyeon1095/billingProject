@@ -1,6 +1,5 @@
 package com.github.filter;
 
-import com.github.service.AuthService;
 import com.github.util.JwtTokenProvider;
 import com.github.util.UserDetailServiceImpl;
 import io.jsonwebtoken.Claims;
@@ -13,7 +12,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -34,10 +35,10 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
-    private final AuthService authService;
+    private final UserDetailServiceImpl userDetailsService;
 
-    public JwtAuthenticationFilter(AuthService authService, JwtTokenProvider jwtTokenProvider) {
-        this.authService = authService;
+    public JwtAuthenticationFilter(UserDetailServiceImpl userDetailsService, JwtTokenProvider jwtTokenProvider) {
+        this.userDetailsService = userDetailsService;
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
@@ -63,11 +64,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
              WebAuthenticationDetailsSource().buildDetails(request):
              요청에서 WebAuthenticationDetails 객체를 생성. 이 객체는 요청에서 IP 주소와 세션 ID를 추출하여 저장.
              */
-            AbstractAuthenticationToken authentication = authService.authenticate(email, token);
+            final UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            AbstractAuthenticationToken authentication =  new UsernamePasswordAuthenticationToken(
+                    userDetails, token, userDetails.getAuthorities()
+            );
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             log.info("액세스 토큰으로 인증 처리됨");
-
 
             /**
              SecurityException:
