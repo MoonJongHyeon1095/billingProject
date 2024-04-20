@@ -1,9 +1,11 @@
 package com.github.controller;
 
-import com.github.service.VideoService;
+import com.github.dto.StreamDto;
+import com.github.service.StreamService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
@@ -13,13 +15,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
 @RestController
 @RequestMapping("/v1/video")
 public class VideoController {
-    private final VideoService videoService;
+    private final StreamService streamService;
 
-    @GetMapping("/play")
-    public ResponseBodyEmitter streamVideo() {
-
-        System.out.println("111111");
-        return videoService.streamVideoWithExecutor();
+    @GetMapping("/stream/{videoId}")
+    public ResponseBodyEmitter streamVideo(@PathVariable("videoId") int videoId) {
+        return streamService.streamVideoWithExecutor(new StreamDto(videoId));
     }
 
 }

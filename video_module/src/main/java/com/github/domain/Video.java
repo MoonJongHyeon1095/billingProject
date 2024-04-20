@@ -10,9 +10,9 @@ public class Video {
     private Integer userId;
     private String title;
     private String desc;
-    private String path;
     private Integer duration;
     private Integer viewCount;
     private Integer totalAdview;
     private Timestamp createdAt;
+    private String path;
 }

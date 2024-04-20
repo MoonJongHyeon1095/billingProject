@@ -28,7 +28,7 @@ public class JwtTokenProvider {
 
 
 public JwtTokenProvider (
-        @Value("${security.jwt.token.secret-key:secret-key}") String secretKey,
+        @Value("${security.jwt.token.secret-key:secret-key}") String secretKey, //base64
         @Value("${security.jwt.token.access-expire}") String accessTokenExpiredTime,
         @Value("${security.jwt.token.refresh-expire}") String refreshTokenExpiredTime
         ) {
