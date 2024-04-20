@@ -3,10 +3,10 @@ package com.github.dto;
 import lombok.Getter;
 
 @Getter
-public class StreamDto {
+public class ViewDto {
     private int videoId;
 
-    public StreamDto(int videoId) {
+    public ViewDto(int videoId) {
         this.videoId = videoId;
     }
 }

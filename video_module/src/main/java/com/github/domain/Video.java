@@ -1,8 +1,9 @@
 package com.github.domain;
+
 import lombok.Builder;
 import lombok.Getter;
-
 import java.sql.Timestamp;
+
 @Getter
 @Builder
 public class Video {

@@ -1,25 +1,36 @@
 package com.github.controller;
 
-import com.github.dto.StreamDto;
+import com.github.common.response.Response;
+import com.github.controller.response.ViewResponse;
+import com.github.dto.StopDto;
+import com.github.dto.ViewDto;
 import com.github.service.StreamService;
+import com.github.service.ViewService;
+import com.github.service.WatchHistoryService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 @Slf4j
-@RequiredArgsConstructor
 @RestController
+@AllArgsConstructor
 @RequestMapping("/v1/video")
 public class VideoController {
-    private final StreamService streamService;
+    private final ViewService viewService;
+    private final WatchHistoryService watchHistoryService;
 
-    @GetMapping("/stream/{videoId}")
-    public ResponseBodyEmitter streamVideo(@PathVariable("videoId") int videoId) {
-        return streamService.streamVideoWithExecutor(new StreamDto(videoId));
+    @PostMapping("/play/{videoId}")
+    public Response<ViewResponse> countView(@PathVariable("videoId") ViewDto viewDto) {
+        viewService.countView(viewDto);
+        return Response.success(new ViewResponse());
+    }
+
+    @PostMapping("/stop/{videoId}/{stoppedTime}")
+    public Response createWatchHistory(@PathVariable("stoppedTime") StopDto stopDto){
+        watchHistoryService.createWatchHistory(stopDto);
+        return Response.success();
     }
 
 }
