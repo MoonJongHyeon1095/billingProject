@@ -22,7 +22,7 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public LoginResponse login(UserDto userDto) {
+    public LoginResponse login(final UserDto userDto) {
         final String email = userDto.getEmail();
         final String password = userDto.getPassword();
 
@@ -41,7 +41,7 @@ public class UserService {
     }
 
     @Transactional
-    public SignupResponse signup(UserDto userDto) {
+    public SignupResponse signup(final UserDto userDto) {
         //이메일과 비밀번호 형식 검증
         UserSignupValidation validator = UserSignupValidation.builder()
                 .email(userDto.getEmail())

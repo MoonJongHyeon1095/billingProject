@@ -22,14 +22,19 @@ public class VideoController {
     private final WatchHistoryService watchHistoryService;
 
     @PostMapping("/play/{videoId}")
-    public Response<ViewResponse> countView(@PathVariable("videoId") ViewDto viewDto) {
+    public Response<ViewResponse> countView(
+            @PathVariable("videoId") final ViewDto viewDto
+    ) {
         viewService.countView(viewDto);
         return Response.success(new ViewResponse());
     }
 
-    @PostMapping("/stop/{videoId}/{stoppedTime}")
-    public Response createWatchHistory(@PathVariable("stoppedTime") StopDto stopDto){
-        watchHistoryService.createWatchHistory(stopDto);
+    @PutMapping("/stop")
+    public Response upsertWatchHistory(
+            @RequestBody final StopDto stopDto,
+            @RequestHeader("X-Device-UUID") final String deviceUUID
+    ){
+        watchHistoryService.upsertWatchHistory(stopDto, deviceUUID);
         return Response.success();
     }
 

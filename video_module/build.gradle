@@ -14,4 +14,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     //Redis 서버와의 실질적인 통신을 담당
     implementation 'redis.clients:jedis:3.6.0'
+
+    //Feign
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 }

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class WatchHistoryService {
-    public void createWatchHistory(StopDto stopDto) {
+    public void upsertWatchHistory(final StopDto stopDto, final String deviceUUID) {
 
     }
 }

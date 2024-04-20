@@ -6,7 +6,7 @@ import lombok.Getter;
 public class ViewDto {
     private int videoId;
 
-    public ViewDto(int videoId) {
+    public ViewDto(final int videoId) {
         this.videoId = videoId;
     }
 }

@@ -1,7 +1,6 @@
 package com.github.service;
 
 import com.github.domain.Video;
-import com.github.dto.StreamDto;
 import jakarta.annotation.PreDestroy;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -26,14 +25,14 @@ public class StreamService {
 
     //선언과 동시에 이를 초기화, 클래스의 다른 부분에서 스레드 생성 로직을 신경 쓸 필요가 없도록
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private final VideoService videoService;
+    private final ViewService viewService;
 
-    public StreamService(VideoService videoService) {
-        this.videoService = videoService;
+    public StreamService(final ViewService viewService) {
+        this.viewService = viewService;
     }
 
     public ResponseBodyEmitter streamVideoWithExecutor(final int videoId){
-        final Video video = videoService.findVideoById(videoId);
+        final Video video = viewService.findVideoById(videoId);
 
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
         executorService.execute(() -> {
