@@ -13,7 +13,5 @@ public class Video {
     private String desc;
     private Integer duration;
     private Integer viewCount;
-    private Integer totalAdview;
     private Timestamp createdAt;
-    private String path;
 }
