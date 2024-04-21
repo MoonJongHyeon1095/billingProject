@@ -10,12 +10,14 @@ public class StopDto {
     //로그인 한 경우만 존재
     private Optional<Integer> userId;
     private int playedTime;
-    private int stoppedTime;
+    private int lastWatched;
+    private int adViewCount;
 
-    public StopDto(final int videoId,final Integer userId,final int playedTime,final int stoppedTime) {
+    public StopDto(final int videoId,final Integer userId,final int playedTime,final int lastWatched, final int adViewCount) {
         this.videoId = videoId;
         this.userId = Optional.ofNullable(userId);
         this.playedTime = playedTime;
-        this.stoppedTime = stoppedTime;
+        this.lastWatched = lastWatched;
+        this.adViewCount = adViewCount;
     }
 }

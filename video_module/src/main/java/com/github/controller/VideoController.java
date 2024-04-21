@@ -27,11 +27,11 @@ public class VideoController {
     }
 
     @PutMapping("/stop")
-    public Response upsertWatchHistory(
+    public Response createWatchHistory(
             @RequestBody final StopDto stopDto,
             @RequestHeader("X-Device-UUID") final String deviceUUID
     ){
-        watchHistoryService.upsertWatchHistory(stopDto, deviceUUID);
+        watchHistoryService.createWatchHistory(stopDto, deviceUUID);
         return Response.success();
     }
 
