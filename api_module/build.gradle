@@ -1,11 +1,3 @@
-//이 설정을 활용할 경우 도커 이미지 빌드에 문제가 있다.
-//tasks.named('bootJar'){ // bootJar 세팅을 켜기
-//    enabled = true
-//}
-//
-//tasks.named('jar'){ // jar 설정은 끄기
-//    enabled = false
-//}
 
 //plugins {
 //    id 'application' // Application 플러그인 추가
@@ -14,16 +6,32 @@
 //application {
 //    mainClass = 'com.github.api_module.ApiModuleApplication'
 //}
-bootJar {
-    mainClass = 'com.github.ApiModuleApplication'
-}
+//bootJar {
+//    mainClass = 'com.github.ApiModuleApplication'
+//}
+//
 
-springBoot {
-    mainClass = 'com.github.ApiModuleApplication'
-}
 //ext: "extra properties"의 약자로, 프로젝트의 모든 Gradle 스크립트에서 접근 가능한 추가적인 속성을 설정
 //springCloudVersion을 ext 블록에 변수로 설정하는 이유는 여러 곳에서 동일한 버전을 참조할 수 있도록 하기 위함.
 //추후 버전변경을 적용할 때 한 곳에서만 버전을 수정하면 전체적으로 적용
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.4'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+springBoot {
+    mainClass = 'com.github.ApiModuleApplication'
+}
+group = 'com.github'
+version = '0.0.1-SNAPSHOT'
+java {
+    sourceCompatibility = '21'
+}
+repositories {
+    mavenCentral()
+}
+
 ext {
     set('springCloudVersion', "2023.0.0")
 }
@@ -41,7 +49,15 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 }
-
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+////이 설정을 활용할 경우 도커 이미지 빌드에 문제가 있다.
+//tasks.named('bootJar'){ // bootJar 세팅을 켜기
+//    enabled = true
+//}
+//
+//tasks.named('jar'){ // jar 설정은 끄기
+//    enabled = false
+//}

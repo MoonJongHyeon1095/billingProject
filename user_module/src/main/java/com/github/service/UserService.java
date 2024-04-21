@@ -33,8 +33,8 @@ public class UserService {
 
         final String accessToken = jwtTokenProvider.createAccessToken(user.getUserId(), user.getEmail());
         final String refreshToken = jwtTokenProvider.createRefreshToken(user.getUserId(), user.getEmail());
-
-        userMapper.updateRefreshToken(user.getUserId(), refreshToken);
+        user.setRefreshToken(refreshToken);
+        userMapper.updateRefreshToken(user);
 
         return LoginResponse.from(accessToken, refreshToken, "로그인 성공!");
 

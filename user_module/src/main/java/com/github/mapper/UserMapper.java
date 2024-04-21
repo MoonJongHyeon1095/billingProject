@@ -32,8 +32,7 @@ public interface UserMapper {
 
     /**
      * 리프레시 토큰 갱신
-     * @param userId
-     * @param refreshToken
+     * @param user domain/User객체
      */
-    void updateRefreshToken(@Param("userId") int userId, @Param("refreshToken") String refreshToken);
+    void updateRefreshToken(User user);
 }

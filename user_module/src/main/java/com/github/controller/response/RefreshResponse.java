@@ -1,13 +1,15 @@
 package com.github.controller.response;
 
-public class RefreshResponse {
-    private final String accessToken;
-    private final String refreshToken;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-    public RefreshResponse(final String accessToken, final String refreshToken) {
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
-    }
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class RefreshResponse {
+    private String accessToken;
+    private String refreshToken;
 
     public static RefreshResponse from(final String accessToken, final String refreshToken){
         return new RefreshResponse(accessToken, refreshToken);

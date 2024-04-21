@@ -48,13 +48,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final HttpServletResponse response,
             final FilterChain filterChain
     ) throws ServletException, IOException {
+        final String requestURI = request.getRequestURI();
+        log.info("필터를 우회합니다: " + requestURI);
+        if ("/v1/user/signup".equals(requestURI) ||
+                "/v1/user/login".equals(requestURI) ||
+                "/v1/user/refresh".equals(requestURI)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try{
             final String authorizationHeader = request.getHeader("Authorization");
             final String token = parseBearerToken(authorizationHeader);
             final Claims claims = jwtTokenProvider.extractClaims(token);
             final String email = jwtTokenProvider.getEmail(claims);
-            final int userId = jwtTokenProvider.getUserId(claims);
-            final String tokenType = jwtTokenProvider.getTokenType(claims);
+
+            // 토큰 만료 여부 검사
+            if (token != null && jwtTokenProvider.isExpired(token)) {
+                throw new ExpiredJwtException(null, null, "토큰이 만료되었습니다. 다시 로그인해주세요.");
+            }
 
             /**
              WebAutheticationDetails :
@@ -90,19 +102,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
              요청 객체에 예외 정보를 추가. 후속 단계에서 이 예외 정보를 참조하거나, 에러 응답을 생성할 때 사용
              */
         } catch (SecurityException | MalformedJwtException e){
-            log.error(" JWT가 잘못 서명되었거나 변조된 경우");
+            log.error(" JWT가 잘못 서명되었거나 변조된 경우. {}", e.toString());
             request.setAttribute("JwtAuthenticationFilterExceiption", e);
         } catch (ExpiredJwtException e){
-            log.error("토큰 만료됨");
+            log.error("토큰 만료되었습니다. 다시 로그인 해주세요. {}", e.toString());
             request.setAttribute("JwtAuthenticationFilterExceiption", e);
         } catch ( UnsupportedJwtException e){
-            log.error("지원되지 않는 토큰 형식입니다.");
+            log.error("지원되지 않는 토큰 형식입니다.{}", e.toString());
             request.setAttribute("JwtAuthenticationFilterExceiption", e);
         } catch ( IllegalArgumentException e){
-            log.error("토큰 형식이 잘못되었습니다.");
+            log.error("토큰 형식이 잘못되었습니다.{}", e.toString());
             request.setAttribute("JwtAuthenticationFilterExceiption", e);
         }  catch ( NullPointerException e ){
-            log.error("요청에 토큰이 누락되었습니다.");
+            log.error("요청에 토큰이 누락되었습니다. {}", e.toString());
             request.setAttribute("JwtAuthenticationFilterExceiption", e);
         } catch (RuntimeException e){
             log.error("기타 다른 JWT 에러 {}", e.toString());

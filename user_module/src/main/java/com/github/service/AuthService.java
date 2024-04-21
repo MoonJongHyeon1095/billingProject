@@ -20,7 +20,7 @@ public class AuthService {
 
     public RefreshResponse refresh(final RefreshDto refreshDto){
         final String refreshToken = refreshDto.getRefreshToken();
-        final Claims claims = jwtTokenProvider.extractClaims(refreshToken);
+        final Claims claims = jwtTokenProvider.extractClaimsFromRefreshToken(refreshToken);
         final int userId = jwtTokenProvider.getUserId(claims);
         final User user = findUserById(userId);
         validateSameToken(user.getRefreshToken(), refreshToken);

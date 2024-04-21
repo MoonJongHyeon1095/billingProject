@@ -19,6 +19,7 @@ import java.util.Date;
 
 @Service
 public class JwtTokenProvider {
+    private static final String BEARER_PREFIX = "Bearer ";
 
     private int accessTokenExpiredTime;
 
@@ -54,12 +55,13 @@ public JwtTokenProvider (
         Date now = new Date();
         Date expireTime = new Date(now.getTime() + expire);
 
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(expireTime)
-                .signWith(getSigningkey(keyBytes))
-                .compact();
+        String token = Jwts.builder()
+                    .setClaims(claims)
+                    .setIssuedAt(now)
+                    .setExpiration(expireTime)
+                    .signWith(getSigningkey(keyBytes))
+                    .compact();
+        return BEARER_PREFIX + token;
     }
 
     public boolean isExpired(String token){
@@ -88,7 +90,19 @@ public JwtTokenProvider (
                 .build().parseClaimsJws(token).getBody();
     }
 
+    public Claims extractClaimsFromRefreshToken(String token){
+        return extractClaims(parseBearerToken(token));
+    }
+
     private Key getSigningkey(byte[] keyBytes){
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    private String parseBearerToken(final String inputString) {
+
+        if (inputString != null && inputString.startsWith("Bearer ")) {
+            return inputString.substring(7);
+        }
+        return null;
     }
 }

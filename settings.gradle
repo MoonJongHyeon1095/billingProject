@@ -1,6 +1,5 @@
 rootProject.name = 'billingProject'
-
-include 'user_module'
 include 'api_module'
+include 'user_module'
 include 'video_module'
 

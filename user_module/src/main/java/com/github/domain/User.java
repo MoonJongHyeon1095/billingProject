@@ -2,6 +2,7 @@ package com.github.domain;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  - MyBatis를 사용할 때, 도메인 객체는 실제로 매우 간단하게 유지하는 것이 일반적
@@ -18,7 +19,9 @@ public class User {
 
     private String password;
 
+    @Setter
     private String refreshToken;
 
     private String role;
+
 }
