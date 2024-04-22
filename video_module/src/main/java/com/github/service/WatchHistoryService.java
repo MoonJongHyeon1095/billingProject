@@ -9,6 +9,7 @@ import com.github.mapper.WatchHistoryMapper;
 import com.github.util.DateColumnCalculator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -19,6 +20,7 @@ public class WatchHistoryService {
     private final WatchHistoryMapper watchHistoryMapper;
     private final AdFeignClient adFeignClient;
 
+    @Transactional
     public void createWatchHistory(final WatchHistoryDto watchHistoryDto, final String deviceUUID) {
         final DateColumnCalculator.CustomDate date = dateColumnCalculator.createDateObject();
         WatchHistory watchHistory = WatchHistory.builder()
@@ -37,19 +39,19 @@ public class WatchHistoryService {
 
         insertWatchHistory(watchHistory);
 
-//        if(watchHistory.getAdviewCount() > 0) {
-//            createAdDetail(watchHistory);
-//        }
+        if(watchHistory.getAdviewCount() > 0) {
+            createAdDetail(watchHistory);
+        }
     }
 
-    private void insertWatchHistory(WatchHistory watchHistory){
+    private void insertWatchHistory( final WatchHistory watchHistory){
         Integer resultPK = watchHistoryMapper.insertWatchHistory(watchHistory);
         if(resultPK ==null) throw new VideoException(VideoErrorCode.INSERT_WATCH_HISTORY_FAILED);
     }
 
-    private void createAdDetail( WatchHistory watchHistory) {
+    private void createAdDetail( final WatchHistory watchHistory) {
         try {
-            adFeignClient.createAdDetail(watchHistory);
+            adFeignClient.createAdDetail(watchHistory.getVideoId(), watchHistory.getAdviewCount());
         } catch (Exception e){
             //TODO: Exception 만들기
             throw new RuntimeException("feign client error", e);

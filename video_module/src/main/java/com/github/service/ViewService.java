@@ -31,6 +31,7 @@ public class ViewService {
      4. db 업데이트 조건 : 증가량 100이상
      * @param viewDto
      */
+    @Transactional
     public void countView(final ViewDto viewDto){
         final int videoId = viewDto.getVideoId();
         final String lockKey = "video:view:lock:" + videoId;
@@ -102,16 +103,6 @@ public class ViewService {
                 .build();
     }
 
-
-    private RedisViewRecord increaseViewCount(final RedisViewRecord currentRecord){
-        return RedisViewRecord.builder()
-                .videoId(currentRecord.getVideoId())
-                .viewCount(currentRecord.getViewCount()+1)
-                .increment(currentRecord.getIncrement()+1)
-                .build();
-    }
-
-    @Transactional
     protected Video findVideoById(final int videoId){
         return videoMapper.findOneVideoById(videoId).orElseThrow(()->new VideoException(VideoErrorCode.VIDEO_NOT_FOUND));
     }

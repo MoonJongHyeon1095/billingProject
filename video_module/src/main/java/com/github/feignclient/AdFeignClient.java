@@ -1,13 +1,14 @@
 package com.github.feignclient;
 
-import com.github.domain.WatchHistory;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "adFeignClient", url = "http://localhost:8082")
+@FeignClient(name = "adFeignClient", url = "http://localhost:8083")
 public interface AdFeignClient {
-    @RequestMapping(method = RequestMethod.POST, value="/v1/advertisement/")
-    void createAdDetail(@RequestBody WatchHistory watchHistory);
+    @PostMapping("/v1/advertisement/{videoId}/{adViewCount}")
+    void createAdDetail(
+            @PathVariable("videoId") int videoId,
+            @PathVariable("adViewCount") int adViewCount
+    );
+
 }
