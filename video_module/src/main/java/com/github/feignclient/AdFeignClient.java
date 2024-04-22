@@ -10,5 +10,4 @@ public interface AdFeignClient {
             @PathVariable("videoId") int videoId,
             @PathVariable("adViewCount") int adViewCount
     );
-
 }

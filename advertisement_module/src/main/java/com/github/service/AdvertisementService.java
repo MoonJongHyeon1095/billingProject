@@ -15,13 +15,13 @@ public class AdvertisementService {
     private final AdvertisementDetailMapper advertisementDetailMapper;
 
     @Transactional
-    public void countAdViewCount( final int videoId, final int adViewCount) {
+    public void countAdView( final int videoId, final int adViewCount) {
         //해당 videoId의 영상에 5분 간격으로 광고가 몇개 붙어있는지
         List<Integer> adList = getAllAdByVideoId(videoId);
         int plusViewCount=1;
         int remainingViewCount=0;
         int attachedAdNum = adList.size();
-        System.out.println("111111" + attachedAdNum);
+
         if(adViewCount==0 || attachedAdNum==0) throw new AdException(AdErrorCode.AD_NOT_FOUND);
 
         if(adViewCount > attachedAdNum ){

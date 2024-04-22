@@ -2,6 +2,7 @@ package com.github.controller;
 
 import com.github.common.response.Response;
 import com.github.controller.response.VideoResponse;
+import com.github.controller.response.ViewResponse;
 import com.github.dto.WatchHistoryDto;
 import com.github.dto.ViewDto;
 import com.github.service.ViewService;
@@ -18,15 +19,30 @@ public class VideoController {
     private final ViewService viewService;
     private final WatchHistoryService watchHistoryService;
 
-    @PostMapping("/play/{videoId}")
-    public Response<VideoResponse> countView(
-            @PathVariable("videoId") final int videoId
+    /**
+     * 영상 조회수 증가 및 가장 최근의 시청중단 지점 응답
+     * @param viewDto
+     * @param deviceUUID 로그인을 하지 않은 유저를 식별하는 데에 사용
+     * @return
+     */
+    @PostMapping("/play")
+    public Response<ViewResponse> countView(
+            @RequestBody final ViewDto viewDto,
+            @RequestHeader("X-Device-UUID") final String deviceUUID
     ) {
-        ViewDto viewDto = new ViewDto(videoId);
+
         viewService.countView(viewDto);
-        return Response.success(new VideoResponse("조회수 업데이트 성공"));
+        ViewResponse response = viewService.getLastWatched(viewDto, deviceUUID);
+        return Response.success(response);
     }
 
+    /**
+     * 재생 중단시점의 정보들로 시청기록 생성
+     * Batch 통계를 위해, 행을 업데이트 하는 것이 아니라 계속 신규 생성
+     * @param watchHistoryDto
+     * @param deviceUUID 로그인을 하지 않은 유저를 식별하는 데에 사용
+     * @return
+     */
     @PostMapping("/stop")
     public Response<VideoResponse> createWatchHistory(
             @RequestBody final WatchHistoryDto watchHistoryDto,
@@ -35,5 +51,6 @@ public class VideoController {
         watchHistoryService.createWatchHistory(watchHistoryDto, deviceUUID);
         return Response.success(new VideoResponse("시청기록 생성 성공"));
     }
+
 
 }
