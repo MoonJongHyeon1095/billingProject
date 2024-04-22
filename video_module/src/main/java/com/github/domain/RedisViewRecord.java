@@ -8,5 +8,5 @@ import lombok.Getter;
 public class RedisViewRecord {
     String videoId;
     Integer viewCount;
-    Integer deltaView;
+    Integer increment;
 }

@@ -7,8 +7,8 @@ public class VideoException extends GlobalException {
         super(errorCode.getStatus(), errorCode.getMessage());
     }
 
-    public static class InvalidPasswordException extends VideoException {
-        public InvalidPasswordException(final VideoErrorCode errorCode) {
+    public static class InsertWatchHistoryException extends VideoException {
+        public InsertWatchHistoryException(final VideoErrorCode errorCode) {
             super(errorCode);
         }
     }

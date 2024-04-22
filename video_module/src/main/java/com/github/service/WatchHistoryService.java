@@ -1,7 +1,9 @@
 package com.github.service;
 
 import com.github.domain.WatchHistory;
-import com.github.dto.StopDto;
+import com.github.dto.WatchHistoryDto;
+import com.github.exception.VideoErrorCode;
+import com.github.exception.VideoException;
 import com.github.feignclient.AdFeignClient;
 import com.github.mapper.WatchHistoryMapper;
 import com.github.util.DateColumnCalculator;
@@ -17,13 +19,13 @@ public class WatchHistoryService {
     private final WatchHistoryMapper watchHistoryMapper;
     private final AdFeignClient adFeignClient;
 
-    public void createWatchHistory(final StopDto stopDto, final String deviceUUID) {
+    public void createWatchHistory(final WatchHistoryDto watchHistoryDto, final String deviceUUID) {
         final DateColumnCalculator.CustomDate date = dateColumnCalculator.createDateObject();
         WatchHistory watchHistory = WatchHistory.builder()
-                .videoId(stopDto.getVideoId())
-                .playedTime(stopDto.getPlayedTime())
-                .lastWatched(stopDto.getLastWatched())
-                .adviewCount(stopDto.getAdViewCount())
+                .videoId(watchHistoryDto.getVideoId())
+                .playedTime(watchHistoryDto.getPlayedTime())
+                .lastWatched(watchHistoryDto.getLastWatched())
+                .adviewCount(watchHistoryDto.getAdViewCount())
                 .UUID(deviceUUID)
                 .year(date.getYear())
                 .month(date.getMonth())
@@ -31,13 +33,18 @@ public class WatchHistoryService {
                 .day(date.getDay())
                 .createdAt(dateColumnCalculator.getCurrentTime())
                 .build();
-        watchHistory.setUserId(stopDto.getUserId());
+        watchHistory.setUserId(watchHistoryDto.getUserId());
 
-        watchHistoryMapper.insertWatchHistory(watchHistory);
+        insertWatchHistory(watchHistory);
 
-        if(watchHistory.getAdviewCount() > 0) {
-            createAdDetail(watchHistory);
-        }
+//        if(watchHistory.getAdviewCount() > 0) {
+//            createAdDetail(watchHistory);
+//        }
+    }
+
+    private void insertWatchHistory(WatchHistory watchHistory){
+        Integer resultPK = watchHistoryMapper.insertWatchHistory(watchHistory);
+        if(resultPK ==null) throw new VideoException(VideoErrorCode.INSERT_WATCH_HISTORY_FAILED);
     }
 
     private void createAdDetail( WatchHistory watchHistory) {

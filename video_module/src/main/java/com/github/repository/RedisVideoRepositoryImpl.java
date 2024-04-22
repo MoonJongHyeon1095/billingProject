@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisVideoRepositoryImpl implements RedisVideoRepository {
     //key는 String으로 저장
     private final RedisTemplate<String, String> redisTemplate;
-    private final HashOperations<String, String, Integer> hashOperations;
+    private final HashOperations<String, String, String> hashOperations;
 
     public RedisVideoRepositoryImpl(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
@@ -25,21 +25,21 @@ public class RedisVideoRepositoryImpl implements RedisVideoRepository {
 
 
     @Override
-    public void saveHash(final String videoId, final int viewCount, final int deltaViewCount, final long ttl) {
-        hashOperations.put(videoId, "viewCount", viewCount);
-        hashOperations.put(videoId, "deltaViewCount", deltaViewCount);
+    public void saveHash(final String videoId, final int viewCount, final int increment, final long ttl) {
+        hashOperations.put(videoId, "viewCount", String.valueOf(viewCount)); // 문자열로 변환
+        hashOperations.put(videoId, "increment", String.valueOf(increment)); // 문자열로 변환
         //K key, final long timeout, final TimeUnit unit
         redisTemplate.expire(videoId, ttl, TimeUnit.SECONDS);
     }
 
     @Override
     public Integer getFromHashMap(final String videoId, final String key) {
-        return hashOperations.get(videoId, key);
+        return Integer.parseInt(hashOperations.get(videoId, key));
     }
 
     @Override
     public void updateHash(String videoId, final String fieldKey, final int fieldValue) {
-        hashOperations.put(videoId, fieldKey, fieldValue);
+        hashOperations.put(videoId, fieldKey, String.valueOf(fieldValue));
     }
 
     @Override
@@ -48,7 +48,8 @@ public class RedisVideoRepositoryImpl implements RedisVideoRepository {
     }
 
     @Override
-    public Map<String, Integer> getHashMap(String videoId) {
+    public Map<String, String> getHashMap(String videoId) {
         return hashOperations.entries(videoId);
     }
+
 }

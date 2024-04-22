@@ -1,8 +1,8 @@
 package com.github.controller;
 
 import com.github.common.response.Response;
-import com.github.controller.response.ViewResponse;
-import com.github.dto.StopDto;
+import com.github.controller.response.VideoResponse;
+import com.github.dto.WatchHistoryDto;
 import com.github.dto.ViewDto;
 import com.github.service.ViewService;
 import com.github.service.WatchHistoryService;
@@ -19,20 +19,21 @@ public class VideoController {
     private final WatchHistoryService watchHistoryService;
 
     @PostMapping("/play/{videoId}")
-    public Response<ViewResponse> countView(
-            @PathVariable("videoId") final ViewDto viewDto
+    public Response<VideoResponse> countView(
+            @PathVariable("videoId") final int videoId
     ) {
+        ViewDto viewDto = new ViewDto(videoId);
         viewService.countView(viewDto);
-        return Response.success(new ViewResponse());
+        return Response.success(new VideoResponse("조회수 업데이트 성공"));
     }
 
-    @PutMapping("/stop")
-    public Response createWatchHistory(
-            @RequestBody final StopDto stopDto,
+    @PostMapping("/stop")
+    public Response<VideoResponse> createWatchHistory(
+            @RequestBody final WatchHistoryDto watchHistoryDto,
             @RequestHeader("X-Device-UUID") final String deviceUUID
     ){
-        watchHistoryService.createWatchHistory(stopDto, deviceUUID);
-        return Response.success();
+        watchHistoryService.createWatchHistory(watchHistoryDto, deviceUUID);
+        return Response.success(new VideoResponse("시청기록 생성 성공"));
     }
 
 }

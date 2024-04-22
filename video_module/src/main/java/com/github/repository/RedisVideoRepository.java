@@ -12,5 +12,5 @@ public interface RedisVideoRepository {
 
     void deleteHash(String key);
 
-    Map<String, Integer> getHashMap(String videoId);
+    Map<String, String> getHashMap(String videoId);
 }

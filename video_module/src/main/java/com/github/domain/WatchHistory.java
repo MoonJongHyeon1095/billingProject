@@ -24,7 +24,13 @@ public class WatchHistory {
     private Integer adviewCount; //그냥 순서대로 나오는 광고 몇개 봤는지
 
     public void setUserId(final Optional<Integer> userIdOptional) {
-        // Optional이 비어있을 경우 null
-        this.userId = userIdOptional.orElse(null);
+        if (userIdOptional.isEmpty()) {
+            // Handle null scenario, either set to a default value or handle with an exception
+            this.userId = null;
+        } else {
+            // Set the userId to the value or default to null if Optional is empty
+            this.userId = userIdOptional.orElse(null);
+        }
     }
+
 }

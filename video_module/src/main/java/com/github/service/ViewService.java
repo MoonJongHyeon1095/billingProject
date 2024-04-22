@@ -1,15 +1,14 @@
 package com.github.service;
 
+import com.github.config.RedisLockManager;
 import com.github.domain.RedisViewRecord;
 import com.github.domain.Video;
 import com.github.dto.ViewDto;
 import com.github.exception.VideoErrorCode;
 import com.github.exception.VideoException;
 import com.github.mapper.VideoMapper;
-import com.github.repository.RedisVideoRepository;
 import com.github.repository.RedisVideoRepositoryImpl;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +22,7 @@ import java.util.Map;
 public class ViewService {
     private final VideoMapper videoMapper;
     private final RedisVideoRepositoryImpl redisVideoRepository;
+    private final RedisLockManager redisLockManager;
 
     /**
      1. redis에서 조회수 기록 가져오기
@@ -31,27 +31,36 @@ public class ViewService {
      4. db 업데이트 조건 : 증가량 100이상
      * @param viewDto
      */
-    @Transactional
     public void countView(final ViewDto viewDto){
         final int videoId = viewDto.getVideoId();
-        // redis에서 조회수 기록 가져오기
-        final RedisViewRecord currentRecord = findAndUpdateRedisRecord(videoId);
-        // 조회수 +1, 증가량 +1
-        final RedisViewRecord newRecord = increaseViewCount(currentRecord);
-        // 증가량이 100이상이면 db에 업데이트 후 증가량 0으로 초기화
-        if(newRecord.getDeltaView() >=100) {
+        final String lockKey = "video:view:lock:" + videoId;
+        final String lockValue = String.valueOf(System.currentTimeMillis());
 
-            videoMapper.updateViewCount(
-                    Video.builder()
-                            .videoId(videoId)
-                            .viewCount(newRecord.getViewCount())
-                            .build()
-            );
-
-            //증가량 0으로 초기화
-            redisVideoRepository.updateHash(String.valueOf(videoId), "deltaViewCount", 0);
+        //redis lock 생성
+        if (!redisLockManager.acquireLock(lockKey, lockValue)) {
+            log.warn("Unable to acquire lock for video ID: {}", videoId);
+            return;
         }
 
+        try {
+            // redis에서 조회수 기록 가져오기 및 업데이트
+            final RedisViewRecord newRecord = findAndUpdateRedisRecord(videoId);
+            // 증가량이 100이상이면 db에 업데이트 후 증가량 0으로 초기화
+            if (newRecord.getIncrement() >= 100) {
+
+                videoMapper.updateViewCount(
+                        Video.builder()
+                                .videoId(videoId)
+                                .viewCount(newRecord.getViewCount())
+                                .build()
+                );
+
+                //증가량 0으로 초기화
+                redisVideoRepository.updateHash(String.valueOf(videoId), "increment", 0);
+            }
+        } finally {
+            redisLockManager.releaseLock(lockKey, lockValue);
+        }
     }
 
 
@@ -66,24 +75,30 @@ public class ViewService {
     @Transactional
     private RedisViewRecord findAndUpdateRedisRecord(final int videoId) {
         // Redis에서 먼저 비디오 정보를 조회합니다.
-        Map<String, Integer> currentHashMap = redisVideoRepository.getHashMap(String.valueOf(videoId));
-
+        Map<String, String> currentHashMap = redisVideoRepository.getHashMap(String.valueOf(videoId));
+        int newViewCount;
+        int newIncrement;
         if (currentHashMap == null || currentHashMap.isEmpty()) {
             // Redis에 데이터가 없으면 데이터베이스에서 조회
             Video foundVideo = findVideoById(videoId);
+            newViewCount = foundVideo.getViewCount()+1;
+            newIncrement = 1;
 
             // Redis에 비디오 정보를 저장하고, TTL을 설정 //3600초
-            redisVideoRepository.saveHash(String.valueOf(videoId), foundVideo.getViewCount(), 0, 3600);
+            redisVideoRepository.saveHash(String.valueOf(videoId), newViewCount, newIncrement, 3600);
 
-            currentHashMap = new HashMap<>();
-            currentHashMap.put("viewCount", foundVideo.getViewCount());
-            currentHashMap.put("deltaViewCount", 0);
 
+        }else{
+            newViewCount = Integer.parseInt(currentHashMap.get("viewCount"))+1;
+            newIncrement = Integer.parseInt(currentHashMap.get("increment"))+1;
+
+            redisVideoRepository.updateHash(String.valueOf(videoId), "viewCount", newViewCount);
+            redisVideoRepository.updateHash(String.valueOf(videoId), "increment", newIncrement);
         }
         return RedisViewRecord.builder()
                 .videoId(String.valueOf(videoId))
-                .viewCount(currentHashMap.get("viewCount"))
-                .deltaView(currentHashMap.get("deltaViewCount"))
+                .viewCount(newViewCount)
+                .increment(newIncrement)
                 .build();
     }
 
@@ -92,7 +107,7 @@ public class ViewService {
         return RedisViewRecord.builder()
                 .videoId(currentRecord.getVideoId())
                 .viewCount(currentRecord.getViewCount()+1)
-                .deltaView(currentRecord.getDeltaView()+1)
+                .increment(currentRecord.getIncrement()+1)
                 .build();
     }
 
