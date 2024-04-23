@@ -21,5 +21,19 @@ services:
     ports:
       - "8081:8081"
 
+  video_module:
+    image: video_module:latest
+    depends_on:
+      - mysql
+    ports:
+      - "8082:8082"
+
+  advertisement_module:
+    image: advertisement_module:latest
+    depends_on:
+      - mysql
+    ports:
+      - "8082:8082"
+
 volumes:
   hh99mysql:
