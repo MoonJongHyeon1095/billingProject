@@ -1,5 +1,5 @@
-
-#docker build -f Dockerfile_Video -t video_module .
+#docker push zin354/video_module:latest
+#docker build -f Dockerfile_Video -t zin354/video_module .
 # 1단계: Gradle을 사용하여 스프링 부트 애플리케이션 빌드
 FROM gradle:jdk21-alpine AS builder
 WORKDIR /app
