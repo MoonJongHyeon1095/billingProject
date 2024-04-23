@@ -48,8 +48,7 @@ public class ViewService {
          각각의 videoId에 대해 고유한 락을 생성하기 위해 videoId를 조합하여 사용.
 
          lockValue는 락의 값으로, 보통 현재 시간이나 랜덤한 값 등이 사용. 이 값은 락을 해제할 때 사용.
-         만약 락을 획득한 스레드가 락을 해제하지 않고 종료되는 경우를 대비하여, 일정 시간이 지나면 자동으로 락을 해제할 수 있도록 한다..
-         .
+         만약 락을 획득한 스레드가 락을 해제하지 않고 종료되는 경우를 대비하여, 일정 시간이 지나면 자동으로 락을 해제
          */
         if (!redisLockManager.acquireLock(lockKey, lockValue)) {
             throw new VideoException(VideoErrorCode.REDIS_LOCK_NOT_AVAILABLE);
@@ -124,6 +123,11 @@ public class ViewService {
                 .viewCount(newViewCount)
                 .increment(newIncrement)
                 .build();
+    }
+
+    public void updateIfTtlExpired(final String expiredVideoId){
+        Video foundVideo = findVideoById(Integer.parseInt(expiredVideoId));
+        videoMapper.updateViewCount(foundVideo);
     }
 
     protected Video findVideoById(final int videoId){
