@@ -22,6 +22,14 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
+      ## create application.properties
+      - name: make application.properties
+        run: |
+          cd ./src/main/resources
+          touch ./application.properties
+          echo "${{ secrets.PROPERTIES }}" >> ./application.properties
+        shell: bash
+
       # 각 모듈에 대한 작업을 병렬로 실행
       - name: Build and push Docker images
         run: |
