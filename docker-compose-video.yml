@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: [ "redis-server", "--appendonly", "yes" ]  # AOF(Append Only File) 옵션 활성화
+    networks:
+      - billing_project
+
+  video_module:
+    image: zin354/video_module:latest
+    ports:
+      - "8082:8082"
+    networks:
+      - billing_project
+
+networks:
+  billing_project:
+    driver: bridge
+
+volumes:
+  redis_data:

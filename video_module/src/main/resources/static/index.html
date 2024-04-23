@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Streaming Test</title>
+</head>
+<body>
+<h1>Video Streaming Demo</h1>
+<video id="videoPlayer" controls width="720">
+    Your browser does not support the video tag.
+</video>
+<input type="text" id="videoId" placeholder="검색을 통해 특정 비디오를 찾은 클라이언트가 Video PK를 넘겨준다고 가정">
+<button onclick="startStreaming()">Start Streaming</button>
+
+<script>
+        function startStreaming() {
+            const video = document.getElementById('videoPlayer');
+            const videoId = document.getElementById('videoId').value;
+            if (videoId) { // Check if a video name is entered
+                video.src = `http://localhost:8082/v1/video/stream/${videoId}`;
+                video.load();
+                video.play();
+            } else {
+                alert('Please enter a video name.');
+            }
+        }
+    </script>
+</body>
+</html>

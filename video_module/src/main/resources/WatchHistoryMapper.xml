@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.mapper.WatchHistoryMapper">
+
+    <select id="findOneById" parameterType="java.lang.Integer" resultType="com.github.domain.WatchHistory">
+        SELECT *
+        FROM WatchHistory
+        WHERE watchHistoryId = #{watchHistoryId}
+    </select>
+
+    <select id="findLastWatchedByUserId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT lastWatched
+        FROM WatchHistory
+        WHERE userId = #{userId}
+        ORDER BY createdAt DESC
+        LIMIT 1
+    </select>
+
+    <select id="findLastWatchedByUUID" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT lastWatched
+        FROM WatchHistory
+        WHERE UUID = #{UUID}
+        ORDER BY createdAt DESC
+        LIMIT 1
+    </select>
+
+    <!-- 새로 생성된 PK값 반환   -->
+    <insert id="insertWatchHistory" parameterType="com.github.domain.WatchHistory" useGeneratedKeys="true" keyProperty="watchHistoryId">
+        INSERT INTO WatchHistory (videoId, userId, playedTime, lastWatched, adviewCount, UUID, createdAt, day, week, month, year)
+        VALUES (#{videoId}, #{userId}, #{playedTime}, #{lastWatched}, #{adviewCount}, #{UUID}, #{createdAt}, #{day}, #{week}, #{month}, #{year})
+    </insert>
+
+</mapper>
