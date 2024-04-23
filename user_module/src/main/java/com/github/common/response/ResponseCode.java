@@ -1,6 +1,7 @@
 package com.github.common.response;
 
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ResponseCode {
@@ -14,4 +15,5 @@ public enum ResponseCode {
         this.description = description;
         this.code = code;
     }
+
 }

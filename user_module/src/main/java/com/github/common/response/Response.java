@@ -1,6 +1,7 @@
 package com.github.common.response;
 
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Getter
 public class Response<T> {

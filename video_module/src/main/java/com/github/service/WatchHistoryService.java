@@ -1,5 +1,6 @@
 package com.github.service;
 
+import com.github.domain.Video;
 import com.github.domain.WatchHistory;
 import com.github.dto.WatchHistoryDto;
 import com.github.exception.VideoErrorCode;
@@ -17,12 +18,14 @@ public class WatchHistoryService {
     private final DateColumnCalculator dateColumnCalculator;
     private final WatchHistoryMapper watchHistoryMapper;
     private final AdFeignClient adFeignClient;
+    private final ViewService viewService;
 
     @Transactional
     public void createWatchHistory(final WatchHistoryDto watchHistoryDto, final String deviceUUID) {
         final DateColumnCalculator.CustomDate date = dateColumnCalculator.createDateObject();
+        Video video = viewService.findVideoById(watchHistoryDto.getVideoId());
         WatchHistory watchHistory = WatchHistory.builder()
-                .videoId(watchHistoryDto.getVideoId())
+                .videoId(video.getVideoId())
                 .playedTime(watchHistoryDto.getPlayedTime())
                 .lastWatched(watchHistoryDto.getLastWatched())
                 .adviewCount(watchHistoryDto.getAdViewCount())

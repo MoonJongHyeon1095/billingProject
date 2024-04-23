@@ -2,6 +2,7 @@ package com.github.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Optional;
 
@@ -9,6 +10,7 @@ import java.util.Optional;
 @NoArgsConstructor
 public class WatchHistoryDto {
     private int videoId;
+    @Setter
     //로그인 한 경우만 존재
     private Optional<Integer> userId = Optional.empty();
     private int playedTime;

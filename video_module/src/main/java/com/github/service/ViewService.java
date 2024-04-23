@@ -80,6 +80,7 @@ public class ViewService {
     public ViewResponse getLastWatched(final ViewDto viewDto, final String deviceUUID) {
         //로그인을 하고 플레이한 경우
         if(viewDto.getUserId().isPresent()){
+            System.out.println("userId:  " +viewDto.getUserId().get());
             Integer lastWatched = watchHistoryMapper.findLastWatchedByUserId(viewDto.getUserId().get()).orElse(0);
             return ViewResponse.builder().lastWatched(lastWatched).build();
         }else {
@@ -87,8 +88,6 @@ public class ViewService {
             return ViewResponse.builder().lastWatched(lastWatched).build();
         }
     }
-
-
 
     /**
      * 1. redis에서 조회수 기록 조회

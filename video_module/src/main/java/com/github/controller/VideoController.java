@@ -7,9 +7,15 @@ import com.github.dto.WatchHistoryDto;
 import com.github.dto.ViewDto;
 import com.github.service.ViewService;
 import com.github.service.WatchHistoryService;
+import com.github.util.UserDetailsImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -30,6 +36,15 @@ public class VideoController {
             @RequestBody final ViewDto viewDto,
             @RequestHeader("X-Device-UUID") final String deviceUUID
     ) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetailsImpl) {
+            UserDetailsImpl userDetails = (UserDetailsImpl) principal;
+            if (userDetails.getUserId() != null) viewDto.setUserId(Optional.of(userDetails.getUserId()));
+
+        } else {
+            // 로그인하지 않은 사용자일 경우, userId를 설정하지 않음
+            viewDto.setUserId(Optional.empty());
+        }
 
         viewService.countView(viewDto);
         ViewResponse response = viewService.getLastWatched(viewDto, deviceUUID);
@@ -48,6 +63,17 @@ public class VideoController {
             @RequestBody final WatchHistoryDto watchHistoryDto,
             @RequestHeader("X-Device-UUID") final String deviceUUID
     ){
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetailsImpl) {
+            UserDetailsImpl userDetails = (UserDetailsImpl) principal;
+            if (userDetails.getUserId() != null) watchHistoryDto.setUserId(Optional.of(userDetails.getUserId()));
+
+        } else {
+            // 로그인하지 않은 사용자일 경우, userId를 설정하지 않음
+            watchHistoryDto.setUserId(Optional.empty());
+        }
+
         watchHistoryService.createWatchHistory(watchHistoryDto, deviceUUID);
         return Response.success(new VideoResponse("시청기록 생성 성공"));
     }

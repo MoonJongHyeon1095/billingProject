@@ -54,7 +54,7 @@ public class UserService {
         validateDuplicatedEmail(userDto.getEmail());
 
         //비밀번호 암호화 후 저장
-        String encodedPassword = passwordEncoder.encode(userDto.getPassword());
+        final String encodedPassword = passwordEncoder.encode(userDto.getPassword());
         final User user = User.builder()
                 .email(userDto.getEmail())
                 .password(encodedPassword)
@@ -62,7 +62,7 @@ public class UserService {
         userMapper.insertUser(user);
 
         // 삽입된 사용자 정보 다시 조회 후 반환
-        User newUser = findUserByEmail(userDto.getEmail());
+        final User newUser = findUserByEmail(userDto.getEmail());
 
         return SignupResponse.from(newUser, "회원가입 성공!");
     }
