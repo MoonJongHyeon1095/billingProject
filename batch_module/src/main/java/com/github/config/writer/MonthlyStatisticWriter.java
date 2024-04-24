@@ -19,8 +19,8 @@ public class MonthlyStatisticWriter implements ItemWriter<VideoStatistic> {
         for(VideoStatistic videoStat : chunk){
             VideoStatistic newStat = VideoStatistic.builder()
                     .videoId(videoStat.getVideoId())
-                    .dailyViewCount(videoStat.getDailyViewCount())
-                    .dailyWatchedTime(videoStat.getDailyWatchedTime())
+                    .monthlyViewCount(videoStat.getMonthlyViewCount())
+                    .monthlyWatchedTime(videoStat.getMonthlyWatchedTime())
                     .build();
             statisticMapper.upsertMonthlyStatistic(newStat);
         }

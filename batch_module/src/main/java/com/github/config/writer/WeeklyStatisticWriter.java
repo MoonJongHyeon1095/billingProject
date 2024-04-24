@@ -19,8 +19,8 @@ public class WeeklyStatisticWriter implements ItemWriter<VideoStatistic> {
         for(VideoStatistic videoStat : chunk){
             VideoStatistic newStat = VideoStatistic.builder()
                     .videoId(videoStat.getVideoId())
-                    .dailyViewCount(videoStat.getDailyViewCount())
-                    .dailyWatchedTime(videoStat.getDailyWatchedTime())
+                    .weeklyViewCount(videoStat.getWeeklyViewCount())
+                    .weeklyWatchedTime(videoStat.getWeeklyWatchedTime())
                     .build();
             statisticMapper.upsertWeeklyStatistic(newStat);
         }

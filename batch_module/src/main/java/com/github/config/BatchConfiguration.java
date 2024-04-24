@@ -1,5 +1,7 @@
 package com.github.config;
 
+import com.github.config.listener.CacheClearStepListener;
+import com.github.config.listener.StepExecutionListenerImpl;
 import com.github.config.processor.DailyStatisticsProcessor;
 import com.github.config.processor.MonthlyStatisticsProcessor;
 import com.github.config.processor.WeeklyStatisticsProcessor;
@@ -22,8 +24,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 
-import javax.sql.DataSource;
-
 @Configuration
 @EnableBatchProcessing
 public class BatchConfiguration {
@@ -43,11 +43,6 @@ public class BatchConfiguration {
     private MonthlyStatisticsProcessor monthlyStatisticsProcessor;
     @Autowired
     private MonthlyStatisticWriter monthlyStatisticWriter;
-    @Autowired
-    private DateColumnCalculator dateColumnCalculator;
-
-//    private DataSource dataSource;
-
 
     @Bean(name = "transactionManager") //transactionManager라고 명시하지 않으면 찾지 못한다.
     public JdbcTransactionManager batchTransactionManager() {
@@ -67,6 +62,7 @@ public class BatchConfiguration {
                 .reader(readerConfiguration.dailyWatchHistoryReader())
                 .processor(dailyStatisticsProcessor)
                 .listener((ChunkListener)new CacheClearStepListener())
+                .listener(new StepExecutionListenerImpl())
                 .writer(dailyStatisticWriter)
                 .build();
     }
@@ -74,7 +70,7 @@ public class BatchConfiguration {
     @Bean
     public Job weeklyStatisticJob(JobRepository jobRepository) {
         return new JobBuilder("weeklyStatisticJob", jobRepository)
-                .start(dailyStatisticStep(jobRepository))
+                .start(weeklyStatisticStep(jobRepository))
                 .build();
     }
     @Bean
@@ -83,6 +79,8 @@ public class BatchConfiguration {
                 .<WatchHistory, VideoStatistic>chunk(10, batchTransactionManager())
                 .reader(readerConfiguration.weeklyWatchHistoryReader())
                 .processor(weeklyStatisticsProcessor)
+                .listener((ChunkListener)new CacheClearStepListener())
+                .listener(new StepExecutionListenerImpl())
                 .writer(weeklyStatisticWriter)
                 .build();
     }
@@ -90,7 +88,7 @@ public class BatchConfiguration {
     @Bean
     public Job monthlyStatisticJob(JobRepository jobRepository) {
         return new JobBuilder("monthlyStatisticJob", jobRepository)
-                .start(dailyStatisticStep(jobRepository))
+                .start(monthlyStatisticStep(jobRepository))
                 .build();
     }
     @Bean
@@ -99,6 +97,8 @@ public class BatchConfiguration {
                 .<WatchHistory, VideoStatistic>chunk(10, batchTransactionManager())
                 .reader(readerConfiguration.monthlyWatchHistoryReader())
                 .processor(monthlyStatisticsProcessor)
+                .listener((ChunkListener)new CacheClearStepListener())
+                .listener(new StepExecutionListenerImpl())
                 .writer(monthlyStatisticWriter)
                 .build();
     }
