@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.mapper.StatisticMapper">
+    <insert id="upsertDailyStatistic" parameterType="com.github.domain.VideoStatistic">
+        INSERT INTO VideoStatistic (videoId, dailyWatchedTime, dailyViewCount)
+        VALUES (#{videoId}, #{dailyWatchedTime}, #{dailyViewCount})
+        ON DUPLICATE KEY UPDATE
+        dailyWatchedTime = VALUES(dailyWatchedTime),
+        dailyViewCount = VALUES(dailyViewCount)
+    </insert>
+
+
+</mapper>
