@@ -1,4 +1,4 @@
-package com.github.config;
+package com.github.config.mapper;
 
 import com.github.domain.WatchHistory;
 import org.springframework.jdbc.core.RowMapper;

@@ -10,6 +10,20 @@
         dailyWatchedTime = VALUES(dailyWatchedTime),
         dailyViewCount = VALUES(dailyViewCount)
     </insert>
+    <insert id="upsertWeeklyStatistic" parameterType="com.github.domain.VideoStatistic">
+        INSERT INTO VideoStatistic (videoId, weeklyWatchedTime, weeklyViewCount)
+        VALUES (#{videoId}, #{weeklyWatchedTime}, #{weeklyViewCount})
+        ON DUPLICATE KEY UPDATE
+        weeklyWatchedTime = VALUES(weeklyWatchedTime),
+        weeklyViewCount = VALUES(weeklyViewCount)
+    </insert>
+    <insert id="upsertMonthlyStatistic" parameterType="com.github.domain.VideoStatistic">
+        INSERT INTO VideoStatistic (videoId, monthlyWatchedTime, monthlyViewCount)
+        VALUES (#{videoId}, #{monthlyWatchedTime}, #{monthlyViewCount})
+        ON DUPLICATE KEY UPDATE
+        dailyWatchedTime = VALUES(monthlyWatchedTime),
+        dailyViewCount = VALUES(monthlyViewCount)
+    </insert>
 
 
 </mapper>
