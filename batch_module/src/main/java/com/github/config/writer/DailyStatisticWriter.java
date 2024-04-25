@@ -1,43 +1,39 @@
 package com.github.config.writer;
 
+import com.github.domain.DailyVideoStatistic;
 import com.github.domain.VideoStatistic;
-import com.github.mapper.StatisticMapper;
+import com.github.util.GlobalSingletonCache;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Component
-public class DailyStatisticWriter implements ItemWriter<VideoStatistic> {
-    private final StatisticMapper statisticMapper;
+public class DailyStatisticWriter implements ItemWriter<DailyVideoStatistic> {
+    private final GlobalSingletonCache globalCache;
 
-    public DailyStatisticWriter(StatisticMapper statisticMapper) {
-        this.statisticMapper = statisticMapper;
+    // 생성자 주입
+    @Autowired
+    public DailyStatisticWriter() {
+        this.globalCache = GlobalSingletonCache.getInstance();
     }
-
     @Override
-    public void write(Chunk<? extends VideoStatistic> chunk) throws Exception {
-        for(VideoStatistic videoStat : chunk){
-            Optional<VideoStatistic> foundStatistic = statisticMapper.findOneByVideoId(videoStat.getVideoId());
-            if(foundStatistic.isPresent()){
-                statisticMapper.updateDailyStatistic(
-                        VideoStatistic.builder()
-                                .videoId(videoStat.getVideoId())
-                                .dailyViewCount(foundStatistic.get().getDailyViewCount() + videoStat.getDailyViewCount())
-                                .dailyWatchedTime(foundStatistic.get().getDailyWatchedTime() + videoStat.getDailyWatchedTime())
-                                .build()
-                );
-            }else{
-                statisticMapper.insertDailyStatistic(
-                        VideoStatistic.builder()
-                                .videoId(videoStat.getVideoId())
-                                .dailyViewCount(videoStat.getDailyViewCount())
-                                .dailyWatchedTime(videoStat.getDailyWatchedTime())
-                                .build()
-                );
-            }
+    public void write(Chunk<? extends DailyVideoStatistic> chunk) throws Exception {
+        for (DailyVideoStatistic stat : chunk) {
+
+            globalCache.addDailyData(
+                    VideoStatistic.builder()
+                        .videoId(stat.getVideoId())
+                        .dailyViewCount(stat.getDailyViewCount())
+                        .dailyWatchedTime(stat.getDailyWatchedTime())
+                        .build()
+            ); // 데이터 전역 캐시에 추가
         }
     }
-
 }

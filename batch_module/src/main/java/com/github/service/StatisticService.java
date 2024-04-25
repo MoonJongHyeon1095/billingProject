@@ -40,7 +40,7 @@ public class StatisticService {
      * 따라서 한국 서울 시간(KST)으로 설정하려면 UTC 시간에 9시간을 더하거나 타임존 명시
      * 초 분 시 일 월 요일
      */
-    @Scheduled(cron = "0 40 16 * * ?", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 21 22 * * ?", zone = "Asia/Seoul")
     public void runDailyStatisticJob() throws Exception {
         try{
             JobParameters jobParameters = new JobParametersBuilder()
@@ -53,7 +53,7 @@ public class StatisticService {
 
     }
 
-    @Scheduled(cron = "0 42 16 * * ?", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 15 23 * * ?", zone = "Asia/Seoul")
     public void runWeeklyStatisticJob() {
         try {
             JobParameters jobParameters = new JobParametersBuilder()
@@ -65,7 +65,7 @@ public class StatisticService {
         }
     }
 
-    @Scheduled(cron = "0 45 16 * * ?", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 20 23 * * ?", zone = "Asia/Seoul")
     public void runMonthlyStatisticJob() {
         try {
             JobParameters jobParameters = new JobParametersBuilder()
@@ -76,7 +76,7 @@ public class StatisticService {
             e.printStackTrace();
         }
     }
-    @Scheduled(cron = "0 34 16 * * ?", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 06 17 * * ?", zone = "Asia/Seoul")
     public void runClearDataJob() {
         try {
             JobParameters jobParameters = new JobParametersBuilder()

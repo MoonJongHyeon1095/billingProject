@@ -1,8 +1,6 @@
 package com.github.config;
 
-import com.github.config.listener.CacheClearStepListener;
-import com.github.config.listener.CacheClearStepListenerFactory;
-import com.github.config.listener.StepExecutionListenerImpl;
+import com.github.config.listener.*;
 import com.github.config.processor.DailyStatisticsProcessor;
 import com.github.config.processor.MonthlyStatisticsProcessor;
 import com.github.config.processor.WeeklyStatisticsProcessor;
@@ -10,8 +8,8 @@ import com.github.config.reader.ReaderConfiguration;
 import com.github.config.writer.DailyStatisticWriter;
 import com.github.config.writer.MonthlyStatisticWriter;
 import com.github.config.writer.WeeklyStatisticWriter;
-import com.github.domain.VideoStatistic;
-import com.github.domain.WatchHistory;
+import com.github.domain.*;
+import com.github.mapper.VideoStatisticMapper;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -46,6 +44,9 @@ public class BatchConfiguration {
     private MonthlyStatisticsProcessor monthlyStatisticsProcessor;
     @Autowired
     private MonthlyStatisticWriter monthlyStatisticWriter;
+    @Autowired
+    private VideoStatisticMapper videoStatisticMapper;
+
 
     @Bean(name = "transactionManager") //transactionManager라고 명시하지 않으면 찾지 못한다.
     public JdbcTransactionManager batchTransactionManager() {
@@ -56,17 +57,18 @@ public class BatchConfiguration {
     public Job dailyStatisticJob(JobRepository jobRepository) {
         return new JobBuilder("dailyStaticJob", jobRepository)
                 .preventRestart()
+                .listener(new DailyUpdateJobListener(videoStatisticMapper))
                 .start(dailyStatisticStep(jobRepository))
                 .build();
     }
     @Bean
     public Step dailyStatisticStep(JobRepository jobRepository) {
         return new StepBuilder("dailyStaticStep", jobRepository)
-                .<WatchHistory, VideoStatistic>chunk(20, batchTransactionManager())
+                .<WatchHistory, DailyVideoStatistic>chunk(20, batchTransactionManager())
                 .reader(readerConfiguration.dailyWatchHistoryReader())
                 .processor(dailyStatisticsProcessor)
                 .listener(CacheClearStepListenerFactory.createWithDaily(dailyStatisticsProcessor))
-                .listener(new StepExecutionListenerImpl())
+                .listener(new LoggerListener())
                 .writer(dailyStatisticWriter)
                 .build();
     }
@@ -74,17 +76,18 @@ public class BatchConfiguration {
     @Bean
     public Job weeklyStatisticJob(JobRepository jobRepository) {
         return new JobBuilder("weeklyStatisticJob", jobRepository)
+                .listener(new WeeklyUpdateJobListener(videoStatisticMapper))
                 .start(weeklyStatisticStep(jobRepository))
                 .build();
     }
     @Bean
     public Step weeklyStatisticStep(JobRepository jobRepository) {
         return new StepBuilder("weeklyStatisticStep", jobRepository)
-                .<WatchHistory, VideoStatistic>chunk(20, batchTransactionManager())
+                .<WatchHistory, WeeklyVideoStatistic>chunk(20, batchTransactionManager())
                 .reader(readerConfiguration.weeklyWatchHistoryReader())
                 .processor(weeklyStatisticsProcessor)
                 .listener(CacheClearStepListenerFactory.createWithWeekly(weeklyStatisticsProcessor))
-                .listener(new StepExecutionListenerImpl())
+                .listener(new LoggerListener())
                 .writer(weeklyStatisticWriter)
                 .build();
     }
@@ -92,17 +95,18 @@ public class BatchConfiguration {
     @Bean
     public Job monthlyStatisticJob(JobRepository jobRepository) {
         return new JobBuilder("monthlyStatisticJob", jobRepository)
+                .listener(new MonthlyUpdateJobListener(videoStatisticMapper))
                 .start(monthlyStatisticStep(jobRepository))
                 .build();
     }
     @Bean
     public Step monthlyStatisticStep(JobRepository jobRepository) {
         return new StepBuilder("monthlyStatisticStep", jobRepository)
-                .<WatchHistory, VideoStatistic>chunk(20, batchTransactionManager())
+                .<WatchHistory, MonthlyVideoStatistic>chunk(20, batchTransactionManager())
                 .reader(readerConfiguration.monthlyWatchHistoryReader())
                 .processor(monthlyStatisticsProcessor)
                 .listener(CacheClearStepListenerFactory.createWithMonthly(monthlyStatisticsProcessor))
-                .listener(new StepExecutionListenerImpl())
+                .listener(new LoggerListener())
                 .writer(monthlyStatisticWriter)
                 .build();
     }

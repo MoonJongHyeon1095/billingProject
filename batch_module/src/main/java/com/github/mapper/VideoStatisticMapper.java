@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.Optional;
 
 @Mapper
-public interface StatisticMapper {
+public interface VideoStatisticMapper {
     void upsertDailyStatistic(final VideoStatistic videoStatistic);
     void upsertWeeklyStatistic(final VideoStatistic videoStatistic);
     void upsertMonthlyStatistic(final VideoStatistic videoStatistic);

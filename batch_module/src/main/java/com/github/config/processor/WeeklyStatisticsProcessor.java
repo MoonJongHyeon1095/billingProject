@@ -2,12 +2,13 @@ package com.github.config.processor;
 
 import com.github.domain.VideoStatistic;
 import com.github.domain.WatchHistory;
+import com.github.domain.WeeklyVideoStatistic;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class WeeklyStatisticsProcessor implements ItemProcessor<WatchHistory, VideoStatistic> {
+public class WeeklyStatisticsProcessor implements ItemProcessor<WatchHistory, WeeklyVideoStatistic> {
     // 동시성 문제를 방지하기 위해 ConcurrentHashMap 사용
     /**
      * final 키워드는 변수의 참조가 불변임을 의미합니다.
@@ -21,16 +22,16 @@ public class WeeklyStatisticsProcessor implements ItemProcessor<WatchHistory, Vi
      * 캐싱 효과 저하: 메서드 호출 시마다 새로운 객체가 생성된다면, 캐싱 효과X
      * 따라서 videoStatisticsCache는 클래스 필드로 선언하고, 한 번만 초기화. 메서드 호출 시마다 새로운 객체가 생성되는 문제를 방지
      */
-    private final ConcurrentHashMap<Integer, VideoStatistic> videoStatisticsCache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, WeeklyVideoStatistic> videoStatisticsCache = new ConcurrentHashMap<>();
     @Override
-    public VideoStatistic process(final WatchHistory item) throws Exception {
+    public WeeklyVideoStatistic process(final WatchHistory item) throws Exception {
         final Integer videoId = item.getVideoId();
 
         // 캐시에서 VideoStatistic 가져오기
         videoStatisticsCache.compute(videoId, (key, videoStatistic) -> {
             if (videoStatistic == null) {
                 // 캐시에 없으면 새로 생성
-                return VideoStatistic.builder()
+                return WeeklyVideoStatistic.builder()
                         .videoId(videoId)
                         .weeklyWatchedTime(item.getPlayedTime())
                         .weeklyViewCount(1)

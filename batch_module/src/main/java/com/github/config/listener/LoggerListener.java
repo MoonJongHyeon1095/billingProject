@@ -6,7 +6,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 
 @Slf4j
-public class StepExecutionListenerImpl implements StepExecutionListener {
+public class LoggerListener implements StepExecutionListener {
 
 
     @Override
