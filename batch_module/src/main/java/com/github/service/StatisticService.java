@@ -6,16 +6,17 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class DailyStatisticService {
+public class StatisticService {
     private final JobLauncher jobLauncher;
     private final Job dailyStatisticJob;
     private final Job weeklyStatisticJob;
     private final Job monthlyStatisticJob;
 
 
-    public DailyStatisticService(JobLauncher jobLauncher,
+    public StatisticService(JobLauncher jobLauncher,
                                  @Qualifier("dailyStatisticJob") Job dailyStatisticJob,
                                  @Qualifier("weeklyStatisticJob") Job weeklyStatisticJob,
                                  @Qualifier("monthlyStatisticJob") Job monthlyStatisticJob
@@ -31,7 +32,7 @@ public class DailyStatisticService {
      * 따라서 한국 서울 시간(KST)으로 설정하려면 UTC 시간에 9시간을 더하거나 타임존 명시
      * 초 분 시 일 월 요일
      */
-    @Scheduled(cron = "0 30 22 * * ?", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 50 12 * * ?", zone = "Asia/Seoul")
     public void runDailyStatisticsJob() {
         try {
             jobLauncher.run(dailyStatisticJob, new JobParameters());
@@ -41,7 +42,7 @@ public class DailyStatisticService {
         }
     }
 
-    @Scheduled(cron = "0 35 22 * * ?", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 55 12 * * ?", zone = "Asia/Seoul")
     public void runWeeklyStatisticJob() {
         try {
             jobLauncher.run(weeklyStatisticJob, new JobParameters());
@@ -51,7 +52,7 @@ public class DailyStatisticService {
         }
     }
 
-    @Scheduled(cron = "0 40 22 * * ?", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 13 * * ?", zone = "Asia/Seoul")
     public void monthlyStatisticJob() {
         try {
             jobLauncher.run(monthlyStatisticJob, new JobParameters());

@@ -25,5 +25,45 @@
         dailyViewCount = VALUES(monthlyViewCount)
     </insert>
 
+    <!--  일간  -->
+    <insert id="insertDailyStatistic" parameterType="com.github.domain.VideoStatistic">
+        INSERT INTO VideoStatistic (videoId, dailyWatchedTime, dailyViewCount)
+        VALUES (#{videoId}, #{dailyWatchedTime}, #{dailyViewCount})
+    </insert>
+    <update id="updateDailyStatistic" parameterType="com.github.domain.VideoStatistic">
+        UPDATE VideoStatistic
+        SET dailyWatchedTime = #{dailyWatchedTime},
+        dailyViewCount = #{dailyViewCount}
+        WHERE videoId = #{videoId}
+    </update>
 
+    <!--  주간  -->
+    <insert id="insertWeeklyStatistic" parameterType="com.github.domain.VideoStatistic">
+        INSERT INTO VideoStatistic (videoId, weeklyWatchedTime, weeklyViewCount)
+        VALUES (#{videoId}, #{weeklyWatchedTime}, #{weeklyViewCount})
+    </insert>
+    <update id="updateWeeklyStatistic" parameterType="com.github.domain.VideoStatistic">
+        UPDATE VideoStatistic
+        SET weeklyWatchedTime = #{weeklyWatchedTime},
+        weeklyViewCount = #{weeklyViewCount}
+        WHERE videoId = #{videoId}
+    </update>
+
+    <!-- 월간   -->
+    <update id="updateMonthlyStatistic" parameterType="com.github.domain.VideoStatistic">
+        UPDATE VideoStatistic
+        SET monthlyWatchedTime = #{monthlyWatchedTime},
+        monthlyViewCount = #{monthlyViewCount}
+        WHERE videoId = #{videoId}
+    </update>
+
+    <insert id="insertMonthlyStatistic" parameterType="com.github.domain.VideoStatistic">
+        INSERT INTO VideoStatistic (videoId, monthlyWatchedTime, monthlyViewCount)
+        VALUES (#{videoId}, #{monthlyWatchedTime}, #{monthlyViewCount})
+    </insert>
+
+    <!--    존재여부만 확인    -->
+    <select id="getVideoStatisticByVideoId" parameterType="int" resultType="com.github.domain.VideoStatistic">
+        SELECT * FROM VideoStatistic WHERE videoId = #{videoId}
+    </select>
 </mapper>

@@ -16,6 +16,7 @@ import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -58,7 +59,7 @@ public class BatchConfiguration {
     @Bean
     public Step dailyStatisticStep(JobRepository jobRepository) {
         return new StepBuilder("dailyStaticStep", jobRepository)
-                .<WatchHistory, VideoStatistic>chunk(10, batchTransactionManager())
+                .<WatchHistory, VideoStatistic>chunk(20, batchTransactionManager())
                 .reader(readerConfiguration.dailyWatchHistoryReader())
                 .processor(dailyStatisticsProcessor)
                 .listener((ChunkListener)new CacheClearStepListener())
@@ -76,7 +77,7 @@ public class BatchConfiguration {
     @Bean
     public Step weeklyStatisticStep(JobRepository jobRepository) {
         return new StepBuilder("weeklyStatisticStep", jobRepository)
-                .<WatchHistory, VideoStatistic>chunk(10, batchTransactionManager())
+                .<WatchHistory, VideoStatistic>chunk(20, batchTransactionManager())
                 .reader(readerConfiguration.weeklyWatchHistoryReader())
                 .processor(weeklyStatisticsProcessor)
                 .listener((ChunkListener)new CacheClearStepListener())
@@ -94,7 +95,7 @@ public class BatchConfiguration {
     @Bean
     public Step monthlyStatisticStep(JobRepository jobRepository) {
         return new StepBuilder("monthlyStatisticStep", jobRepository)
-                .<WatchHistory, VideoStatistic>chunk(10, batchTransactionManager())
+                .<WatchHistory, VideoStatistic>chunk(20, batchTransactionManager())
                 .reader(readerConfiguration.monthlyWatchHistoryReader())
                 .processor(monthlyStatisticsProcessor)
                 .listener((ChunkListener)new CacheClearStepListener())

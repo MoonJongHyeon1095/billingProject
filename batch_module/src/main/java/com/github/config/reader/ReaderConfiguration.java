@@ -18,11 +18,9 @@ public class ReaderConfiguration {
      * 빈 등록: Spring이 애플리케이션을 시작할 때, BatchConfiguration의 batchDataSource() 메서드를 호출, DataSource 빈을 생성하고 컨텍스트에 등록
      * 의존성 주입: ReaderConfiguration이 생성될 때, Spring은 컨텍스트에서 DataSource 타입의 빈을 찾아 생성자 주입. 이때 BatchConfiguration에서 생성된 DataSource가 주입.
      */
-    private final DataSource dataSource;
     private final DateColumnCalculator dateColumnCalculator;
     private final DataSourceConfiguration dataSourceConfiguration;
-    public ReaderConfiguration(DataSource batchDataSource, DateColumnCalculator dateColumnCalculator, DataSourceConfiguration dataSourceConfiguration) {
-        this.dataSource = batchDataSource;
+    public ReaderConfiguration(DateColumnCalculator dateColumnCalculator, DataSourceConfiguration dataSourceConfiguration) {
         this.dateColumnCalculator = dateColumnCalculator;
         this.dataSourceConfiguration = dataSourceConfiguration;
     }
@@ -30,44 +28,44 @@ public class ReaderConfiguration {
     @Bean
     @JobScope
     public JdbcCursorItemReader<WatchHistory> dailyWatchHistoryReader() {
-        JdbcCursorItemReader<WatchHistory> reader = new JdbcCursorItemReader<>();
-        DateColumnCalculator.CustomDate today = dateColumnCalculator.createDateObject();
-        int year = today.getYear();
-        int month = today.getMonth();
-        int day = today.getDay();
+        final JdbcCursorItemReader<WatchHistory> reader = new JdbcCursorItemReader<>();
+        final DateColumnCalculator.CustomDate today = dateColumnCalculator.createDateObject();
+        final int year = today.getYear();
+        final int month = today.getMonth();
+        final int day = today.getDay();
 
         reader.setDataSource(dataSourceConfiguration.dataSource());
         reader.setSql(String.format(
-                "SELECT * FROM WatchHistory WHERE year = %d AND month = %d AND day = %d", year, month, day));
+                "SELECT * FROM WatchHistory WHERE day = %d AND month = %d AND year = %d", day, month, year));
         reader.setRowMapper(new WatchHistoryRowMapper());
         return reader;
     }
     @Bean
     @JobScope
     public JdbcCursorItemReader<WatchHistory> weeklyWatchHistoryReader() {
-        JdbcCursorItemReader<WatchHistory> reader = new JdbcCursorItemReader<>();
-        DateColumnCalculator.CustomDate today = dateColumnCalculator.createDateObject();
-        int year = today.getYear();
-        int month = today.getMonth();
-        int week = today.getWeek();
+        final JdbcCursorItemReader<WatchHistory> reader = new JdbcCursorItemReader<>();
+        final DateColumnCalculator.CustomDate today = dateColumnCalculator.createDateObject();
+        final int year = today.getYear();
+        final int month = today.getMonth();
+        final int week = today.getWeek();
 
         reader.setDataSource(dataSourceConfiguration.dataSource());
         reader.setSql(String.format(
-                "SELECT * FROM WatchHistory WHERE year = %d AND month = %d AND week = %d", year, month, week));
+                "SELECT * FROM WatchHistory WHERE week = %d AND month = %d AND year = %d", week, month, year));
         reader.setRowMapper(new WatchHistoryRowMapper());
         return reader;
     }
     @Bean
     @JobScope
     public JdbcCursorItemReader<WatchHistory> monthlyWatchHistoryReader() {
-        JdbcCursorItemReader<WatchHistory> reader = new JdbcCursorItemReader<>();
-        DateColumnCalculator.CustomDate today = dateColumnCalculator.createDateObject();
-        int year = today.getYear();
-        int month = today.getMonth();
+        final JdbcCursorItemReader<WatchHistory> reader = new JdbcCursorItemReader<>();
+        final DateColumnCalculator.CustomDate today = dateColumnCalculator.createDateObject();
+        final int year = today.getYear();
+        final int month = today.getMonth();
 
         reader.setDataSource(dataSourceConfiguration.dataSource());
         reader.setSql(String.format(
-                "SELECT * FROM WatchHistory WHERE year = %d AND month = %d", year, month));
+                "SELECT * FROM WatchHistory WHERE month = %d AND year = %d", month, year));
         reader.setRowMapper(new WatchHistoryRowMapper());
         return reader;
     }

@@ -17,12 +17,16 @@ public class MonthlyStatisticWriter implements ItemWriter<VideoStatistic> {
     @Override
     public void write(Chunk<? extends VideoStatistic> chunk) throws Exception {
         for(VideoStatistic videoStat : chunk){
-            VideoStatistic newStat = VideoStatistic.builder()
+            final VideoStatistic newStat = VideoStatistic.builder()
                     .videoId(videoStat.getVideoId())
                     .monthlyViewCount(videoStat.getMonthlyViewCount())
                     .monthlyWatchedTime(videoStat.getMonthlyWatchedTime())
                     .build();
-            statisticMapper.upsertMonthlyStatistic(newStat);
+            if(statisticMapper.existsVideoStatisticByVideoId(newStat.getVideoId())){
+                statisticMapper.updateMonthlyStatistic(newStat);
+            }else{
+                statisticMapper.insertMonthlyStatistic(newStat);
+            }
         }
     }
 }
