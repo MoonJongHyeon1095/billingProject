@@ -22,10 +22,10 @@ public class MonthlyStatisticsProcessor  implements ItemProcessor<WatchHistory, 
      * 캐싱 효과 저하: 메서드 호출 시마다 새로운 객체가 생성된다면, 캐싱 효과X
      * 따라서 videoStatisticsCache는 클래스 필드로 선언하고, 한 번만 초기화. 메서드 호출 시마다 새로운 객체가 생성되는 문제를 방지
      */
-    private ConcurrentHashMap<Integer, VideoStatistic> videoStatisticsCache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, VideoStatistic> videoStatisticsCache = new ConcurrentHashMap<>();
     @Override
     public VideoStatistic process(WatchHistory item) throws Exception {
-        Integer videoId = item.getVideoId();
+        final Integer videoId = item.getVideoId();
 
         // 캐시에서 VideoStatistic 가져오기
         videoStatisticsCache.compute(videoId, (key, videoStatistic) -> {

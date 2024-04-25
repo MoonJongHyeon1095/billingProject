@@ -8,16 +8,20 @@ import org.springframework.batch.core.StepExecutionListener;
 @Slf4j
 public class StepExecutionListenerImpl implements StepExecutionListener {
 
+
     @Override
     public void beforeStep(StepExecution stepExecution){
-        int selectedCount = (int) stepExecution.getExecutionContext().get("selectedCount");
-        log.info("Selected {} records", selectedCount);
+
+
     }
 
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
+        long selectedCount = stepExecution.getReadCount();
+        log.info("Selected {} records", selectedCount);
+
         // 삽입한 레코드 수 기록
-        int insertedCount = (int) stepExecution.getExecutionContext().get("insertedCount");
+        long insertedCount = stepExecution.getWriteCount();
         log.info("Inserted {} records", insertedCount);
         return stepExecution.getExitStatus();
     }

@@ -1,6 +1,7 @@
 package com.github.config;
 
 import com.github.config.listener.CacheClearStepListener;
+import com.github.config.listener.CacheClearStepListenerFactory;
 import com.github.config.listener.StepExecutionListenerImpl;
 import com.github.config.processor.DailyStatisticsProcessor;
 import com.github.config.processor.MonthlyStatisticsProcessor;
@@ -11,18 +12,19 @@ import com.github.config.writer.MonthlyStatisticWriter;
 import com.github.config.writer.WeeklyStatisticWriter;
 import com.github.domain.VideoStatistic;
 import com.github.domain.WatchHistory;
-import com.github.util.DateColumnCalculator;
-import org.springframework.batch.core.ChunkListener;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 
 @Configuration
@@ -53,6 +55,7 @@ public class BatchConfiguration {
     @Bean
     public Job dailyStatisticJob(JobRepository jobRepository) {
         return new JobBuilder("dailyStaticJob", jobRepository)
+                .preventRestart()
                 .start(dailyStatisticStep(jobRepository))
                 .build();
     }
@@ -62,7 +65,7 @@ public class BatchConfiguration {
                 .<WatchHistory, VideoStatistic>chunk(20, batchTransactionManager())
                 .reader(readerConfiguration.dailyWatchHistoryReader())
                 .processor(dailyStatisticsProcessor)
-                .listener((ChunkListener)new CacheClearStepListener())
+                .listener(CacheClearStepListenerFactory.createWithDaily(dailyStatisticsProcessor))
                 .listener(new StepExecutionListenerImpl())
                 .writer(dailyStatisticWriter)
                 .build();
@@ -80,7 +83,7 @@ public class BatchConfiguration {
                 .<WatchHistory, VideoStatistic>chunk(20, batchTransactionManager())
                 .reader(readerConfiguration.weeklyWatchHistoryReader())
                 .processor(weeklyStatisticsProcessor)
-                .listener((ChunkListener)new CacheClearStepListener())
+                .listener(CacheClearStepListenerFactory.createWithWeekly(weeklyStatisticsProcessor))
                 .listener(new StepExecutionListenerImpl())
                 .writer(weeklyStatisticWriter)
                 .build();
@@ -98,11 +101,37 @@ public class BatchConfiguration {
                 .<WatchHistory, VideoStatistic>chunk(20, batchTransactionManager())
                 .reader(readerConfiguration.monthlyWatchHistoryReader())
                 .processor(monthlyStatisticsProcessor)
-                .listener((ChunkListener)new CacheClearStepListener())
+                .listener(CacheClearStepListenerFactory.createWithMonthly(monthlyStatisticsProcessor))
                 .listener(new StepExecutionListenerImpl())
                 .writer(monthlyStatisticWriter)
                 .build();
     }
 
+    @Bean
+    public Job clearDataJob(JobRepository jobRepository) {
+        return new JobBuilder("clearDataJob", jobRepository)
+                .start(clearDataStep(jobRepository))
+                .build();
+    }
 
+    @Bean
+    public Step clearDataStep(JobRepository jobRepository) {
+        return new StepBuilder("clearDataStep", jobRepository)
+                .tasklet(clearDataTasklet(), batchTransactionManager())
+                .build();
+    }
+    @Bean
+    public Tasklet clearDataTasklet() {
+        return (StepContribution contribution, ChunkContext context) -> {
+            // 데이터 삭제 SQL 실행
+            context.getStepContext().getStepExecution().getJobExecution()
+                    .getExecutionContext().put("executionContext", "Clear data in target tables.");
+
+            String sql = "DELETE FROM VideoStatistic"; // 대상 테이블의 데이터 삭제
+            JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSourceConfiguration.dataSource());
+            jdbcTemplate.execute(sql);
+
+            return RepeatStatus.FINISHED; // 작업 종료
+        };
+    }
 }

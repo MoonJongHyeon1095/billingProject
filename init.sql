@@ -60,3 +60,19 @@ CREATE TABLE IF NOT EXISTS `AdvertisementDetail` (
   CONSTRAINT `AdvertisementDetail_FK` FOREIGN KEY (`adPriority`) REFERENCES `Advertisement` (`adPriority`),
   CONSTRAINT `AdvertisementDetail_FK_1` FOREIGN KEY (`videoId`) REFERENCES `Video` (`videoId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `VideoStatistic` (
+	`videoStatisticId` INT UNSIGNED auto_increment NOT NULL,
+	`videoId` INT UNSIGNED NOT NULL,
+	`dailyWatchedTime` BIGINT UNSIGNED DEFAULT 0 NOT NULL,
+	`weeklyWatchedTime` BIGINT UNSIGNED DEFAULT 0 NOT NULL,
+	`monthlyWatchedTime` BIGINT UNSIGNED DEFAULT 0 NOT NULL,
+	`dailyViewCount` INT UNSIGNED DEFAULT 0 NOT NULL,
+	`weeklyViewCount` INT UNSIGNED DEFAULT 0 NOT NULL,
+	`monthlyViewCount` INT UNSIGNED DEFAULT 0 NOT NULL,
+	CONSTRAINT `VideoStatistic_PK` PRIMARY KEY (`videoStatisticId`),
+	CONSTRAINT `VideoStatistic_FK` FOREIGN KEY (`videoId`) REFERENCES `Video`(`videoId`)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_0900_ai_ci;

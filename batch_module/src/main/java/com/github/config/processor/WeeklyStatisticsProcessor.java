@@ -21,7 +21,7 @@ public class WeeklyStatisticsProcessor implements ItemProcessor<WatchHistory, Vi
      * 캐싱 효과 저하: 메서드 호출 시마다 새로운 객체가 생성된다면, 캐싱 효과X
      * 따라서 videoStatisticsCache는 클래스 필드로 선언하고, 한 번만 초기화. 메서드 호출 시마다 새로운 객체가 생성되는 문제를 방지
      */
-    final private ConcurrentHashMap<Integer, VideoStatistic> videoStatisticsCache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, VideoStatistic> videoStatisticsCache = new ConcurrentHashMap<>();
     @Override
     public VideoStatistic process(final WatchHistory item) throws Exception {
         final Integer videoId = item.getVideoId();

@@ -4,6 +4,8 @@ import com.github.domain.VideoStatistic;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Optional;
+
 @Mapper
 public interface StatisticMapper {
     void upsertDailyStatistic(final VideoStatistic videoStatistic);
@@ -19,4 +21,6 @@ public interface StatisticMapper {
 
     // videoId로 VideoStatistic 존재 여부 확인
     boolean existsVideoStatisticByVideoId(@Param("videoId") final int videoId);
+
+    Optional<VideoStatistic> findOneByVideoId(@Param("videoId") final int videoId);
 }

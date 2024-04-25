@@ -63,7 +63,11 @@
     </insert>
 
     <!--    존재여부만 확인    -->
-    <select id="getVideoStatisticByVideoId" parameterType="int" resultType="com.github.domain.VideoStatistic">
-        SELECT * FROM VideoStatistic WHERE videoId = #{videoId}
+    <select id="existsVideoStatisticByVideoId" parameterType="java.lang.Integer" resultType="java.lang.Boolean">
+        SELECT EXISTS(SELECT 1 FROM VideoStatistic WHERE videoId = #{videoId})
+    </select>
+
+    <select id="findOneByVideoId" parameterType="java.lang.Integer" resultType="com.github.domain.VideoStatistic">
+        SELECT * FROM VideoStatistic WHERE videoId = #{videoId})
     </select>
 </mapper>

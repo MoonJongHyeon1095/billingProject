@@ -18,9 +18,11 @@ public class ReaderConfiguration {
      * 빈 등록: Spring이 애플리케이션을 시작할 때, BatchConfiguration의 batchDataSource() 메서드를 호출, DataSource 빈을 생성하고 컨텍스트에 등록
      * 의존성 주입: ReaderConfiguration이 생성될 때, Spring은 컨텍스트에서 DataSource 타입의 빈을 찾아 생성자 주입. 이때 BatchConfiguration에서 생성된 DataSource가 주입.
      */
+    //private final DataSource dataSource;
     private final DateColumnCalculator dateColumnCalculator;
     private final DataSourceConfiguration dataSourceConfiguration;
     public ReaderConfiguration(DateColumnCalculator dateColumnCalculator, DataSourceConfiguration dataSourceConfiguration) {
+        //this.dataSource = dataSource;
         this.dateColumnCalculator = dateColumnCalculator;
         this.dataSourceConfiguration = dataSourceConfiguration;
     }
@@ -28,15 +30,15 @@ public class ReaderConfiguration {
     @Bean
     @JobScope
     public JdbcCursorItemReader<WatchHistory> dailyWatchHistoryReader() {
-        final JdbcCursorItemReader<WatchHistory> reader = new JdbcCursorItemReader<>();
+        JdbcCursorItemReader<WatchHistory> reader = new JdbcCursorItemReader<>();
         final DateColumnCalculator.CustomDate today = dateColumnCalculator.createDateObject();
         final int year = today.getYear();
         final int month = today.getMonth();
-        final int day = today.getDay();
-
+        //final int day = today.getDay();
+        final int day = 24;
         reader.setDataSource(dataSourceConfiguration.dataSource());
         reader.setSql(String.format(
-                "SELECT * FROM WatchHistory WHERE day = %d AND month = %d AND year = %d", day, month, year));
+                "SELECT videoId, playedTime FROM WatchHistory WHERE day = %d AND month = %d AND year = %d", day, month, year));
         reader.setRowMapper(new WatchHistoryRowMapper());
         return reader;
     }
@@ -51,7 +53,7 @@ public class ReaderConfiguration {
 
         reader.setDataSource(dataSourceConfiguration.dataSource());
         reader.setSql(String.format(
-                "SELECT * FROM WatchHistory WHERE week = %d AND month = %d AND year = %d", week, month, year));
+                "SELECT videoId, playedTime FROM WatchHistory WHERE week = %d AND month = %d AND year = %d", week, month, year));
         reader.setRowMapper(new WatchHistoryRowMapper());
         return reader;
     }
@@ -65,7 +67,7 @@ public class ReaderConfiguration {
 
         reader.setDataSource(dataSourceConfiguration.dataSource());
         reader.setSql(String.format(
-                "SELECT * FROM WatchHistory WHERE month = %d AND year = %d", month, year));
+                "SELECT videoId, playedTime FROM WatchHistory WHERE month = %d AND year = %d", month, year));
         reader.setRowMapper(new WatchHistoryRowMapper());
         return reader;
     }

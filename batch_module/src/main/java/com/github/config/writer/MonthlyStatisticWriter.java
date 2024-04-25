@@ -6,6 +6,8 @@ import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class MonthlyStatisticWriter implements ItemWriter<VideoStatistic> {
     private final StatisticMapper statisticMapper;
@@ -17,15 +19,23 @@ public class MonthlyStatisticWriter implements ItemWriter<VideoStatistic> {
     @Override
     public void write(Chunk<? extends VideoStatistic> chunk) throws Exception {
         for(VideoStatistic videoStat : chunk){
-            final VideoStatistic newStat = VideoStatistic.builder()
-                    .videoId(videoStat.getVideoId())
-                    .monthlyViewCount(videoStat.getMonthlyViewCount())
-                    .monthlyWatchedTime(videoStat.getMonthlyWatchedTime())
-                    .build();
-            if(statisticMapper.existsVideoStatisticByVideoId(newStat.getVideoId())){
-                statisticMapper.updateMonthlyStatistic(newStat);
+            Optional<VideoStatistic> foundStatistic = statisticMapper.findOneByVideoId(videoStat.getVideoId());
+            if(foundStatistic.isPresent()){
+                statisticMapper.updateMonthlyStatistic(
+                        VideoStatistic.builder()
+                                .videoId(videoStat.getVideoId())
+                                .monthlyViewCount(foundStatistic.get().getMonthlyViewCount() + videoStat.getMonthlyViewCount())
+                                .monthlyWatchedTime(foundStatistic.get().getMonthlyWatchedTime() + videoStat.getMonthlyWatchedTime())
+                                .build()
+                );
             }else{
-                statisticMapper.insertMonthlyStatistic(newStat);
+                statisticMapper.insertMonthlyStatistic(
+                        VideoStatistic.builder()
+                                .videoId(videoStat.getVideoId())
+                                .monthlyViewCount(videoStat.getMonthlyViewCount())
+                                .monthlyWatchedTime(videoStat.getMonthlyWatchedTime())
+                                .build()
+                );
             }
         }
     }
