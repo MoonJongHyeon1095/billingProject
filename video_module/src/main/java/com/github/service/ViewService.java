@@ -24,7 +24,6 @@ public class ViewService {
     private final VideoMapper videoMapper;
     private final WatchHistoryMapper watchHistoryMapper;
     private final RedisVideoRepositoryImpl redisVideoRepository;
-    private final RedisLockManager redisLockManager;
     private final RedisService redisService;
 
     /**

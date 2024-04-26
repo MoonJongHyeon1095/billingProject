@@ -38,10 +38,6 @@ dependencyManagement {
     }
 }
 
-//bootJar {
-//    mainClass = 'com.github.UserModuleApplication'
-//}
-
 springBoot {
     mainClass = 'com.github.UserModuleApplication'
 }
@@ -50,8 +46,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
+    //Eureka 클라이언트로 등록
+    //implementation 'org.springframework.cloud:spring-cloud-starter-eureka'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
     //MyBatis
-    //implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
     testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3'
 

@@ -34,6 +34,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
+    //Eureka 클라이언트로 등록
+    //implementation 'org.springframework.cloud:spring-cloud-starter-eureka'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
     //Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     //Redis 서버와의 실질적인 통신을 담당

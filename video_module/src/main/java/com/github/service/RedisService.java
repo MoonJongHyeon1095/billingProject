@@ -29,7 +29,7 @@ public class RedisService {
     // 매일 0시와 12시에 실행
     @Scheduled(cron = "0 0 0,12 * * ?", zone = "Asia/Seoul")
     @Transactional
-    private void updateRecords(){
+    public void updateRecords(){
         // Redis 내의 모든 키 가져오기
         final Set<String> keys = redisVideoRepository.getAllVideoRecords(); // 키 패턴에 따라 적절히 조정
 

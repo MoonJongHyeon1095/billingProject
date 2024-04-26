@@ -29,12 +29,16 @@ springBoot {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    //Feign
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+//    //Feign
+//    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
     //MyBatis
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
     testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3'
+
+    //Eureka 클라이언트로 등록
+    //implementation 'org.springframework.cloud:spring-cloud-starter-eureka'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 }
 
 tasks.named('test') {
