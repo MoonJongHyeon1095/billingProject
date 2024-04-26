@@ -1,10 +1,6 @@
-package com.github.config.listener;
+package com.github.config.listener.job_listener;
 
-import com.github.config.processor.DailyStatisticsProcessor;
-import com.github.config.processor.MonthlyStatisticsProcessor;
-import com.github.config.processor.WeeklyStatisticsProcessor;
-import com.github.domain.DailyVideoStatistic;
-import com.github.domain.VideoStatistic;
+import com.github.domain.statistic.VideoStatistic;
 import com.github.mapper.VideoStatisticMapper;
 import com.github.util.GlobalSingletonCache;
 import lombok.extern.slf4j.Slf4j;
@@ -17,11 +13,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import java.util.List;
 
 @Slf4j
-public class DailyUpdateJobListener implements JobExecutionListener {
+public class MonthlyUpdateJobListener implements JobExecutionListener {
     private final VideoStatisticMapper videoStatisticMapper;  // 필드 주입
     private final GlobalSingletonCache globalCache = GlobalSingletonCache.getInstance();
     @Autowired
-    public DailyUpdateJobListener(VideoStatisticMapper videoStatisticMapper) {
+    public MonthlyUpdateJobListener(VideoStatisticMapper videoStatisticMapper) {
         this.videoStatisticMapper = videoStatisticMapper;
     }
     @Override
@@ -36,20 +32,20 @@ public class DailyUpdateJobListener implements JobExecutionListener {
 
             try {
                 // 먼저 업데이트 시도
-                videoStatisticMapper.updateDailyStatistic(
+                videoStatisticMapper.updateMonthlyStatistic(
                         VideoStatistic.builder()
                                 .videoId(newStat.getVideoId())
-                                .dailyViewCount(newStat.getDailyViewCount())
-                                .dailyWatchedTime(newStat.getDailyWatchedTime())
+                                .monthlyViewCount(newStat.getMonthlyViewCount())
+                                .monthlyWatchedTime(newStat.getMonthlyWatchedTime())
                                 .build()
                 );
             } catch (EmptyResultDataAccessException e) {
                 // 업데이트에 실패하면(행이 없어서) 삽입 시도
-                videoStatisticMapper.insertDailyStatistic(
+                videoStatisticMapper.insertMonthlyStatistic(
                         VideoStatistic.builder()
                                 .videoId(newStat.getVideoId())
-                                .dailyViewCount(newStat.getDailyViewCount())
-                                .dailyWatchedTime(newStat.getDailyWatchedTime())
+                                .monthlyViewCount(newStat.getMonthlyViewCount())
+                                .monthlyWatchedTime(newStat.getMonthlyWatchedTime())
                                 .build()
                 );
             }

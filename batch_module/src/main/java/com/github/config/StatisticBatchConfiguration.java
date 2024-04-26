@@ -1,6 +1,11 @@
 package com.github.config;
 
-import com.github.config.listener.*;
+import com.github.config.db.DataSourceConfiguration;
+import com.github.config.listener.job_listener.DailyUpdateJobListener;
+import com.github.config.listener.job_listener.MonthlyUpdateJobListener;
+import com.github.config.listener.job_listener.WeeklyUpdateJobListener;
+import com.github.config.listener.step_listener.CacheClearStepListenerFactory;
+import com.github.config.listener.step_listener.LoggerListener;
 import com.github.config.processor.DailyStatisticsProcessor;
 import com.github.config.processor.MonthlyStatisticsProcessor;
 import com.github.config.processor.WeeklyStatisticsProcessor;
@@ -9,6 +14,9 @@ import com.github.config.writer.DailyStatisticWriter;
 import com.github.config.writer.MonthlyStatisticWriter;
 import com.github.config.writer.WeeklyStatisticWriter;
 import com.github.domain.*;
+import com.github.domain.statistic.MonthlyVideoStatistic;
+import com.github.domain.statistic.VideoStatistic;
+import com.github.domain.statistic.WeeklyVideoStatistic;
 import com.github.mapper.VideoStatisticMapper;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -17,7 +25,6 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +34,7 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 
 @Configuration
 @EnableBatchProcessing
-public class BatchConfiguration {
+public class StatisticBatchConfiguration {
     @Autowired
     private DataSourceConfiguration dataSourceConfiguration;
     @Autowired
@@ -64,7 +71,7 @@ public class BatchConfiguration {
     @Bean
     public Step dailyStatisticStep(JobRepository jobRepository) {
         return new StepBuilder("dailyStaticStep", jobRepository)
-                .<WatchHistory, DailyVideoStatistic>chunk(20, batchTransactionManager())
+                .<WatchHistory, VideoStatistic>chunk(20, batchTransactionManager())
                 .reader(readerConfiguration.dailyWatchHistoryReader())
                 .processor(dailyStatisticsProcessor)
                 .listener(CacheClearStepListenerFactory.createWithDaily(dailyStatisticsProcessor))

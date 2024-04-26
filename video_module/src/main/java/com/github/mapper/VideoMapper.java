@@ -15,5 +15,5 @@ public interface VideoMapper {
     // Find all videos by title
     List<Video> findAllVideoByTitle(String title);
 
-    void updateViewCount(Video video);
+    void updatedTotalViewCount(Video video);
 }

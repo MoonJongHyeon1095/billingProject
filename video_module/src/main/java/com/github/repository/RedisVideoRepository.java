@@ -1,10 +1,13 @@
 package com.github.repository;
 
 import java.util.Map;
+import java.util.Set;
 
 public interface RedisVideoRepository {
 
-    void saveHash(String videoId, int viewCount, int deltaViewCount, long ttl);
+    Set<String> getAllVideoRecords();
+
+    void saveHash(String key, int viewCount, int deltaViewCount, long ttl);
 
     Integer getFromHashMap(String videoId, String key);
 

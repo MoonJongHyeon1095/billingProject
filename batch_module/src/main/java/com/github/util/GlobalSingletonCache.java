@@ -1,7 +1,6 @@
 package com.github.util;
 
-import com.github.domain.DailyVideoStatistic;
-import com.github.domain.VideoStatistic;
+import com.github.domain.statistic.VideoStatistic;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +52,7 @@ public class GlobalSingletonCache {
             // 필요한 경우 통계 업데이트
             existingData.setDailyWatchedTime(existingData.getDailyWatchedTime() + data.getDailyWatchedTime());
             existingData.setDailyViewCount(existingData.getDailyViewCount() + data.getDailyViewCount());
+            existingData.setDailyAdViewCount(existingData.getDailyAdViewCount() + data.getDailyAdViewCount());
         } else {
             cacheData.put(videoId, data);
         }

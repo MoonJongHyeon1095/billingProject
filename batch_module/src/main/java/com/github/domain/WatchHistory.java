@@ -22,7 +22,7 @@ public class WatchHistory {
     private Integer week;
     private Integer month;
     private Integer year;
-    private Integer adviewCount; //그냥 순서대로 나오는 광고 몇개 봤는지
+    private Integer adViewCount; //그냥 순서대로 나오는 광고 몇개 봤는지
 
     public void setUserId(final Optional<Integer> userIdOptional) {
         if (userIdOptional.isEmpty()) {

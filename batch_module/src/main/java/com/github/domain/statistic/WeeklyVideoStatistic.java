@@ -1,4 +1,4 @@
-package com.github.domain;
+package com.github.domain.statistic;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -10,5 +10,5 @@ import lombok.Setter;
 public class WeeklyVideoStatistic {
     private Integer videoId;
     private long weeklyWatchedTime;
-    private long weeklyViewCount;
+    private Integer weeklyViewCount;
 }

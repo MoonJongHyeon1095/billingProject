@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class RedisViewRecord {
-    String videoId;
+    String key; //"video:" + videoId
     Integer viewCount;
     Integer increment;
 }

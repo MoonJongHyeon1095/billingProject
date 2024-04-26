@@ -9,20 +9,25 @@ CREATE TABLE IF NOT EXISTS `User` (
   UNIQUE KEY `User_UN` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE IF NOT EXISTS `Advertisement` (
+-- hh99_2.Advertisement definition
+
+CREATE TABLE `Advertisement` (
   `advertisementId` int unsigned NOT NULL AUTO_INCREMENT,
   `adPriority` int unsigned NOT NULL,
+  `totalViewCount` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`advertisementId`),
   UNIQUE KEY `Advertisement_UN` (`adPriority`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE IF NOT EXISTS `Video` (
+-- hh99_2.Video definition
+
+CREATE TABLE `Video` (
   `videoId` int unsigned NOT NULL AUTO_INCREMENT,
   `userId` int unsigned NOT NULL,
   `title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
   `desc` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
   `duration` int unsigned NOT NULL DEFAULT '0',
-  `viewCount` int unsigned NOT NULL DEFAULT '0',
+  `totalViewCount` int unsigned NOT NULL DEFAULT '0',
   `createdAt` datetime DEFAULT NULL,
   PRIMARY KEY (`videoId`),
   KEY `userId` (`userId`),

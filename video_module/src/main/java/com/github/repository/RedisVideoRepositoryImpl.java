@@ -5,6 +5,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,13 +24,17 @@ public class RedisVideoRepositoryImpl implements RedisVideoRepository {
         this.hashOperations = redisTemplate.opsForHash();
     }
 
+    @Override
+    public Set<String> getAllVideoRecords(){
+        return redisTemplate.keys("video:*"); // 키 패턴
+    }
 
     @Override
-    public void saveHash(final String videoId, final int viewCount, final int increment, final long ttl) {
-        hashOperations.put(videoId, "viewCount", String.valueOf(viewCount)); // 문자열로 변환
-        hashOperations.put(videoId, "increment", String.valueOf(increment)); // 문자열로 변환
+    public void saveHash(final String key, final int viewCount, final int increment, final long ttl) {
+        hashOperations.put(key, "viewCount", String.valueOf(viewCount)); // 문자열로 변환
+        hashOperations.put(key, "increment", String.valueOf(increment)); // 문자열로 변환
         //K key, final long timeout, final TimeUnit unit
-        redisTemplate.expire(videoId, ttl, TimeUnit.SECONDS);
+        redisTemplate.expire(key, ttl, TimeUnit.SECONDS);
     }
 
     @Override
@@ -38,8 +43,8 @@ public class RedisVideoRepositoryImpl implements RedisVideoRepository {
     }
 
     @Override
-    public void updateHash(String videoId, final String fieldKey, final int fieldValue) {
-        hashOperations.put(videoId, fieldKey, String.valueOf(fieldValue));
+    public void updateHash(String key, final String fieldKey, final int fieldValue) {
+        hashOperations.put(key, fieldKey, String.valueOf(fieldValue));
     }
 
     @Override
@@ -48,8 +53,8 @@ public class RedisVideoRepositoryImpl implements RedisVideoRepository {
     }
 
     @Override
-    public Map<String, String> getHashMap(String videoId) {
-        return hashOperations.entries(videoId);
+    public Map<String, String> getHashMap(String key) {
+        return hashOperations.entries(key);
     }
 
 }

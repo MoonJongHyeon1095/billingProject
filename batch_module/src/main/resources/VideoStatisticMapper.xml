@@ -3,71 +3,64 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.github.mapper.VideoStatisticMapper">
-    <insert id="upsertDailyStatistic" parameterType="com.github.domain.VideoStatistic">
-        INSERT INTO VideoStatistic (videoId, dailyWatchedTime, dailyViewCount)
-        VALUES (#{videoId}, #{dailyWatchedTime}, #{dailyViewCount})
-        ON DUPLICATE KEY UPDATE
-        dailyWatchedTime = VALUES(dailyWatchedTime),
-        dailyViewCount = VALUES(dailyViewCount)
-    </insert>
-    <insert id="upsertWeeklyStatistic" parameterType="com.github.domain.VideoStatistic">
-        INSERT INTO VideoStatistic (videoId, weeklyWatchedTime, weeklyViewCount)
-        VALUES (#{videoId}, #{weeklyWatchedTime}, #{weeklyViewCount})
-        ON DUPLICATE KEY UPDATE
-        weeklyWatchedTime = VALUES(weeklyWatchedTime),
-        weeklyViewCount = VALUES(weeklyViewCount)
-    </insert>
-    <insert id="upsertMonthlyStatistic" parameterType="com.github.domain.VideoStatistic">
-        INSERT INTO VideoStatistic (videoId, monthlyWatchedTime, monthlyViewCount)
-        VALUES (#{videoId}, #{monthlyWatchedTime}, #{monthlyViewCount})
-        ON DUPLICATE KEY UPDATE
-        dailyWatchedTime = VALUES(monthlyWatchedTime),
-        dailyViewCount = VALUES(monthlyViewCount)
-    </insert>
 
     <!--  일간  -->
-    <insert id="insertDailyStatistic" parameterType="com.github.domain.VideoStatistic">
-        INSERT INTO VideoStatistic (videoId, dailyWatchedTime, dailyViewCount)
-        VALUES (#{videoId}, #{dailyWatchedTime}, #{dailyViewCount})
+    <insert id="insertDailyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">
+        INSERT INTO VideoStatistic (videoId, dailyWatchedTime, dailyViewCount, dailyAdViewCount)
+        VALUES (#{videoId}, #{dailyWatchedTime}, #{dailyViewCount}), #{dailyAdViewCount}
     </insert>
-    <update id="updateDailyStatistic" parameterType="com.github.domain.VideoStatistic">
+    <update id="updateDailyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">
         UPDATE VideoStatistic
         SET dailyWatchedTime = #{dailyWatchedTime},
-        dailyViewCount = #{dailyViewCount}
+        dailyViewCount = #{dailyViewCount},
+        dailyAdViewCount = #{dailyAdViewCount}
         WHERE videoId = #{videoId}
     </update>
 
     <!--  주간  -->
-    <insert id="insertWeeklyStatistic" parameterType="com.github.domain.VideoStatistic">
-        INSERT INTO VideoStatistic (videoId, weeklyWatchedTime, weeklyViewCount)
-        VALUES (#{videoId}, #{weeklyWatchedTime}, #{weeklyViewCount})
+    <insert id="insertWeeklyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">
+        INSERT INTO VideoStatistic (videoId, weeklyWatchedTime, weeklyViewCount, weeklyAdViewCount)
+        VALUES (#{videoId}, #{weeklyWatchedTime}, #{weeklyViewCount}, #{weeklyAdViewCount})
     </insert>
-    <update id="updateWeeklyStatistic" parameterType="com.github.domain.VideoStatistic">
+    <update id="updateWeeklyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">
         UPDATE VideoStatistic
         SET weeklyWatchedTime = #{weeklyWatchedTime},
-        weeklyViewCount = #{weeklyViewCount}
+        weeklyViewCount = #{weeklyViewCount},
+        weeklyAdViewCount = #{weeklyAdViewCount}
         WHERE videoId = #{videoId}
     </update>
 
     <!-- 월간   -->
-    <update id="updateMonthlyStatistic" parameterType="com.github.domain.VideoStatistic">
+    <update id="updateMonthlyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">
         UPDATE VideoStatistic
         SET monthlyWatchedTime = #{monthlyWatchedTime},
-        monthlyViewCount = #{monthlyViewCount}
+        monthlyViewCount = #{monthlyViewCount},
+        monthlyAdViewCount = #{monthlyAdViewCount}
         WHERE videoId = #{videoId}
     </update>
 
-    <insert id="insertMonthlyStatistic" parameterType="com.github.domain.VideoStatistic">
-        INSERT INTO VideoStatistic (videoId, monthlyWatchedTime, monthlyViewCount)
-        VALUES (#{videoId}, #{monthlyWatchedTime}, #{monthlyViewCount})
+    <insert id="insertMonthlyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">
+        INSERT INTO VideoStatistic (videoId, monthlyWatchedTime, monthlyViewCount, monthlyAdViewCount)
+        VALUES (#{videoId}, #{monthlyWatchedTime}, #{monthlyViewCount}, #{monthlyAdViewCount})
     </insert>
+
+
+    <update id="updateDailyBill" parameterType="java.lang.Integer">
+        UPDATE VideoStatistic
+        SET dailyBill = #{dailyBill}
+        WHERE videoId = #{videoId}
+    </update>
+
+
+
+
 
     <!--    존재여부만 확인    -->
     <select id="existsVideoStatisticByVideoId" parameterType="java.lang.Integer" resultType="java.lang.Boolean">
         SELECT EXISTS(SELECT 1 FROM VideoStatistic WHERE videoId = #{videoId})
     </select>
 
-    <select id="findOneByVideoId" parameterType="java.lang.Integer" resultType="com.github.domain.VideoStatistic">
+    <select id="findOneByVideoId" parameterType="java.lang.Integer" resultType="com.github.domain.statistic.VideoStatistic">
         SELECT * FROM VideoStatistic WHERE videoId = #{videoId}
     </select>
 </mapper>

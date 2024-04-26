@@ -1,4 +1,4 @@
-package com.github.config;
+package com.github.config.redis;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;

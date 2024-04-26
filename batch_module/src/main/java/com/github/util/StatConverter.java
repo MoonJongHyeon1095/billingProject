@@ -1,9 +1,9 @@
 package com.github.util;
 
-import com.github.domain.DailyVideoStatistic;
-import com.github.domain.MonthlyVideoStatistic;
-import com.github.domain.VideoStatistic;
-import com.github.domain.WeeklyVideoStatistic;
+import com.github.domain.statistic.DailyVideoStatistic;
+import com.github.domain.statistic.MonthlyVideoStatistic;
+import com.github.domain.statistic.VideoStatistic;
+import com.github.domain.statistic.WeeklyVideoStatistic;
 
 public class StatConverter {
 

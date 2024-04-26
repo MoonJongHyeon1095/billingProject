@@ -24,9 +24,9 @@
         WHERE title LIKE '%' || #{title} || '%'
     </select>
 
-    <update id="updateViewCount" parameterType="com.github.domain.Video">
+    <update id="updatedTotalViewCount" parameterType="com.github.domain.Video">
         UPDATE Video
-        SET viewCount = #{viewCount}
+        SET totalViewCount = #{totalViewCount}
         WHERE videoId = #{videoId}
     </update>
 

@@ -1,6 +1,6 @@
-package com.github.config.listener;
+package com.github.config.listener.job_listener;
 
-import com.github.domain.VideoStatistic;
+import com.github.domain.statistic.VideoStatistic;
 import com.github.mapper.VideoStatisticMapper;
 import com.github.util.GlobalSingletonCache;
 import lombok.extern.slf4j.Slf4j;
@@ -13,11 +13,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import java.util.List;
 
 @Slf4j
-public class MonthlyUpdateJobListener implements JobExecutionListener {
+public class WeeklyUpdateJobListener implements JobExecutionListener {
     private final VideoStatisticMapper videoStatisticMapper;  // 필드 주입
     private final GlobalSingletonCache globalCache = GlobalSingletonCache.getInstance();
     @Autowired
-    public MonthlyUpdateJobListener(VideoStatisticMapper videoStatisticMapper) {
+    public WeeklyUpdateJobListener(VideoStatisticMapper videoStatisticMapper) {
         this.videoStatisticMapper = videoStatisticMapper;
     }
     @Override
@@ -32,20 +32,20 @@ public class MonthlyUpdateJobListener implements JobExecutionListener {
 
             try {
                 // 먼저 업데이트 시도
-                videoStatisticMapper.updateMonthlyStatistic(
+                videoStatisticMapper.updateWeeklyStatistic(
                         VideoStatistic.builder()
                                 .videoId(newStat.getVideoId())
-                                .monthlyViewCount(newStat.getMonthlyViewCount())
-                                .monthlyWatchedTime(newStat.getMonthlyWatchedTime())
+                                .weeklyViewCount(newStat.getWeeklyViewCount())
+                                .weeklyWatchedTime(newStat.getWeeklyWatchedTime())
                                 .build()
                 );
             } catch (EmptyResultDataAccessException e) {
                 // 업데이트에 실패하면(행이 없어서) 삽입 시도
-                videoStatisticMapper.insertMonthlyStatistic(
+                videoStatisticMapper.insertWeeklyStatistic(
                         VideoStatistic.builder()
                                 .videoId(newStat.getVideoId())
-                                .monthlyViewCount(newStat.getMonthlyViewCount())
-                                .monthlyWatchedTime(newStat.getMonthlyWatchedTime())
+                                .weeklyViewCount(newStat.getWeeklyViewCount())
+                                .weeklyWatchedTime(newStat.getWeeklyWatchedTime())
                                 .build()
                 );
             }

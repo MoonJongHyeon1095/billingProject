@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.mapper.VideoMapper">
+    <!-- Find one video by videoId -->
+    <select id="findOneVideoById" parameterType="java.lang.Integer" resultType="com.github.domain.Video">
+        SELECT *
+        FROM Video
+        WHERE videoId = #{videoId}
+    </select>
+
+    <!-- Find one video by videoId -->
+    <select id="getTotalViewById" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT totalViewCount
+        FROM Video
+        WHERE videoId = #{videoId}
+    </select>
+
+
+</mapper>

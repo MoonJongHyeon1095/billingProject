@@ -1,6 +1,6 @@
-package com.github.config.listener;
+package com.github.config.listener.job_listener;
 
-import com.github.domain.VideoStatistic;
+import com.github.domain.statistic.VideoStatistic;
 import com.github.mapper.VideoStatisticMapper;
 import com.github.util.GlobalSingletonCache;
 import lombok.extern.slf4j.Slf4j;
@@ -13,11 +13,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import java.util.List;
 
 @Slf4j
-public class WeeklyUpdateJobListener implements JobExecutionListener {
+public class DailyUpdateJobListener implements JobExecutionListener {
     private final VideoStatisticMapper videoStatisticMapper;  // 필드 주입
     private final GlobalSingletonCache globalCache = GlobalSingletonCache.getInstance();
     @Autowired
-    public WeeklyUpdateJobListener(VideoStatisticMapper videoStatisticMapper) {
+    public DailyUpdateJobListener(VideoStatisticMapper videoStatisticMapper) {
         this.videoStatisticMapper = videoStatisticMapper;
     }
     @Override
@@ -29,23 +29,24 @@ public class WeeklyUpdateJobListener implements JobExecutionListener {
     public void afterJob(JobExecution jobExecution) {
         List<VideoStatistic> statList = globalCache.getCacheData();
         for(VideoStatistic newStat: statList){
-
             try {
                 // 먼저 업데이트 시도
-                videoStatisticMapper.updateWeeklyStatistic(
+                videoStatisticMapper.updateDailyStatistic(
                         VideoStatistic.builder()
                                 .videoId(newStat.getVideoId())
-                                .weeklyViewCount(newStat.getWeeklyViewCount())
-                                .weeklyWatchedTime(newStat.getWeeklyWatchedTime())
+                                .dailyViewCount(newStat.getDailyViewCount())
+                                .dailyWatchedTime(newStat.getDailyWatchedTime())
+                                .dailyAdViewCount(newStat.getDailyAdViewCount())
                                 .build()
                 );
             } catch (EmptyResultDataAccessException e) {
                 // 업데이트에 실패하면(행이 없어서) 삽입 시도
-                videoStatisticMapper.insertWeeklyStatistic(
+                videoStatisticMapper.insertDailyStatistic(
                         VideoStatistic.builder()
                                 .videoId(newStat.getVideoId())
-                                .weeklyViewCount(newStat.getWeeklyViewCount())
-                                .weeklyWatchedTime(newStat.getWeeklyWatchedTime())
+                                .dailyViewCount(newStat.getDailyViewCount())
+                                .dailyWatchedTime(newStat.getDailyWatchedTime())
+                                .dailyAdViewCount(newStat.getDailyAdViewCount())
                                 .build()
                 );
             }

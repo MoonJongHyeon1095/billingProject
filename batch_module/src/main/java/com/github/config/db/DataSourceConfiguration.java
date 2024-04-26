@@ -1,4 +1,4 @@
-package com.github.config;
+package com.github.config.db;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;

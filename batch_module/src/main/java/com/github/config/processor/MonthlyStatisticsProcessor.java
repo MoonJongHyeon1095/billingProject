@@ -1,7 +1,6 @@
 package com.github.config.processor;
 
-import com.github.domain.MonthlyVideoStatistic;
-import com.github.domain.VideoStatistic;
+import com.github.domain.statistic.MonthlyVideoStatistic;
 import com.github.domain.WatchHistory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;

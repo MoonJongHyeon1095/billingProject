@@ -1,8 +1,7 @@
 package com.github.config.processor;
 
-import com.github.domain.VideoStatistic;
 import com.github.domain.WatchHistory;
-import com.github.domain.WeeklyVideoStatistic;
+import com.github.domain.statistic.WeeklyVideoStatistic;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 import java.util.concurrent.ConcurrentHashMap;

@@ -1,4 +1,4 @@
-package com.github.config.listener;
+package com.github.config.listener.step_listener;
 
 import com.github.config.processor.DailyStatisticsProcessor;
 import com.github.config.processor.MonthlyStatisticsProcessor;

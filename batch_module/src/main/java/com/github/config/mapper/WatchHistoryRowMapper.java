@@ -12,6 +12,7 @@ public class WatchHistoryRowMapper implements RowMapper<WatchHistory> {
         return WatchHistory.builder()
                 .videoId(rs.getInt("videoId"))
                 .playedTime(rs.getInt("playedTime"))
+                .adViewCount(rs.getInt("adViewCount"))
                 .build();
     }
 }

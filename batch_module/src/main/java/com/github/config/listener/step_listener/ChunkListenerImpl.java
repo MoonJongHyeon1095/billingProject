@@ -1,8 +1,7 @@
-package com.github.config.listener;
+package com.github.config.listener.step_listener;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.core.StepExecution;
 
 public class ChunkListenerImpl implements ChunkListener {
 
