@@ -31,7 +31,7 @@ public class ReaderConfiguration {
         JdbcCursorItemReader<VideoStatistic> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(dataSourceConfiguration.dataSource());
         reader.setSql(String.format(
-                "SELECT videoId, dailyViewCount, dailyAdViewCount FROM VideoStatistic"
+                "SELECT videoId, dailyViewCount, dailyAdViewCount, zScore FROM VideoStatistic"
                 ));
         reader.setRowMapper(new VideoStatisticRowMapper());
         return reader;

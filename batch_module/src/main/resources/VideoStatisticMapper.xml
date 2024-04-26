@@ -6,14 +6,15 @@
 
     <!--  일간  -->
     <insert id="insertDailyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">
-        INSERT INTO VideoStatistic (videoId, dailyWatchedTime, dailyViewCount, dailyAdViewCount)
-        VALUES (#{videoId}, #{dailyWatchedTime}, #{dailyViewCount}), #{dailyAdViewCount}
+        INSERT INTO VideoStatistic (videoId, dailyWatchedTime, dailyViewCount, dailyAdViewCount, zScore)
+        VALUES (#{videoId}, #{dailyWatchedTime}, #{dailyViewCount}), #{dailyAdViewCount}, #{zScore}
     </insert>
     <update id="updateDailyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">
         UPDATE VideoStatistic
         SET dailyWatchedTime = #{dailyWatchedTime},
         dailyViewCount = #{dailyViewCount},
-        dailyAdViewCount = #{dailyAdViewCount}
+        dailyAdViewCount = #{dailyAdViewCount},
+        zScore = #{zScore}
         WHERE videoId = #{videoId}
     </update>
 

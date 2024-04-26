@@ -29,4 +29,6 @@ public class VideoStatistic  {
     private Integer weeklyBill;
     private Integer monthlyBill;
 
+    private double zScore;
+
 }

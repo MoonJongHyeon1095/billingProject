@@ -9,9 +9,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GlobalSingletonCache {
     private static volatile GlobalSingletonCache globalSingletonCache;
     private ConcurrentHashMap<Integer, VideoStatistic> cacheData;
+    private long totalAdViewCount;// dailyAdViewCount의 누적값을 저장하는 변수
+
 
     private GlobalSingletonCache() {
         cacheData = new ConcurrentHashMap<Integer, VideoStatistic>();
+        totalAdViewCount = 0;
     }
 
     /**
@@ -56,6 +59,8 @@ public class GlobalSingletonCache {
         } else {
             cacheData.put(videoId, data);
         }
+        // 전체 누적값 업데이트
+        totalAdViewCount += data.getDailyAdViewCount();
     }
     // VideoStatistic 객체를 추가하는 메소드
     public void addWeeklyData(VideoStatistic data) {
@@ -89,5 +94,54 @@ public class GlobalSingletonCache {
 
     public void clearCache() {
         cacheData.clear();
+        totalAdViewCount = 0; // 초기화
     }
+
+    //Z-Score
+    public void setZScores() {
+        double mean = getAverage(); // 평균 계산
+        double stdDev = getStandardDeviation(); // 표준편차 계산
+
+        if (stdDev == 0) {
+            return; // 표준편차가 0, Z-스코어를 계산못함 //모든 값이 동일한 비현실적인 경우
+        }
+
+        for (VideoStatistic data : cacheData.values()) { // 모든 데이터 순회
+            double zScore = (data.getDailyAdViewCount() - mean) / stdDev; // Z-스코어 계산
+            data.setZScore(zScore); // VideoStatistic 객체에 Z-스코어 설정
+        }
+    }
+
+    //표준편차
+    public double getStandardDeviation() {
+        int dataCount = getCacheSize();
+        if (dataCount == 0) {
+            return 0; // 데이터가 없는 경우
+        }
+
+        double average = getAverage(); // 평균 계산
+        double variance = 0; // 분산 초기화
+
+        for (VideoStatistic data : cacheData.values()) { // 모든 데이터에 대해
+            double deviation = data.getDailyAdViewCount() - average; // 평균과의 차이
+            variance += deviation * deviation; // 제곱한 편차 누적
+        }
+
+        variance /= dataCount; // 분산 계산
+        return Math.sqrt(variance); // 표준편차 반환
+    }
+
+    //평균
+    public double getAverage() {
+        int dataCount = getCacheSize(); // 전체 데이터 개수
+        if (dataCount == 0) { // 데이터가 없는 경우
+            return 0; // 나누기 오류 방지
+        }
+        return (double) totalAdViewCount / dataCount; // 평균
+    }
+
+    public int getCacheSize() {
+        return cacheData.size(); // 전체 데이터 개수 반환
+    }
+
 }
