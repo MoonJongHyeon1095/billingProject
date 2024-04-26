@@ -2,9 +2,9 @@ package com.github.config;
 
 import com.github.config.db.DataSourceConfiguration;
 import com.github.config.listener.step_listener.LoggerListener;
-import com.github.config.processor.DailyBillingProcessor;
+import com.github.config.processor.billing.DailyBillingProcessor;
 import com.github.config.reader.ReaderConfiguration;
-import com.github.config.writer.DailyBillingWriter;
+import com.github.config.writer.billing.DailyBillingWriter;
 import com.github.domain.statistic.VideoStatistic;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;

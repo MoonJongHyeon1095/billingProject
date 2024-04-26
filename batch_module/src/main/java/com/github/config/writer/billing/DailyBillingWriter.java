@@ -1,4 +1,4 @@
-package com.github.config.writer;
+package com.github.config.writer.billing;
 
 
 import com.github.domain.statistic.VideoStatistic;

@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GlobalSingletonCache {
     private static volatile GlobalSingletonCache globalSingletonCache;
     private ConcurrentHashMap<Integer, VideoStatistic> cacheData;
-    private long totalAdViewCount;// dailyAdViewCount의 누적값을 저장하는 변수
+    private long totalAdViewCount;// AdViewCount의 누적값을 저장하는 변수
 
 
     private GlobalSingletonCache() {
@@ -70,21 +70,25 @@ public class GlobalSingletonCache {
             // 필요한 경우 통계 업데이트
             existingData.setWeeklyViewCount(existingData.getWeeklyViewCount() + data.getWeeklyViewCount());
             existingData.setWeeklyWatchedTime(existingData.getWeeklyWatchedTime() + data.getWeeklyWatchedTime());
+            existingData.setWeeklyAdViewCount(existingData.getWeeklyAdViewCount() + data.getWeeklyAdViewCount());
         } else {
             cacheData.put(videoId, data);
         }
+        // 전체 누적값 업데이트
+        totalAdViewCount += data.getWeeklyAdViewCount();
     }
-    // VideoStatistic 객체를 추가하는 메소드
+
     public void addMonthlyData(VideoStatistic data) {
         int videoId = data.getVideoId();
-        if (cacheData.containsKey(videoId)) { // 존재 여부를 확인
+        if (cacheData.containsKey(videoId)) {
             VideoStatistic existingData = cacheData.get(videoId);
-            // 필요한 경우 통계 업데이트
             existingData.setMonthlyViewCount(existingData.getMonthlyViewCount() + data.getMonthlyViewCount());
             existingData.setMonthlyWatchedTime(existingData.getMonthlyWatchedTime() + data.getMonthlyWatchedTime());
+            existingData.setMonthlyAdViewCount(existingData.getMonthlyAdViewCount() + data.getMonthlyAdViewCount());
         } else {
             cacheData.put(videoId, data);
         }
+        totalAdViewCount += data.getMonthlyAdViewCount();
     }
 
     // 전체 캐시 데이터를 반환하는 메소드
@@ -97,51 +101,131 @@ public class GlobalSingletonCache {
         totalAdViewCount = 0; // 초기화
     }
 
-    //Z-Score
-    public void setZScores() {
-        double mean = getAverage(); // 평균 계산
-        double stdDev = getStandardDeviation(); // 표준편차 계산
+    // 일간 Z-스코어 설정
+    public void setDailyZScores() {
+        double average = getDailyAverage();
+        double stdDev = getDailyStandardDeviation();
 
         if (stdDev == 0) {
-            return; // 표준편차가 0, Z-스코어를 계산못함 //모든 값이 동일한 비현실적인 경우
+            return; // Z-스코어를 계산할 수 없음 //모든 데이터가 같은 비현실적인 경우
         }
 
-        for (VideoStatistic data : cacheData.values()) { // 모든 데이터 순회
-            double zScore = (data.getDailyAdViewCount() - mean) / stdDev; // Z-스코어 계산
+        for (VideoStatistic data : cacheData.values()) {
+            double zScore = (data.getDailyAdViewCount() - average) / stdDev; // Z-스코어 계산
             data.setZScore(zScore); // VideoStatistic 객체에 Z-스코어 설정
         }
     }
 
-    //표준편차
-    public double getStandardDeviation() {
-        int dataCount = getCacheSize();
-        if (dataCount == 0) {
-            return 0; // 데이터가 없는 경우
+    // 주간 Z-스코어 설정
+    public void setWeeklyZScores() {
+        double average = getWeeklyAverage();
+        double stdDev = getWeeklyStandardDeviation();
+
+        if (stdDev == 0) {
+            return;
         }
 
-        double average = getAverage(); // 평균 계산
-        double variance = 0; // 분산 초기화
-
-        for (VideoStatistic data : cacheData.values()) { // 모든 데이터에 대해
-            double deviation = data.getDailyAdViewCount() - average; // 평균과의 차이
-            variance += deviation * deviation; // 제곱한 편차 누적
+        for (VideoStatistic data : cacheData.values()) {
+            double zScore = (data.getWeeklyAdViewCount() - average) / stdDev;
+            data.setZScore(zScore);
         }
-
-        variance /= dataCount; // 분산 계산
-        return Math.sqrt(variance); // 표준편차 반환
     }
 
-    //평균
-    public double getAverage() {
-        int dataCount = getCacheSize(); // 전체 데이터 개수
-        if (dataCount == 0) { // 데이터가 없는 경우
-            return 0; // 나누기 오류 방지
+    // 월간 Z-스코어 설정
+    public void setMonthlyZScores() {
+        double average = getMonthlyAverage();
+        double stdDev = getMonthlyStandardDeviation();
+
+        if (stdDev == 0) {
+            return;
         }
-        return (double) totalAdViewCount / dataCount; // 평균
+
+        for (VideoStatistic data : cacheData.values()) {
+            double zScore = (data.getMonthlyAdViewCount() - average) / stdDev;
+            data.setZScore(zScore);
+        }
+    }
+
+    public double getDailyStandardDeviation() {
+        int dataCount = getCacheSize();
+        if (dataCount == 0) {
+            return 0;
+        }
+
+        double average = getDailyAverage();
+        double variance = 0;
+
+        for (VideoStatistic data : cacheData.values()) {
+            double deviation = data.getDailyAdViewCount() - average;
+            variance += deviation * deviation;
+        }
+
+        variance /= dataCount;
+        return Math.sqrt(variance);
+    }
+
+    public double getWeeklyStandardDeviation() {
+        int dataCount = getCacheSize();
+        if (dataCount == 0) {
+            return 0;
+        }
+
+        double average = getWeeklyAverage();
+        double variance = 0;
+
+        for (VideoStatistic data : cacheData.values()) {
+            double deviation = data.getWeeklyAdViewCount() - average;
+            variance += deviation * deviation;
+        }
+
+        variance /= dataCount;
+        return Math.sqrt(variance);
+    }
+
+    public double getMonthlyStandardDeviation() {
+        int dataCount = getCacheSize();
+        if (dataCount == 0) {
+            return 0;
+        }
+
+        double average = getMonthlyAverage();
+        double variance = 0;
+
+        for (VideoStatistic data : cacheData.values()) {
+            double deviation = data.getMonthlyAdViewCount() - average;
+            variance += deviation * deviation;
+        }
+
+        variance /= dataCount;
+        return Math.sqrt(variance);
+    }
+
+    public double getDailyAverage() {
+        int dataCount = getCacheSize();
+        if (dataCount == 0) {
+            return 0;
+        }
+        return (double) totalAdViewCount / dataCount;
+    }
+
+    public double getWeeklyAverage() {
+        int dataCount = getCacheSize();
+        if (dataCount == 0) {
+            return 0;
+        }
+
+        return (double) totalAdViewCount / dataCount;
+    }
+
+    public double getMonthlyAverage() {
+        int dataCount = getCacheSize();
+        if (dataCount == 0) {
+            return 0;
+        }
+        return (double) totalAdViewCount / dataCount;
     }
 
     public int getCacheSize() {
-        return cacheData.size(); // 전체 데이터 개수 반환
+        return cacheData.size();
     }
-
 }

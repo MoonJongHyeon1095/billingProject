@@ -27,6 +27,7 @@ public class WeeklyUpdateJobListener implements JobExecutionListener {
 
     @Override
     public void afterJob(JobExecution jobExecution) {
+        globalCache.setWeeklyZScores();
         List<VideoStatistic> statList = globalCache.getCacheData();
         for(VideoStatistic newStat: statList){
 
@@ -37,6 +38,8 @@ public class WeeklyUpdateJobListener implements JobExecutionListener {
                                 .videoId(newStat.getVideoId())
                                 .weeklyViewCount(newStat.getWeeklyViewCount())
                                 .weeklyWatchedTime(newStat.getWeeklyWatchedTime())
+                                .weeklyAdViewCount(newStat.getWeeklyAdViewCount())
+                                .zScore(newStat.getZScore())
                                 .build()
                 );
             } catch (EmptyResultDataAccessException e) {
@@ -46,6 +49,8 @@ public class WeeklyUpdateJobListener implements JobExecutionListener {
                                 .videoId(newStat.getVideoId())
                                 .weeklyViewCount(newStat.getWeeklyViewCount())
                                 .weeklyWatchedTime(newStat.getWeeklyWatchedTime())
+                                .weeklyAdViewCount(newStat.getWeeklyAdViewCount())
+                                .zScore(newStat.getZScore())
                                 .build()
                 );
             }

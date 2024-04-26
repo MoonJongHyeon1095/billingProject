@@ -55,7 +55,7 @@ public class StatisticService {
 
     }
 
-    @Scheduled(cron = "0 15 23 * * ?", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 54 21 * * ?", zone = "Asia/Seoul")
     public void runWeeklyStatisticJob() {
         try {
             JobParameters jobParameters = new JobParametersBuilder()
@@ -67,7 +67,7 @@ public class StatisticService {
         }
     }
 
-    @Scheduled(cron = "0 20 23 * * ?", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 56 21 * * ?", zone = "Asia/Seoul")
     public void runMonthlyStatisticJob() {
         try {
             JobParameters jobParameters = new JobParametersBuilder()

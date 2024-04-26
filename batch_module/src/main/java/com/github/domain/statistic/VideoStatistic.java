@@ -29,6 +29,7 @@ public class VideoStatistic  {
     private Integer weeklyBill;
     private Integer monthlyBill;
 
+    //일간, 주간, 월간 통계마다 갱신. 공간상 공유하는 칼럼
     private double zScore;
 
 }

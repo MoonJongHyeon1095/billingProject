@@ -20,14 +20,15 @@
 
     <!--  주간  -->
     <insert id="insertWeeklyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">
-        INSERT INTO VideoStatistic (videoId, weeklyWatchedTime, weeklyViewCount, weeklyAdViewCount)
-        VALUES (#{videoId}, #{weeklyWatchedTime}, #{weeklyViewCount}, #{weeklyAdViewCount})
+        INSERT INTO VideoStatistic (videoId, weeklyWatchedTime, weeklyViewCount, weeklyAdViewCount, zScore)
+        VALUES (#{videoId}, #{weeklyWatchedTime}, #{weeklyViewCount}, #{weeklyAdViewCount}, #{zScore})
     </insert>
     <update id="updateWeeklyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">
         UPDATE VideoStatistic
         SET weeklyWatchedTime = #{weeklyWatchedTime},
         weeklyViewCount = #{weeklyViewCount},
-        weeklyAdViewCount = #{weeklyAdViewCount}
+        weeklyAdViewCount = #{weeklyAdViewCount},
+        zScore = #{zScore}
         WHERE videoId = #{videoId}
     </update>
 
@@ -36,19 +37,32 @@
         UPDATE VideoStatistic
         SET monthlyWatchedTime = #{monthlyWatchedTime},
         monthlyViewCount = #{monthlyViewCount},
-        monthlyAdViewCount = #{monthlyAdViewCount}
+        monthlyAdViewCount = #{monthlyAdViewCount},
+        zScore = #{zScore}
         WHERE videoId = #{videoId}
     </update>
 
     <insert id="insertMonthlyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">
-        INSERT INTO VideoStatistic (videoId, monthlyWatchedTime, monthlyViewCount, monthlyAdViewCount)
-        VALUES (#{videoId}, #{monthlyWatchedTime}, #{monthlyViewCount}, #{monthlyAdViewCount})
+        INSERT INTO VideoStatistic (videoId, monthlyWatchedTime, monthlyViewCount, monthlyAdViewCount, zScore)
+        VALUES (#{videoId}, #{monthlyWatchedTime}, #{monthlyViewCount}, #{monthlyAdViewCount}, #{zScore})
     </insert>
 
 
     <update id="updateDailyBill" parameterType="java.lang.Integer">
         UPDATE VideoStatistic
         SET dailyBill = #{dailyBill}
+        WHERE videoId = #{videoId}
+    </update>
+
+    <update id="updateWeeklyBill" parameterType="java.lang.Integer">
+        UPDATE VideoStatistic
+        SET weeklyBill = #{weeklyBill}
+        WHERE videoId = #{videoId}
+    </update>
+
+    <update id="updateMonthlyBill" parameterType="java.lang.Integer">
+        UPDATE VideoStatistic
+        SET monthlyBill = #{monthlyBill}
         WHERE videoId = #{videoId}
     </update>
 

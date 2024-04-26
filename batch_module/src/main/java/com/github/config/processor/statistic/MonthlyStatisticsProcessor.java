@@ -1,16 +1,17 @@
-package com.github.config.processor;
+package com.github.config.processor.statistic;
+
+import com.github.domain.WatchHistory;
+import com.github.domain.statistic.VideoStatistic;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.github.domain.statistic.VideoStatistic;
-import org.springframework.batch.item.ItemProcessor;
-import com.github.domain.WatchHistory;
-import org.springframework.stereotype.Component;
-
 @Component
-public class DailyStatisticsProcessor implements ItemProcessor<WatchHistory, VideoStatistic> {
-    // 동시성 문제를 방지하기 위해 ConcurrentHashMap 사용
+public class MonthlyStatisticsProcessor  implements ItemProcessor<WatchHistory, VideoStatistic> {
     /**
+     * 동시성 문제를 방지하기 위해 ConcurrentHashMap 사용
+     *
      * final 키워드는 변수의 참조가 불변임을 의미합니다.
      * 즉, videoStatisticsCache 변수가 참조하는 ConcurrentHashMap 객체의 메모리 주소는 변경될 수 없습니다.
      * 하지만 ConcurrentHashMap 내부의 데이터는 변경될 수 있습니다.
@@ -26,21 +27,22 @@ public class DailyStatisticsProcessor implements ItemProcessor<WatchHistory, Vid
     @Override
     public VideoStatistic process(WatchHistory item) throws Exception {
         final Integer videoId = item.getVideoId();
+
         // 캐시에서 VideoStatistic 가져오기
         videoStatisticsCache.compute(videoId, (key, videoStatistic) -> {
             if (videoStatistic == null) {
                 // 캐시에 없으면 새로 생성
                 return VideoStatistic.builder()
                         .videoId(videoId)
-                        .dailyWatchedTime(Long.valueOf(item.getPlayedTime()))
-                        .dailyViewCount(1)
-                        .dailyAdViewCount(item.getAdViewCount())
+                        .monthlyWatchedTime(Long.valueOf(item.getPlayedTime()))
+                        .monthlyViewCount(1)
+                        .monthlyAdViewCount(item.getAdViewCount())
                         .build();
             } else {
                 // 캐시에 있으면 누적
-                videoStatistic.setDailyWatchedTime(videoStatistic.getDailyWatchedTime() + item.getPlayedTime());
-                videoStatistic.setDailyViewCount(videoStatistic.getDailyViewCount() + 1);
-                videoStatistic.setDailyAdViewCount(videoStatistic.getDailyAdViewCount() + item.getAdViewCount());
+                videoStatistic.setMonthlyWatchedTime(videoStatistic.getMonthlyWatchedTime() + item.getPlayedTime());
+                videoStatistic.setMonthlyViewCount(videoStatistic.getMonthlyViewCount() + 1);
+                videoStatistic.setMonthlyAdViewCount(videoStatistic.getMonthlyAdViewCount() + item.getAdViewCount());
                 return videoStatistic;
             }
         });
@@ -52,4 +54,3 @@ public class DailyStatisticsProcessor implements ItemProcessor<WatchHistory, Vid
         videoStatisticsCache.clear(); // 캐시 비우기
     }
 }
-

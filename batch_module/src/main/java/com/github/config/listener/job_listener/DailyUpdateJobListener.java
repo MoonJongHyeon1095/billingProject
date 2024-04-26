@@ -27,7 +27,7 @@ public class DailyUpdateJobListener implements JobExecutionListener {
 
     @Override
     public void afterJob(JobExecution jobExecution) {
-        globalCache.setZScores();
+        globalCache.setDailyZScores();
         List<VideoStatistic> statList = globalCache.getCacheData();
         for(VideoStatistic newStat: statList){
             try {

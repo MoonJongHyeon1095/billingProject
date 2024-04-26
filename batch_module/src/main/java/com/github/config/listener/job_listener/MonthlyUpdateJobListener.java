@@ -27,6 +27,7 @@ public class MonthlyUpdateJobListener implements JobExecutionListener {
 
     @Override
     public void afterJob(JobExecution jobExecution) {
+        globalCache.setMonthlyZScores();
         List<VideoStatistic> statList = globalCache.getCacheData();
         for(VideoStatistic newStat: statList){
 
@@ -37,6 +38,8 @@ public class MonthlyUpdateJobListener implements JobExecutionListener {
                                 .videoId(newStat.getVideoId())
                                 .monthlyViewCount(newStat.getMonthlyViewCount())
                                 .monthlyWatchedTime(newStat.getMonthlyWatchedTime())
+                                .monthlyAdViewCount(newStat.getMonthlyAdViewCount())
+                                .zScore(newStat.getZScore())
                                 .build()
                 );
             } catch (EmptyResultDataAccessException e) {
@@ -46,6 +49,8 @@ public class MonthlyUpdateJobListener implements JobExecutionListener {
                                 .videoId(newStat.getVideoId())
                                 .monthlyViewCount(newStat.getMonthlyViewCount())
                                 .monthlyWatchedTime(newStat.getMonthlyWatchedTime())
+                                .monthlyAdViewCount(newStat.getMonthlyAdViewCount())
+                                .zScore(newStat.getZScore())
                                 .build()
                 );
             }

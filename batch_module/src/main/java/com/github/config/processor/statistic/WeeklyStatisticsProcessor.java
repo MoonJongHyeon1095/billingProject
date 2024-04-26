@@ -1,13 +1,13 @@
-package com.github.config.processor;
+package com.github.config.processor.statistic;
 
 import com.github.domain.WatchHistory;
-import com.github.domain.statistic.WeeklyVideoStatistic;
+import com.github.domain.statistic.VideoStatistic;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class WeeklyStatisticsProcessor implements ItemProcessor<WatchHistory, WeeklyVideoStatistic> {
+public class WeeklyStatisticsProcessor implements ItemProcessor<WatchHistory, VideoStatistic> {
     // 동시성 문제를 방지하기 위해 ConcurrentHashMap 사용
     /**
      * final 키워드는 변수의 참조가 불변임을 의미합니다.
@@ -21,24 +21,26 @@ public class WeeklyStatisticsProcessor implements ItemProcessor<WatchHistory, We
      * 캐싱 효과 저하: 메서드 호출 시마다 새로운 객체가 생성된다면, 캐싱 효과X
      * 따라서 videoStatisticsCache는 클래스 필드로 선언하고, 한 번만 초기화. 메서드 호출 시마다 새로운 객체가 생성되는 문제를 방지
      */
-    private final ConcurrentHashMap<Integer, WeeklyVideoStatistic> videoStatisticsCache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, VideoStatistic> videoStatisticsCache = new ConcurrentHashMap<>();
     @Override
-    public WeeklyVideoStatistic process(final WatchHistory item) throws Exception {
+    public VideoStatistic process(final WatchHistory item) throws Exception {
         final Integer videoId = item.getVideoId();
 
         // 캐시에서 VideoStatistic 가져오기
         videoStatisticsCache.compute(videoId, (key, videoStatistic) -> {
             if (videoStatistic == null) {
                 // 캐시에 없으면 새로 생성
-                return WeeklyVideoStatistic.builder()
+                return VideoStatistic.builder()
                         .videoId(videoId)
-                        .weeklyWatchedTime(item.getPlayedTime())
+                        .weeklyWatchedTime(Long.valueOf(item.getPlayedTime()))
                         .weeklyViewCount(1)
+                        .weeklyAdViewCount(item.getAdViewCount())
                         .build();
             } else {
                 // 캐시에 있으면 누적
                 videoStatistic.setWeeklyWatchedTime(videoStatistic.getWeeklyWatchedTime() + item.getPlayedTime());
                 videoStatistic.setWeeklyViewCount(videoStatistic.getWeeklyViewCount() + 1);
+                videoStatistic.setWeeklyAdViewCount(videoStatistic.getWeeklyAdViewCount() + item.getAdViewCount());
                 return videoStatistic;
             }
         });

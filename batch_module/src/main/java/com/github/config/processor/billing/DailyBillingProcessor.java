@@ -1,4 +1,4 @@
-package com.github.config.processor;
+package com.github.config.processor.billing;
 
 import com.github.common.exception.GlobalException;
 import com.github.domain.statistic.VideoStatistic;
