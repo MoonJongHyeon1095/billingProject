@@ -10,13 +10,10 @@
     <update id="updateRefreshToken" parameterType="com.github.domain.User">
         UPDATE User
         SET refreshToken = #{refreshToken}
-        WHERE userId = #{userId}
+        WHERE email = #{email}
     </update>
 
     <select id="findUserByEmail" parameterType="string" resultType="com.github.domain.User">
         SELECT * FROM User WHERE email = #{email}
-    </select>
-    <select id="findUserById" parameterType="java.lang.Integer" resultType="com.github.domain.User">
-        SELECT * FROM User WHERE userId = #{userId}
     </select>
 </mapper>

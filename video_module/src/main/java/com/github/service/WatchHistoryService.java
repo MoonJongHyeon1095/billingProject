@@ -12,31 +12,35 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.UUID;
+
 @Service
 @AllArgsConstructor
 public class WatchHistoryService {
-    private final DateColumnCalculator dateColumnCalculator;
     private final WatchHistoryMapper watchHistoryMapper;
     private final AdFeignClient adFeignClient;
     private final ViewService viewService;
 
     @Transactional
     public void createWatchHistory(final WatchHistoryDto watchHistoryDto, final String deviceUUID) {
-        final DateColumnCalculator.CustomDate date = dateColumnCalculator.createDateObject();
         Video video = viewService.findVideoById(watchHistoryDto.getVideoId());
+        String watchHistoryId = createUniqueId();
+        LocalDateTime watchedAtKST = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        LocalDate createdAtKST = LocalDate.now(ZoneId.of("Asia/Seoul"));
         WatchHistory watchHistory = WatchHistory.builder()
+                .watchHistoryId(watchHistoryId)
                 .videoId(video.getVideoId())
                 .playedTime(watchHistoryDto.getPlayedTime())
                 .lastWatched(watchHistoryDto.getLastWatched())
                 .adviewCount(watchHistoryDto.getAdViewCount())
-                .UUID(deviceUUID)
-                .year(date.getYear())
-                .month(date.getMonth())
-                .week(date.getWeek())
-                .day(date.getDay())
-                .createdAt(dateColumnCalculator.getCurrentTime())
+                .deviceUUID(deviceUUID)
+                .createdAt(createdAtKST)
+                .watchedAt(watchedAtKST)
                 .build();
-        watchHistory.setUserId(watchHistoryDto.getUserId());
+        watchHistory.setEmail(watchHistoryDto.getEmail());
 
         insertWatchHistory(watchHistory);
 
@@ -57,6 +61,16 @@ public class WatchHistoryService {
             //TODO: Exception 만들기
             throw new RuntimeException("feign client error", e);
         }
+    }
+
+    private String createUniqueId(){
+        String baseUUID = UUID.randomUUID().toString();
+        long currentMillis = System.currentTimeMillis();
+        String watchHistoryId = baseUUID + "_" + currentMillis;
+        if (watchHistoryId.length() > 50) {
+            return watchHistoryId.substring(0, 50);  // 50글자 미만으로 자르기
+        }
+        return watchHistoryId;
     }
 
 }

@@ -33,25 +33,27 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 @Configuration
 @EnableBatchProcessing
 public class StatisticBatchConfiguration {
-    @Autowired
-    private DataSourceConfiguration dataSourceConfiguration;
-    @Autowired
-    private ReaderConfiguration readerConfiguration;
-    @Autowired
-    private DailyStatisticsProcessor dailyStatisticsProcessor;
-    @Autowired
-    private DailyStatisticWriter dailyStatisticWriter;
-    @Autowired
-    private WeeklyStatisticsProcessor weeklyStatisticsProcessor;
-    @Autowired
-    private WeeklyStatisticWriter weeklyStatisticWriter;
-    @Autowired
-    private MonthlyStatisticsProcessor monthlyStatisticsProcessor;
-    @Autowired
-    private MonthlyStatisticWriter monthlyStatisticWriter;
-    @Autowired
-    private VideoStatisticMapper videoStatisticMapper;
+    private final DataSourceConfiguration dataSourceConfiguration;
+    private final ReaderConfiguration readerConfiguration;
+    private final DailyStatisticsProcessor dailyStatisticsProcessor;
+    private final DailyStatisticWriter dailyStatisticWriter;
+    private final WeeklyStatisticsProcessor weeklyStatisticsProcessor;
+    private final WeeklyStatisticWriter weeklyStatisticWriter;
+    private final MonthlyStatisticsProcessor monthlyStatisticsProcessor;
+    private final MonthlyStatisticWriter monthlyStatisticWriter;
+    private final VideoStatisticMapper videoStatisticMapper;
 
+    public StatisticBatchConfiguration(DataSourceConfiguration dataSourceConfiguration, ReaderConfiguration readerConfiguration, DailyStatisticsProcessor dailyStatisticsProcessor, DailyStatisticWriter dailyStatisticWriter, WeeklyStatisticsProcessor weeklyStatisticsProcessor, WeeklyStatisticWriter weeklyStatisticWriter, MonthlyStatisticsProcessor monthlyStatisticsProcessor, MonthlyStatisticWriter monthlyStatisticWriter, VideoStatisticMapper videoStatisticMapper) {
+        this.dataSourceConfiguration = dataSourceConfiguration;
+        this.readerConfiguration = readerConfiguration;
+        this.dailyStatisticsProcessor = dailyStatisticsProcessor;
+        this.dailyStatisticWriter = dailyStatisticWriter;
+        this.weeklyStatisticsProcessor = weeklyStatisticsProcessor;
+        this.weeklyStatisticWriter = weeklyStatisticWriter;
+        this.monthlyStatisticsProcessor = monthlyStatisticsProcessor;
+        this.monthlyStatisticWriter = monthlyStatisticWriter;
+        this.videoStatisticMapper = videoStatisticMapper;
+    }
 
     @Bean(name = "transactionManager") //transactionManager라고 명시하지 않으면 찾지 못한다.
     public JdbcTransactionManager batchTransactionManager() {

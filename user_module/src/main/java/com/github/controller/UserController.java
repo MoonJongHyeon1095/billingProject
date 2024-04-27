@@ -6,8 +6,8 @@ import com.github.controller.response.RefreshResponse;
 import com.github.controller.response.SignupResponse;
 import com.github.dto.RefreshDto;
 import com.github.dto.UserDto;
+import com.github.service.RefreshTokenService;
 import com.github.service.UserService;
-import com.github.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
-    private final AuthService authService;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/signup")
     public Response<SignupResponse> signup(@RequestBody final UserDto userDto){
@@ -35,7 +35,7 @@ public class UserController {
 
     @PostMapping("/refresh")
     public Response<RefreshResponse> refresh(@RequestBody final RefreshDto refreshDto){
-        final RefreshResponse response = authService.refresh(refreshDto);
+        final RefreshResponse response = refreshTokenService.refresh(refreshDto);
         return Response.success(response);
     }
 

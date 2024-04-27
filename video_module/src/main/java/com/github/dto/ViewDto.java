@@ -12,10 +12,10 @@ public class ViewDto {
     private int videoId;
     @Setter
     //로그인 한 경우만 존재
-    private Optional<Integer> userId = Optional.empty();
+    private Optional<String> email = Optional.empty();
 
-    public ViewDto(final int videoId, final Integer userId) {
+    public ViewDto(final int videoId, final String email) {
         this.videoId = videoId;
-        this.userId = Optional.ofNullable(userId);
+        this.email = Optional.ofNullable(email);
     }
 }

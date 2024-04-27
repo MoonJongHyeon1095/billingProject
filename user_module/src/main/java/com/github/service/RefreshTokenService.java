@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class AuthService {
+public class RefreshTokenService {
     private final UserMapper userMapper;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -21,17 +21,17 @@ public class AuthService {
     public RefreshResponse refresh(final RefreshDto refreshDto){
         final String refreshToken = refreshDto.getRefreshToken();
         final Claims claims = jwtTokenProvider.extractClaimsFromRefreshToken(refreshToken);
-        final int userId = jwtTokenProvider.getUserId(claims);
-        final User user = findUserById(userId);
+        final String email = jwtTokenProvider.getEmail(claims);
+        final User user = findUserByEmail(email);
         validateSameToken(user.getRefreshToken(), refreshToken);
 
-        final String newAccessToken = jwtTokenProvider.createAccessToken(user.getUserId(), user.getEmail());
+        final String newAccessToken = jwtTokenProvider.createAccessToken(user.getEmail());
         return RefreshResponse.from(newAccessToken, refreshToken);
 
     }
 
-    private User findUserById(final int userId){
-        return userMapper.findUserById(userId).orElseThrow(()-> new AuthException(AuthErrorCode.NOT_FOUND_REFRESH_TOKEN));
+    private User findUserByEmail(final String email){
+        return userMapper.findUserByEmail(email).orElseThrow(()-> new AuthException(AuthErrorCode.NOT_FOUND_REFRESH_TOKEN));
     }
 
     private void validateSameToken(final String foundToken, final String inputToken){

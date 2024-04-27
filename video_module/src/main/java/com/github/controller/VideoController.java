@@ -11,7 +11,6 @@ import com.github.util.UserDetailsImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -39,11 +38,11 @@ public class VideoController {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetailsImpl) {
             UserDetailsImpl userDetails = (UserDetailsImpl) principal;
-            if (userDetails.getUserId() != null) viewDto.setUserId(Optional.of(userDetails.getUserId()));
+            if (userDetails.getUsername() != null) viewDto.setEmail(Optional.of(userDetails.getUsername()));
 
         } else {
-            // 로그인하지 않은 사용자일 경우, userId를 설정하지 않음
-            viewDto.setUserId(Optional.empty());
+            // 로그인하지 않은 사용자일 경우, email 설정하지 않음
+            viewDto.setEmail(Optional.empty());
         }
 
         viewService.countView(viewDto);
@@ -67,11 +66,11 @@ public class VideoController {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetailsImpl) {
             UserDetailsImpl userDetails = (UserDetailsImpl) principal;
-            if (userDetails.getUserId() != null) watchHistoryDto.setUserId(Optional.of(userDetails.getUserId()));
+            if (userDetails.getUsername() != null) watchHistoryDto.setEmail(Optional.of(userDetails.getUsername()));
 
         } else {
             // 로그인하지 않은 사용자일 경우, userId를 설정하지 않음
-            watchHistoryDto.setUserId(Optional.empty());
+            watchHistoryDto.setEmail(Optional.empty());
         }
 
         watchHistoryService.createWatchHistory(watchHistoryDto, deviceUUID);

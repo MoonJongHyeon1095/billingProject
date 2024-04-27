@@ -13,8 +13,7 @@ import lombok.Setter;
 @Getter
 @Builder
 public class User {
-    private Integer userId;  // Integer로 변경하여 null 가능하게 함
-
+    //고유한 email이 PK
     private String email;
 
     private String password;
@@ -22,6 +21,5 @@ public class User {
     @Setter
     private String refreshToken;
 
-    private String role;
-
+    private Boolean role;
 }

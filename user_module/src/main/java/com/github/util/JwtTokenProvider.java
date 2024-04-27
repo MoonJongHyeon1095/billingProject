@@ -30,17 +30,16 @@ public JwtTokenProvider (
     this.refreshTokenExpiredTime = Integer.parseInt(refreshTokenExpiredTime);
     }
 
-    public String createAccessToken(int userId, String email){
-    return createToken(userId, email, accessTokenExpiredTime, TokenType.ACCESS);
+    public String createAccessToken(String email){
+    return createToken(email, accessTokenExpiredTime, TokenType.ACCESS);
     }
 
-    public String createRefreshToken(int userId, String email){
-        return createToken(userId, email, refreshTokenExpiredTime, TokenType.REFRESH);
+    public String createRefreshToken(String email){
+        return createToken(email, refreshTokenExpiredTime, TokenType.REFRESH);
     }
 
-    private String createToken(int userId, String email, int expire, TokenType tokenType) {
+    private String createToken(String email, int expire, TokenType tokenType) {
         Claims claims = Jwts.claims();
-        claims.put("userId", userId);
         claims.put("email", email);
         claims.put("tokenType", tokenType.name());
 
@@ -63,10 +62,6 @@ public JwtTokenProvider (
 
     public String getEmail(Claims claims) {
         return claims.get("email", String.class);
-    }
-
-    public int getUserId(Claims claims) {
-        return claims.get("userId", Integer.class);
     }
 
     public String getTokenType(Claims claims) {

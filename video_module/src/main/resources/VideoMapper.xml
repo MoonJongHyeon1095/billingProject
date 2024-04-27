@@ -10,13 +10,6 @@
         WHERE videoId = #{videoId}
     </select>
 
-    <!-- Find all videos by userId -->
-    <select id="findAllVideoByUserId" parameterType="java.lang.Integer" resultType="com.github.domain.Video">
-        SELECT *
-        FROM Video
-        WHERE userId = #{userId}
-    </select>
-
     <!-- Find all videos by title -->
     <select id="findAllVideoByTitle" parameterType="java.lang.String" resultType="com.github.domain.Video">
         SELECT *

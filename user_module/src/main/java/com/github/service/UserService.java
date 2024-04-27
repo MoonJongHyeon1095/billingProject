@@ -31,8 +31,8 @@ public class UserService {
         //2.1에서 조회된 사용자의 비밀번호와 새로 입력된 비밀번호 대조
         validatePassword(password, user);
 
-        final String accessToken = jwtTokenProvider.createAccessToken(user.getUserId(), user.getEmail());
-        final String refreshToken = jwtTokenProvider.createRefreshToken(user.getUserId(), user.getEmail());
+        final String accessToken = jwtTokenProvider.createAccessToken(user.getEmail());
+        final String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail());
         user.setRefreshToken(refreshToken);
         userMapper.updateRefreshToken(user);
 

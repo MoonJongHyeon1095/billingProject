@@ -1,6 +1,5 @@
 package com.github.service;
 
-import com.github.config.redis.RedisLockManager;
 import com.github.controller.response.ViewResponse;
 import com.github.domain.RedisViewRecord;
 import com.github.domain.Video;
@@ -62,12 +61,11 @@ public class ViewService {
     @Transactional
     public ViewResponse getLastWatched(final ViewDto viewDto, final String deviceUUID) {
         //로그인을 하고 플레이한 경우
-        if(viewDto.getUserId().isPresent()){
-            System.out.println("userId:  " +viewDto.getUserId().get());
-            Integer lastWatched = watchHistoryMapper.findLastWatchedByUserId(viewDto.getUserId().get()).orElse(0);
+        if(viewDto.getEmail().isPresent()){
+            Integer lastWatched = watchHistoryMapper.findLastWatchedByEmail(viewDto.getEmail().get()).orElse(0);
             return ViewResponse.builder().lastWatched(lastWatched).build();
         }else {
-            Integer lastWatched = watchHistoryMapper.findLastWatchedByUUID(deviceUUID).orElse(0);
+            Integer lastWatched = watchHistoryMapper.findLastWatchedByDeviceUUID(deviceUUID).orElse(0);
             return ViewResponse.builder().lastWatched(lastWatched).build();
         }
     }

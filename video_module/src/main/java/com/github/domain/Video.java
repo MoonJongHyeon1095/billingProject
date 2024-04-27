@@ -8,10 +8,11 @@ import java.time.LocalDateTime;
 @Builder
 public class Video {
     private Integer videoId;
-    private Integer userId;
+    private String email;
     private String title;
     private String desc;
     private Integer duration;
     private Integer totalViewCount;
+    private Integer totalAdViewCount;
     private LocalDateTime createdAt;
 }

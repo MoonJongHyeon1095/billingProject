@@ -16,7 +16,4 @@
     <select id="findUserByEmail" parameterType="string" resultType="com.github.domain.User">
         SELECT * FROM User WHERE email = #{email}
     </select>
-    <select id="findUserById" parameterType="java.lang.Integer" resultType="com.github.domain.User">
-        SELECT * FROM User WHERE userId = #{userId}
-    </select>
 </mapper>

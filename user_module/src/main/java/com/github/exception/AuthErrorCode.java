@@ -8,7 +8,7 @@ public enum AuthErrorCode {
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호를 좀 똑바로 입력해보십쇼."),
     INVALID_AUTHENTICATION_NUM(HttpStatus.BAD_REQUEST, "인증번호를 틀리셨네요."),
     INVALID_REFRESH_TOKEN(HttpStatus.NOT_FOUND, "리프레시 토큰이 동일하지 않습니다."),
-    NOT_FOUND_REFRESH_TOKEN(HttpStatus.NOT_FOUND, "발급받은 리프레시 토큰이 없습니다."),
+    NOT_FOUND_REFRESH_TOKEN(HttpStatus.NOT_FOUND, "해당 리프레시 토큰의 클레임과 일치하는 유저가 없습니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "권한이 없습니다만.");
 
     private final HttpStatus status;

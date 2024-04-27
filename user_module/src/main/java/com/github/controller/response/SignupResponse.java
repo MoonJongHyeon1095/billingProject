@@ -6,17 +6,15 @@ import lombok.Getter;
 
 @Getter
 public class SignupResponse {
-    private final int userId;
     private final String email;
     private final String message;
 
-    public SignupResponse(final int userId,final String email, final String message) {
-        this.userId = userId;
+    public SignupResponse(final String email, final String message) {
         this.email = email;
         this.message = message;
     }
 
     public static SignupResponse from(final User savedUser, final String message) {
-        return new SignupResponse(savedUser.getUserId(), savedUser.getEmail(),message);
+        return new SignupResponse(savedUser.getEmail(),message);
     }
 }

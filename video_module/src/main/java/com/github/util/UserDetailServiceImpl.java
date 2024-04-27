@@ -20,6 +20,6 @@ public class UserDetailServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(final String email){
          User user = userMapper.findUserByEmail(email).orElseThrow(()->new UserException.UserNotFoundException(UserErrorCode.USER_NOT_FOUND));
          return UserDetailsImpl.builder()
-                 .userId(user.getUserId()).password(user.getPassword()).email(user.getEmail()).build();
+                 .email(user.getEmail()).password(user.getPassword()).build();
     }
 }

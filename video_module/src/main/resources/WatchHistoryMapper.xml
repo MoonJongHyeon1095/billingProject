@@ -10,26 +10,26 @@
         WHERE watchHistoryId = #{watchHistoryId}
     </select>
 
-    <select id="findLastWatchedByUserId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+    <select id="findLastWatchedByEmail" parameterType="java.lang.String" resultType="java.lang.String">
         SELECT lastWatched
         FROM WatchHistory
-        WHERE userId = #{userId}
-        ORDER BY createdAt DESC
+        WHERE email = #{email}
+        ORDER BY watchedAt DESC
         LIMIT 1
     </select>
 
-    <select id="findLastWatchedByUUID" parameterType="java.lang.String" resultType="java.lang.Integer">
+    <select id="findLastWatchedByDeviceUUID" parameterType="java.lang.String" resultType="java.lang.Integer">
         SELECT lastWatched
         FROM WatchHistory
-        WHERE UUID = #{UUID}
-        ORDER BY createdAt DESC
+        WHERE deviceUUID = #{deviceUUID}
+        ORDER BY watchedAt DESC
         LIMIT 1
     </select>
 
     <!-- 새로 생성된 PK값 반환   -->
     <insert id="insertWatchHistory" parameterType="com.github.domain.WatchHistory" useGeneratedKeys="true" keyProperty="watchHistoryId">
-        INSERT INTO WatchHistory (videoId, userId, playedTime, lastWatched, adviewCount, UUID, createdAt, day, week, month, year)
-        VALUES (#{videoId}, #{userId}, #{playedTime}, #{lastWatched}, #{adviewCount}, #{UUID}, #{createdAt}, #{day}, #{week}, #{month}, #{year})
+        INSERT INTO WatchHistory (watchHistoryId, videoId, email, playedTime, lastWatched, adviewCount, deviceUUID, createdAt, watchedAt)
+        VALUES (#{watchHistoryId}, #{videoId}, #{email}, #{playedTime}, #{lastWatched}, #{adviewCount}, #{deviceUUID}, #{createdAt}, #{watchedAt})
     </insert>
 
 </mapper>
