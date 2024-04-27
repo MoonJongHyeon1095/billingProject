@@ -10,14 +10,8 @@ import java.util.Optional;
 public interface VideoStatisticMapper {
     void updateDailyStatistic(final VideoStatistic videoStatistic);
     void insertDailyStatistic(final VideoStatistic videoStatistic);
-    void updateWeeklyStatistic(final VideoStatistic videoStatistic);
-    void insertWeeklyStatistic(final VideoStatistic videoStatistic);
-    void updateMonthlyStatistic(final VideoStatistic videoStatistic);
-    void insertMonthlyStatistic(final VideoStatistic videoStatistic);
 
     void updateDailyBill(@Param("videoId")final int videoId, @Param("dailyBill")final int dailyBill);
-    void updateWeeklyBill(@Param("videoId")final int videoId, @Param("weeklyBill")final int weeklyBill);
-    void updateMonthlyBill(@Param("videoId")final int videoId, @Param("monthlyBill")final int monthlyBill);
 
     // videoId로 VideoStatistic 존재 여부 확인
     boolean existsVideoStatisticByVideoId(@Param("videoId") final int videoId);

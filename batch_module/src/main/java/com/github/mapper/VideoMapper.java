@@ -9,9 +9,8 @@ import java.util.Optional;
 @Mapper
 public interface VideoMapper {
     // Find one video by videoId
-    Optional<Video> findOneVideoById(Integer videoId);
+//    Optional<Video> findOneVideoById(@Param("videoId") Integer videoId);
 
     Optional<Integer> getTotalViewById(@Param("videoId") Integer videoId);
-
 
 }

@@ -12,26 +12,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class StatisticService {
-    //private final BatchConfiguration batchConfiguration;
     private final Job dailyStatisticJob;
-    private final Job weeklyStatisticJob;
-    private final Job monthlyStatisticJob;
     private final JobLauncher jobLauncher;
     private final Job clearDataJob;
 
-
     public StatisticService(
-            //BatchConfiguration batchConfiguration,
             JobLauncher jobLauncher,
             @Qualifier("dailyStatisticJob") Job dailyStatisticJob,
-            @Qualifier("weeklyStatisticJob") Job weeklyStatisticJob,
-            @Qualifier("monthlyStatisticJob") Job monthlyStatisticJob,
             @Qualifier("clearDataJob") Job clearDataJob
     ) {
         //this.batchConfiguration = batchConfiguration;
         this.dailyStatisticJob = dailyStatisticJob;
-        this.weeklyStatisticJob = weeklyStatisticJob;
-        this.monthlyStatisticJob = monthlyStatisticJob;
         this.jobLauncher = jobLauncher;
         this.clearDataJob = clearDataJob;
     }
@@ -55,29 +46,6 @@ public class StatisticService {
 
     }
 
-    @Scheduled(cron = "0 54 21 * * ?", zone = "Asia/Seoul")
-    public void runWeeklyStatisticJob() {
-        try {
-            JobParameters jobParameters = new JobParametersBuilder()
-                    .addLong("timestamp", System.currentTimeMillis()) // Job parameter에 고유한 값 추가
-                    .toJobParameters();
-            jobLauncher.run(weeklyStatisticJob, jobParameters);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Scheduled(cron = "0 56 21 * * ?", zone = "Asia/Seoul")
-    public void runMonthlyStatisticJob() {
-        try {
-            JobParameters jobParameters = new JobParametersBuilder()
-                    .addLong("timestamp", System.currentTimeMillis()) // Job parameter에 고유한 값 추가
-                    .toJobParameters();
-            jobLauncher.run(monthlyStatisticJob, jobParameters);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
     @Scheduled(cron = "0 06 17 * * ?", zone = "Asia/Seoul")
     public void runClearDataJob() {
         try {
@@ -89,7 +57,5 @@ public class StatisticService {
             e.printStackTrace();
         }
     }
-
-
 
 }

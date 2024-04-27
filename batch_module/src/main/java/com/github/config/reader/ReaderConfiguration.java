@@ -11,6 +11,10 @@ import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 @Configuration
 public class ReaderConfiguration {
     /**
@@ -31,7 +35,7 @@ public class ReaderConfiguration {
         JdbcCursorItemReader<VideoStatistic> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(dataSourceConfiguration.dataSource());
         reader.setSql(String.format(
-                "SELECT videoId, dailyViewCount, dailyAdViewCount, zScore FROM VideoStatistic"
+                "SELECT videoId, dailyViewCount, dailyAdViewCount FROM VideoStatistic"
                 ));
         reader.setRowMapper(new VideoStatisticRowMapper());
         return reader;
@@ -41,14 +45,10 @@ public class ReaderConfiguration {
     @JobScope
     public JdbcCursorItemReader<WatchHistory> dailyWatchHistoryReader() {
         JdbcCursorItemReader<WatchHistory> reader = new JdbcCursorItemReader<>();
-        final DateColumnCalculator.CustomDate today = dateColumnCalculator.createDateObject();
-        final int year = today.getYear();
-        final int month = today.getMonth();
-        //final int day = today.getDay();
-        final int day = 24;
+        String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         reader.setDataSource(dataSourceConfiguration.dataSource());
         reader.setSql(String.format(
-                "SELECT videoId, playedTime, adViewCount FROM WatchHistory WHERE day = %d AND month = %d AND year = %d", day, month, year));
+                "SELECT videoId, playedTime, adViewCount FROM WatchHistory WHERE createdAt = '%s'", today));
         reader.setRowMapper(new WatchHistoryRowMapper());
         return reader;
     }

@@ -62,34 +62,6 @@ public class GlobalSingletonCache {
         // 전체 누적값 업데이트
         totalAdViewCount += data.getDailyAdViewCount();
     }
-    // VideoStatistic 객체를 추가하는 메소드
-    public void addWeeklyData(VideoStatistic data) {
-        int videoId = data.getVideoId();
-        if (cacheData.containsKey(videoId)) { // 존재 여부를 확인
-            VideoStatistic existingData = cacheData.get(videoId);
-            // 필요한 경우 통계 업데이트
-            existingData.setWeeklyViewCount(existingData.getWeeklyViewCount() + data.getWeeklyViewCount());
-            existingData.setWeeklyWatchedTime(existingData.getWeeklyWatchedTime() + data.getWeeklyWatchedTime());
-            existingData.setWeeklyAdViewCount(existingData.getWeeklyAdViewCount() + data.getWeeklyAdViewCount());
-        } else {
-            cacheData.put(videoId, data);
-        }
-        // 전체 누적값 업데이트
-        totalAdViewCount += data.getWeeklyAdViewCount();
-    }
-
-    public void addMonthlyData(VideoStatistic data) {
-        int videoId = data.getVideoId();
-        if (cacheData.containsKey(videoId)) {
-            VideoStatistic existingData = cacheData.get(videoId);
-            existingData.setMonthlyViewCount(existingData.getMonthlyViewCount() + data.getMonthlyViewCount());
-            existingData.setMonthlyWatchedTime(existingData.getMonthlyWatchedTime() + data.getMonthlyWatchedTime());
-            existingData.setMonthlyAdViewCount(existingData.getMonthlyAdViewCount() + data.getMonthlyAdViewCount());
-        } else {
-            cacheData.put(videoId, data);
-        }
-        totalAdViewCount += data.getMonthlyAdViewCount();
-    }
 
     // 전체 캐시 데이터를 반환하는 메소드
     public List<VideoStatistic> getCacheData() {
@@ -101,50 +73,21 @@ public class GlobalSingletonCache {
         totalAdViewCount = 0; // 초기화
     }
 
-    // 일간 Z-스코어 설정
-    public void setDailyZScores() {
-        double average = getDailyAverage();
-        double stdDev = getDailyStandardDeviation();
+//    // 일간 Z-스코어 설정
+//    public void setDailyZScores() {
+//        double average = getDailyAverage();
+//        double stdDev = getDailyStandardDeviation();
+//
+//        if (stdDev == 0) {
+//            return; // Z-스코어를 계산할 수 없음 //모든 데이터가 같은 비현실적인 경우
+//        }
+//
+//        for (VideoStatistic data : cacheData.values()) {
+//            double zScore = (data.getDailyAdViewCount() - average) / stdDev; // Z-스코어 계산
+//            data.setZScore(zScore); // VideoStatistic 객체에 Z-스코어 설정
+//        }
+//    }
 
-        if (stdDev == 0) {
-            return; // Z-스코어를 계산할 수 없음 //모든 데이터가 같은 비현실적인 경우
-        }
-
-        for (VideoStatistic data : cacheData.values()) {
-            double zScore = (data.getDailyAdViewCount() - average) / stdDev; // Z-스코어 계산
-            data.setZScore(zScore); // VideoStatistic 객체에 Z-스코어 설정
-        }
-    }
-
-    // 주간 Z-스코어 설정
-    public void setWeeklyZScores() {
-        double average = getWeeklyAverage();
-        double stdDev = getWeeklyStandardDeviation();
-
-        if (stdDev == 0) {
-            return;
-        }
-
-        for (VideoStatistic data : cacheData.values()) {
-            double zScore = (data.getWeeklyAdViewCount() - average) / stdDev;
-            data.setZScore(zScore);
-        }
-    }
-
-    // 월간 Z-스코어 설정
-    public void setMonthlyZScores() {
-        double average = getMonthlyAverage();
-        double stdDev = getMonthlyStandardDeviation();
-
-        if (stdDev == 0) {
-            return;
-        }
-
-        for (VideoStatistic data : cacheData.values()) {
-            double zScore = (data.getMonthlyAdViewCount() - average) / stdDev;
-            data.setZScore(zScore);
-        }
-    }
 
     public double getDailyStandardDeviation() {
         int dataCount = getCacheSize();
@@ -164,41 +107,6 @@ public class GlobalSingletonCache {
         return Math.sqrt(variance);
     }
 
-    public double getWeeklyStandardDeviation() {
-        int dataCount = getCacheSize();
-        if (dataCount == 0) {
-            return 0;
-        }
-
-        double average = getWeeklyAverage();
-        double variance = 0;
-
-        for (VideoStatistic data : cacheData.values()) {
-            double deviation = data.getWeeklyAdViewCount() - average;
-            variance += deviation * deviation;
-        }
-
-        variance /= dataCount;
-        return Math.sqrt(variance);
-    }
-
-    public double getMonthlyStandardDeviation() {
-        int dataCount = getCacheSize();
-        if (dataCount == 0) {
-            return 0;
-        }
-
-        double average = getMonthlyAverage();
-        double variance = 0;
-
-        for (VideoStatistic data : cacheData.values()) {
-            double deviation = data.getMonthlyAdViewCount() - average;
-            variance += deviation * deviation;
-        }
-
-        variance /= dataCount;
-        return Math.sqrt(variance);
-    }
 
     public double getDailyAverage() {
         int dataCount = getCacheSize();
@@ -208,22 +116,7 @@ public class GlobalSingletonCache {
         return (double) totalAdViewCount / dataCount;
     }
 
-    public double getWeeklyAverage() {
-        int dataCount = getCacheSize();
-        if (dataCount == 0) {
-            return 0;
-        }
 
-        return (double) totalAdViewCount / dataCount;
-    }
-
-    public double getMonthlyAverage() {
-        int dataCount = getCacheSize();
-        if (dataCount == 0) {
-            return 0;
-        }
-        return (double) totalAdViewCount / dataCount;
-    }
 
     public int getCacheSize() {
         return cacheData.size();

@@ -27,7 +27,7 @@ public class DailyUpdateJobListener implements JobExecutionListener {
 
     @Override
     public void afterJob(JobExecution jobExecution) {
-        globalCache.setDailyZScores();
+        //globalCache.setDailyZScores();
         List<VideoStatistic> statList = globalCache.getCacheData();
         for(VideoStatistic newStat: statList){
             try {
@@ -38,7 +38,7 @@ public class DailyUpdateJobListener implements JobExecutionListener {
                                 .dailyViewCount(newStat.getDailyViewCount())
                                 .dailyWatchedTime(newStat.getDailyWatchedTime())
                                 .dailyAdViewCount(newStat.getDailyAdViewCount())
-                                .zScore(newStat.getZScore())
+                                //.zScore(newStat.getZScore())
                                 .build()
                 );
             } catch (EmptyResultDataAccessException e) {
@@ -49,7 +49,7 @@ public class DailyUpdateJobListener implements JobExecutionListener {
                                 .dailyViewCount(newStat.getDailyViewCount())
                                 .dailyWatchedTime(newStat.getDailyWatchedTime())
                                 .dailyAdViewCount(newStat.getDailyAdViewCount())
-                                .zScore(newStat.getZScore())
+                                //.zScore(newStat.getZScore())
                                 .build()
                 );
             }

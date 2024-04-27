@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 
 @Getter
 @Setter
@@ -11,25 +13,15 @@ import lombok.Setter;
 public class VideoStatistic  {
     private Integer videoStatisticId;
     private Integer videoId;
+
     //재생시간 및 조회수 통계 배치작업
     private Long dailyWatchedTime; //분기에 따라 null이 되면, 직렬화 할 수 없다는 에러가 뜬다.
-    private Long weeklyWatchedTime;
-    private Long monthlyWatchedTime;
-
     private Integer dailyViewCount;
-    private Integer weeklyViewCount;
-    private Integer monthlyViewCount;
-
     private Integer dailyAdViewCount;
-    private Integer weeklyAdViewCount;
-    private Integer monthlyAdViewCount;
-
     //정산 배치작업
     private Integer dailyBill;
-    private Integer weeklyBill;
-    private Integer monthlyBill;
 
-    //일간, 주간, 월간 통계마다 갱신. 공간상 공유하는 칼럼
-    private double zScore;
+    //private double zScore;
+    private LocalDate createdAt;
 
 }

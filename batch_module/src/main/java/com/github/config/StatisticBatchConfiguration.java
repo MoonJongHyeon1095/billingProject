@@ -2,17 +2,11 @@ package com.github.config;
 
 import com.github.config.db.DataSourceConfiguration;
 import com.github.config.listener.job_listener.DailyUpdateJobListener;
-import com.github.config.listener.job_listener.MonthlyUpdateJobListener;
-import com.github.config.listener.job_listener.WeeklyUpdateJobListener;
-import com.github.config.listener.step_listener.CacheClearStepListenerFactory;
+import com.github.config.listener.step_listener.CacheClearStepListener;
 import com.github.config.listener.step_listener.LoggerListener;
 import com.github.config.processor.statistic.DailyStatisticsProcessor;
-import com.github.config.processor.statistic.MonthlyStatisticsProcessor;
-import com.github.config.processor.statistic.WeeklyStatisticsProcessor;
 import com.github.config.reader.ReaderConfiguration;
 import com.github.config.writer.statistic.DailyStatisticWriter;
-import com.github.config.writer.statistic.MonthlyStatisticWriter;
-import com.github.config.writer.statistic.WeeklyStatisticWriter;
 import com.github.domain.*;
 import com.github.domain.statistic.VideoStatistic;
 import com.github.mapper.VideoStatisticMapper;
@@ -24,11 +18,12 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.JdbcTransactionManager;
+
+import javax.sql.DataSource;
 
 @Configuration
 @EnableBatchProcessing
@@ -37,22 +32,22 @@ public class StatisticBatchConfiguration {
     private final ReaderConfiguration readerConfiguration;
     private final DailyStatisticsProcessor dailyStatisticsProcessor;
     private final DailyStatisticWriter dailyStatisticWriter;
-    private final WeeklyStatisticsProcessor weeklyStatisticsProcessor;
-    private final WeeklyStatisticWriter weeklyStatisticWriter;
-    private final MonthlyStatisticsProcessor monthlyStatisticsProcessor;
-    private final MonthlyStatisticWriter monthlyStatisticWriter;
     private final VideoStatisticMapper videoStatisticMapper;
+    private final DataSource dataSource;
 
-    public StatisticBatchConfiguration(DataSourceConfiguration dataSourceConfiguration, ReaderConfiguration readerConfiguration, DailyStatisticsProcessor dailyStatisticsProcessor, DailyStatisticWriter dailyStatisticWriter, WeeklyStatisticsProcessor weeklyStatisticsProcessor, WeeklyStatisticWriter weeklyStatisticWriter, MonthlyStatisticsProcessor monthlyStatisticsProcessor, MonthlyStatisticWriter monthlyStatisticWriter, VideoStatisticMapper videoStatisticMapper) {
+    public StatisticBatchConfiguration(
+            DataSourceConfiguration dataSourceConfiguration,
+            ReaderConfiguration readerConfiguration,
+            DailyStatisticsProcessor dailyStatisticsProcessor,
+            DailyStatisticWriter dailyStatisticWriter,
+            VideoStatisticMapper videoStatisticMapper,
+            DataSource dataSource) {
         this.dataSourceConfiguration = dataSourceConfiguration;
         this.readerConfiguration = readerConfiguration;
         this.dailyStatisticsProcessor = dailyStatisticsProcessor;
         this.dailyStatisticWriter = dailyStatisticWriter;
-        this.weeklyStatisticsProcessor = weeklyStatisticsProcessor;
-        this.weeklyStatisticWriter = weeklyStatisticWriter;
-        this.monthlyStatisticsProcessor = monthlyStatisticsProcessor;
-        this.monthlyStatisticWriter = monthlyStatisticWriter;
         this.videoStatisticMapper = videoStatisticMapper;
+        this.dataSource = dataSource;
     }
 
     @Bean(name = "transactionManager") //transactionManager라고 명시하지 않으면 찾지 못한다.
@@ -74,50 +69,11 @@ public class StatisticBatchConfiguration {
                 .<WatchHistory, VideoStatistic>chunk(20, batchTransactionManager())
                 .reader(readerConfiguration.dailyWatchHistoryReader())
                 .processor(dailyStatisticsProcessor)
-                .listener(CacheClearStepListenerFactory.createWithDaily(dailyStatisticsProcessor))
+                .listener(new CacheClearStepListener(dailyStatisticsProcessor))
                 .listener(new LoggerListener())
                 .writer(dailyStatisticWriter)
                 .build();
     }
-
-    @Bean
-    public Job weeklyStatisticJob(JobRepository jobRepository) {
-        return new JobBuilder("weeklyStatisticJob", jobRepository)
-                .listener(new WeeklyUpdateJobListener(videoStatisticMapper))
-                .start(weeklyStatisticStep(jobRepository))
-                .build();
-    }
-    @Bean
-    public Step weeklyStatisticStep(JobRepository jobRepository) {
-        return new StepBuilder("weeklyStatisticStep", jobRepository)
-                .<WatchHistory, VideoStatistic>chunk(20, batchTransactionManager())
-                .reader(readerConfiguration.weeklyWatchHistoryReader())
-                .processor(weeklyStatisticsProcessor)
-                .listener(CacheClearStepListenerFactory.createWithWeekly(weeklyStatisticsProcessor))
-                .listener(new LoggerListener())
-                .writer(weeklyStatisticWriter)
-                .build();
-    }
-
-    @Bean
-    public Job monthlyStatisticJob(JobRepository jobRepository) {
-        return new JobBuilder("monthlyStatisticJob", jobRepository)
-                .listener(new MonthlyUpdateJobListener(videoStatisticMapper))
-                .start(monthlyStatisticStep(jobRepository))
-                .build();
-    }
-    @Bean
-    public Step monthlyStatisticStep(JobRepository jobRepository) {
-        return new StepBuilder("monthlyStatisticStep", jobRepository)
-                .<WatchHistory, VideoStatistic>chunk(20, batchTransactionManager())
-                .reader(readerConfiguration.monthlyWatchHistoryReader())
-                .processor(monthlyStatisticsProcessor)
-                .listener(CacheClearStepListenerFactory.createWithMonthly(monthlyStatisticsProcessor))
-                .listener(new LoggerListener())
-                .writer(monthlyStatisticWriter)
-                .build();
-    }
-
     @Bean
     public Job clearDataJob(JobRepository jobRepository) {
         return new JobBuilder("clearDataJob", jobRepository)

@@ -3,7 +3,6 @@ package com.github.config.processor.billing;
 import com.github.common.exception.GlobalException;
 import com.github.domain.statistic.VideoStatistic;
 import com.github.mapper.VideoMapper;
-import com.github.util.AdProfitCalculator;
 import com.github.util.ProfitCalculator;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.http.HttpStatus;
@@ -22,17 +21,17 @@ public class DailyBillingProcessor implements ItemProcessor<VideoStatistic, Vide
     @Override
     public VideoStatistic process(final VideoStatistic item) throws Exception {
         final int videoId = item.getVideoId();
-//        final int videoViews = item.getDailyViewCount();
-//        final int adViews = item.getDailyAdViewCount();
-        final double zScore = item.getZScore();
+        final int dailyVideoViews = item.getDailyViewCount();
+        final int dailyAdViews = item.getDailyAdViewCount();
+       // final double zScore = item.getZScore();
         final int totalViews = findTotalViewsByVideoId(videoId);
-        final int videoProfit = (int) profitCalculator.calculateVideoProfit(totalViews);
-        final int adProfit = (int) profitCalculator.calculateAdProfit(totalViews);
-        final int adjustedAdProfit = AdProfitCalculator.calculateAdjustedProfit(adProfit, zScore);
+        final int videoProfit = profitCalculator.calculateVideoProfit(totalViews-dailyVideoViews, dailyVideoViews);
+        final int adProfit = profitCalculator.calculateAdProfit(totalViews-dailyAdViews, dailyAdViews);
+      //  final int adjustedAdProfit = AdProfitCalculator.calculateAdjustedProfit(adProfit, zScore);
 
         return VideoStatistic.builder()
                 .videoId(videoId)
-                .dailyBill(videoProfit+adjustedAdProfit)
+                .dailyBill(videoProfit+adProfit)
                 .build();
     }
 

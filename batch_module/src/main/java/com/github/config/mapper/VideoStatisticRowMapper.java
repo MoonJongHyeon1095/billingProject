@@ -13,7 +13,7 @@ public class VideoStatisticRowMapper implements RowMapper<VideoStatistic> {
                 .videoId(rs.getInt("videoId"))
                 .dailyViewCount(rs.getInt("dailyViewCount"))
                 .dailyAdViewCount(rs.getInt("dailyAdViewCount"))
-                .zScore(rs.getDouble("zScore"))
+                //.zScore(rs.getDouble("zScore"))
                 .build();
     }
 }
