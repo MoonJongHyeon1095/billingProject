@@ -1,7 +1,7 @@
 package com.github.util;
 
-import com.github.domain.AdRangeEnum;
-import com.github.domain.VideoRangeEnum;
+import com.github.domain.calculator.AdRangeEnum;
+import com.github.domain.calculator.VideoRangeEnum;
 import org.springframework.stereotype.Component;
 
 /**
@@ -56,7 +56,7 @@ public class ProfitCalculator {
         return 0;
     }
 
-    public int calculateAdProfit(int prevViews, int increment){
+    public int calculateAdProfit(final int prevViews, final int increment){
         final int rangeIncrement = countAdRangeIncrement(prevViews, increment);
 
         if(rangeIncrement==0){

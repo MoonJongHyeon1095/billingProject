@@ -10,8 +10,8 @@
 <!--        WHERE videoId = #{videoId}-->
 <!--    </select>-->
 
-    <select id="getTotalViewById" parameterType="java.lang.Integer" resultType="java.lang.Integer">
-        SELECT totalViewCount
+    <select id="getTotalViewById" parameterType="java.lang.Integer" resultType="com.github.domain.Video">
+        SELECT totalViewCount, totalAdViewCount
         FROM Video
         WHERE videoId = #{videoId}
     </select>

@@ -1,6 +1,7 @@
 package com.github.config.processor.billing;
 
 import com.github.common.exception.GlobalException;
+import com.github.domain.Video;
 import com.github.domain.statistic.VideoStatistic;
 import com.github.mapper.VideoMapper;
 import com.github.util.ProfitCalculator;
@@ -24,9 +25,15 @@ public class DailyBillingProcessor implements ItemProcessor<VideoStatistic, Vide
         final int dailyVideoViews = item.getDailyViewCount();
         final int dailyAdViews = item.getDailyAdViewCount();
        // final double zScore = item.getZScore();
-        final int totalViews = findTotalViewsByVideoId(videoId);
-        final int videoProfit = profitCalculator.calculateVideoProfit(totalViews-dailyVideoViews, dailyVideoViews);
-        final int adProfit = profitCalculator.calculateAdProfit(totalViews-dailyAdViews, dailyAdViews);
+        final Video foundVideo = findTotalViewsByVideoId(videoId);
+        final int videoProfit = profitCalculator.calculateVideoProfit(
+                foundVideo.getTotalViewCount() - dailyVideoViews,
+                dailyVideoViews
+        );
+        final int adProfit = profitCalculator.calculateAdProfit(
+                foundVideo.getTotalAdViewCount() - dailyAdViews,
+                dailyAdViews)
+                ;
       //  final int adjustedAdProfit = AdProfitCalculator.calculateAdjustedProfit(adProfit, zScore);
 
         return VideoStatistic.builder()
@@ -35,8 +42,8 @@ public class DailyBillingProcessor implements ItemProcessor<VideoStatistic, Vide
                 .build();
     }
 
-    private Integer findTotalViewsByVideoId(final int videoId){
-        return videoMapper.getTotalViewById(videoId)
+    private Video findTotalViewsByVideoId(final int videoId){
+        return videoMapper.getViewsById(videoId)
                 .orElseThrow(()-> new GlobalException(HttpStatus.NOT_FOUND,
                         "일간 정산 작업 중 다음의 videoId로 정보를 찾을 수 없습니다. videoId:" + videoId));
     }

@@ -1,4 +1,4 @@
-package com.github.domain;
+package com.github.domain.calculator;
 
 public enum VideoRangeEnum {
     RANGE_0(0),

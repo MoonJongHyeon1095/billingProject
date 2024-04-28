@@ -11,6 +11,6 @@ public interface VideoMapper {
     // Find one video by videoId
 //    Optional<Video> findOneVideoById(@Param("videoId") Integer videoId);
 
-    Optional<Integer> getTotalViewById(@Param("videoId") Integer videoId);
+    Optional<Video> getViewsById(@Param("videoId") Integer videoId);
 
 }

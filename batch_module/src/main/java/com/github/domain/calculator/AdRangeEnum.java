@@ -1,4 +1,4 @@
-package com.github.domain;
+package com.github.domain.calculator;
 public enum AdRangeEnum {
     RANGE_0(0),
     RANGE_1(1),
