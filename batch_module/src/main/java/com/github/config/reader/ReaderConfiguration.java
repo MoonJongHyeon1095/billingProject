@@ -6,81 +6,124 @@ import com.github.config.mapper.WatchHistoryRowMapper;
 import com.github.domain.statistic.VideoStatistic;
 import com.github.domain.WatchHistory;
 import com.github.util.DateColumnCalculator;
-import org.springframework.batch.core.configuration.annotation.JobScope;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.batch.item.database.JdbcPagingItemReader;
+import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
+
+/**
+ * 동시성 관리
+ 1. 페이지 크기 설정: JdbcPagingItemReader의 페이지 크기(pageSize)는 각 청크(chunk)의 크기와 일치해야.
+ - 이 설정은 각 트랜잭션에서 처리할 아이템의 수를 정의하며, 이를 통해 동시에 접근하는 데이터가 겹치지 않도록 한다.
+
+ 2. 유니크한 정렬 키: sortKey가 유니크해야 하며, 이를 통해 데이터가 정렬되고 페이징 처리.
+ - 이 설정은 각 스레드가 서로 다른 데이터 세트를 읽도록 보장.
+
+ 3. 상태 관리: @StepScope는 각 스텝 실행마다 새로운 빈 인스턴스를 생성.
+ - 각 스텝의 실행이 독립적이라는 것을 의미,
+ - 여러 스텝 인스턴스가 동시에 실행되더라도 각 인스턴스가 서로 다른 데이터 세트를 처리하도록 할 수 있다.
+ - @StepScope가 적용된 reader는 이 스텝이 실행될 때마다 새로운 인스턴스로 생성되므로, 각 스텝 실행은 고유한 리더 인스턴스를 사용
+ - 데이터 격리: 각 스텝 인스턴스 데이터를 독립적으로 읽고, 다른 스텝의 실행과 데이터를 공유하지 않습니다.
+ - 병렬 처리
+
+ */
+@Slf4j
 @Configuration
+@AllArgsConstructor
 public class ReaderConfiguration {
-    /**
-     * 자동주입 작동 방식
-     * 빈 등록: Spring이 애플리케이션을 시작할 때, BatchConfiguration의 batchDataSource() 메서드를 호출, DataSource 빈을 생성하고 컨텍스트에 등록
-     * 의존성 주입: ReaderConfiguration이 생성될 때, Spring은 컨텍스트에서 DataSource 타입의 빈을 찾아 생성자 주입. 이때 BatchConfiguration에서 생성된 DataSource가 주입.
-     */
     private final DateColumnCalculator dateColumnCalculator;
     private final DataSourceConfiguration dataSourceConfiguration;
-    public ReaderConfiguration(DateColumnCalculator dateColumnCalculator, DataSourceConfiguration dataSourceConfiguration) {
-        this.dateColumnCalculator = dateColumnCalculator;
-        this.dataSourceConfiguration = dataSourceConfiguration;
-    }
 
     @Bean
-    @JobScope
-    public JdbcCursorItemReader<VideoStatistic> dailyBillingReader() {
-        JdbcCursorItemReader<VideoStatistic> reader = new JdbcCursorItemReader<>();
-        reader.setDataSource(dataSourceConfiguration.dataSource());
-        reader.setSql(String.format(
-                "SELECT videoId, dailyViewCount, dailyAdViewCount FROM VideoStatistic"
-                ));
-        reader.setRowMapper(new VideoStatisticRowMapper());
-        return reader;
+    @StepScope
+    @Transactional(readOnly = true)
+    public JdbcPagingItemReader<VideoStatistic> dailyBillingReader() {
+        try {
+            JdbcPagingItemReader<VideoStatistic> reader = new JdbcPagingItemReader<>();
+            //String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            String today = "2024-04-04";
+            SqlPagingQueryProviderFactoryBean queryProvider = new SqlPagingQueryProviderFactoryBean();
+
+            queryProvider.setDataSource(dataSourceConfiguration.routingDataSource());
+            queryProvider.setSelectClause("SELECT videoId, dailyViewCount, dailyAdViewCount, createdAt");
+            queryProvider.setFromClause("FROM VideoStatistic");
+            //queryProvider.setWhereClause("WHERE createdAt = :today AND videoId BETWEEN :startVideoId AND :endVideoId");
+            queryProvider.setWhereClause("WHERE createdAt = :today");
+            queryProvider.setSortKey("videoId");
+
+            reader.setDataSource(dataSourceConfiguration.routingDataSource());
+            reader.setQueryProvider(queryProvider.getObject());
+            reader.setRowMapper(new VideoStatisticRowMapper());
+            reader.setParameterValues(Map.of(
+                    "today", today
+//                    "startVideoId", startVideoId,
+//                    "endVideoId", endVideoId
+            ));
+            reader.setPageSize(20); //그냥 청크 크기 만큼
+            return reader;
+        }catch (Exception e){
+            log.error("reader 에러: ", e);
+        }
+        return null;
     }
 
+
+    /**
+     queryProvider.setDataSource
+     - qlPagingQueryProviderFactoryBean에서 데이터베이스와 상호작용하는 쿼리 프로바이더를 생성하는데 사용
+     - 쿼리 프로바이더는 페이징 쿼리를 생성하고, 데이터 소스에 연결하여 쿼리 실행을 담당
+     - 데이터 소스를 설정함으로써 데이터베이스 유형과 설정에 맞는 적절한 페이징 쿼리를 생성
+
+     reader.setDataSource(dataSource):
+     - JdbcPagingItemReader에서 직접 데이터베이스 연결을 설정하는 데 사용
+     - 이 설정은 실제로 데이터베이스에 접속하여 데이터를 읽어오는 역할
+
+     */
     @Bean
-    @JobScope
-    public JdbcCursorItemReader<WatchHistory> dailyWatchHistoryReader() {
-        JdbcCursorItemReader<WatchHistory> reader = new JdbcCursorItemReader<>();
-        String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        reader.setDataSource(dataSourceConfiguration.dataSource());
-        reader.setSql(String.format(
-                "SELECT videoId, playedTime, adViewCount FROM WatchHistory WHERE createdAt = '%s'", today));
-        reader.setRowMapper(new WatchHistoryRowMapper());
-        return reader;
-    }
-    @Bean
-    @JobScope
-    public JdbcCursorItemReader<WatchHistory> weeklyWatchHistoryReader() {
-        final JdbcCursorItemReader<WatchHistory> reader = new JdbcCursorItemReader<>();
-        final DateColumnCalculator.CustomDate today = dateColumnCalculator.createDateObject();
-        final int year = today.getYear();
-        final int month = today.getMonth();
-        final int week = today.getWeek();
+    @StepScope
+    public JdbcPagingItemReader<WatchHistory> dailyWatchHistoryReader(
+//            @Value("#{stepExecutionContext['startVideoId']}") Integer startVideoId,
+//            @Value("#{stepExecutionContext['endVideoId']}") Integer endVideoId
+    ) {
+        try {
+            JdbcPagingItemReader<WatchHistory> reader = new JdbcPagingItemReader<>();
+            //String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            String today = "2024-04-05";
 
-        reader.setDataSource(dataSourceConfiguration.dataSource());
-        reader.setSql(String.format(
-                "SELECT videoId, playedTime, adViewCount FROM WatchHistory WHERE week = %d AND month = %d AND year = %d", week, month, year));
-        reader.setRowMapper(new WatchHistoryRowMapper());
-        return reader;
-    }
-    @Bean
-    @JobScope
-    public JdbcCursorItemReader<WatchHistory> monthlyWatchHistoryReader() {
-        final JdbcCursorItemReader<WatchHistory> reader = new JdbcCursorItemReader<>();
-        final DateColumnCalculator.CustomDate today = dateColumnCalculator.createDateObject();
-        final int year = today.getYear();
-        final int month = today.getMonth();
+            SqlPagingQueryProviderFactoryBean queryProvider = new SqlPagingQueryProviderFactoryBean();
+            queryProvider.setDataSource(dataSourceConfiguration.routingDataSource());
+            queryProvider.setSelectClause("SELECT videoId, playedTime, adViewCount, createdAt");
+            queryProvider.setFromClause("FROM WatchHistory");
+            //queryProvider.setWhereClause("WHERE createdAt = :today AND videoId BETWEEN :startVideoId AND :endVideoId");
+            queryProvider.setWhereClause("WHERE createdAt = :today");
+            queryProvider.setSortKey("videoId");
 
-        reader.setDataSource(dataSourceConfiguration.dataSource());
-        reader.setSql(String.format(
-                "SELECT videoId, playedTime, adViewCount FROM WatchHistory WHERE month = %d AND year = %d", month, year));
-        reader.setRowMapper(new WatchHistoryRowMapper());
-        return reader;
+            reader.setDataSource(dataSourceConfiguration.routingDataSource());
+            reader.setQueryProvider(queryProvider.getObject());
+            reader.setRowMapper(new WatchHistoryRowMapper());
+            reader.setParameterValues(Map.of(
+                    "today", today
+//                    "startVideoId", startVideoId,
+//                    "endVideoId", endVideoId
+            ));
+            reader.setPageSize(20); //그냥 청크 크기 만큼
+            return reader;
+        } catch (Exception e) {
+            log.error("reader 에러: ", e);
+        }
+        return null;
     }
-
 
 }

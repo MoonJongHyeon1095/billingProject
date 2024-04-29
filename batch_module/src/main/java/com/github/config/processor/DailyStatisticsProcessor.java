@@ -1,4 +1,4 @@
-package com.github.config.processor.statistic;
+package com.github.config.processor;
 
 import java.util.concurrent.ConcurrentHashMap;
 

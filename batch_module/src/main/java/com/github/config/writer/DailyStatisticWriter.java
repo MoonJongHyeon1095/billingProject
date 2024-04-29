@@ -1,4 +1,4 @@
-package com.github.config.writer.statistic;
+package com.github.config.writer;
 
 import com.github.domain.statistic.VideoStatistic;
 import com.github.util.GlobalSingletonCache;

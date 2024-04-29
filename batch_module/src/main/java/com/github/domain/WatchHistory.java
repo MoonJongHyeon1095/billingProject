@@ -5,6 +5,7 @@ import lombok.Getter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Optional;
 
 @Getter
@@ -16,7 +17,7 @@ public class WatchHistory {
     private Integer playedTime; //seconds로 환원
     private Integer lastWatched; //seconds로로 환원
     private String deviceUUID;
-    private LocalDate createdAt;
+    private Date createdAt;
     private LocalDateTime watchedAt;
     private Integer adViewCount; //그냥 순서대로 나오는 광고 몇개 봤는지
 

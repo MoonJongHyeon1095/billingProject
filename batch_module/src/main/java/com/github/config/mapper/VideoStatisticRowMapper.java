@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 public class VideoStatisticRowMapper implements RowMapper<VideoStatistic> {
     @Override
@@ -13,6 +14,7 @@ public class VideoStatisticRowMapper implements RowMapper<VideoStatistic> {
                 .videoId(rs.getInt("videoId"))
                 .dailyViewCount(rs.getInt("dailyViewCount"))
                 .dailyAdViewCount(rs.getInt("dailyAdViewCount"))
+                .createdAt(rs.getDate("createdAt").toLocalDate())
                 //.zScore(rs.getDouble("zScore"))
                 .build();
     }

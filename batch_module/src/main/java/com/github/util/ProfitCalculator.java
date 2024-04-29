@@ -1,7 +1,7 @@
 package com.github.util;
 
-import com.github.domain.calculator.AdRangeEnum;
-import com.github.domain.calculator.VideoRangeEnum;
+import com.github.util.range.AdRangeEnum;
+import com.github.util.range.VideoRangeEnum;
 import org.springframework.stereotype.Component;
 
 /**

@@ -46,3 +46,7 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += '--enable-preview' // 프리뷰 해야 structured concurrency 사용 가능
+}

@@ -2,15 +2,13 @@ package com.github.config.db;
 
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
-import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -19,81 +17,91 @@ import java.util.Map;
 @Slf4j
 @Configuration
 public class DataSourceConfiguration {
-    private static final String MAIN_DATASOURCE = "mainDataSource";
-    private static final String REPLICA_DATASOURCE_1 = "replicaDataSource_1";
-    private static final String REPLICA_DATASOURCE_2 = "replicaDataSource_2";
 
-    @Value("${spring.datasource.url}")
-    private String dataSourceUrl;
+    private final String dataSourceUrl;
+    private final String dataSourceUsername;
+    private final String dataSourcePassword;
+    private final String dataSourceDriverClassName;
 
-    @Value("${spring.datasource.username}")
-    private String dataSourceUsername;
+    @Autowired
+    public DataSourceConfiguration(
+            @Value("${spring.datasource.url}") String dataSourceUrl,
+            @Value("${spring.datasource.username}") String dataSourceUsername,
+            @Value("${spring.datasource.password}") String dataSourcePassword,
+            @Value("${spring.datasource.driver-class-name}") String dataSourceDriverClassName
+    ) {
+        this.dataSourceUrl = dataSourceUrl;
+        this.dataSourceUsername = dataSourceUsername;
+        this.dataSourcePassword = dataSourcePassword;
+        this.dataSourceDriverClassName = dataSourceDriverClassName;
+    }
 
-    @Value("${spring.datasource.password}")
-    private String dataSourcePassword;
-
-    @Value("${spring.datasource.driver-class-name}")
-    private String dataSourceDriverClassName;
-
+    @Primary
     @Bean
-    public DataSource dataSource() {
-        return DataSourceBuilder.create()
+    public HikariDataSource mainDataSource() {
+        log.info("------------mainDB_initialized------------");
+        HikariDataSource dataSource = DataSourceBuilder.create()
                 .url(dataSourceUrl)
                 .username(dataSourceUsername)
                 .password(dataSourcePassword)
                 .driverClassName(dataSourceDriverClassName)
+                .type(HikariDataSource.class)
                 .build();
+        return dataSource;
     }
 
-//    @Bean(MAIN_DATASOURCE)
-//    @ConfigurationProperties(prefix = "spring.datasource.main.hikari")
-//    public DataSource mainDataSource1() {
-//        log.info("------------mainDB_initialized------------");
-//        return DataSourceBuilder.create()
-//                .type(HikariDataSource.class)
-//                .build();
-//    }
-//
-//    @Bean(REPLICA_DATASOURCE_1)
-//    @ConfigurationProperties(prefix = "spring.datasource.replica1.hikari")
-//    public DataSource replicaDataSource1() {
-//        log.info("------------replicaDB1_initialized------------");
-//        return DataSourceBuilder.create()
-//                .type(HikariDataSource.class)
-//                .build();
-//    }
-//
-//    @Bean(REPLICA_DATASOURCE_2)
-//    @ConfigurationProperties(prefix = "spring.datasource.replica2.hikari")
-//    public DataSource replicaDataSource2() {
-//        log.info("------------replicaDB2_initialized------------");
-//        return DataSourceBuilder.create()
-//                .type(HikariDataSource.class)
-//                .build();
-//    }
-//
-//
+    @Bean
+    public HikariDataSource replicaDataSource1() {
+        log.info("------------replicaDB1_initialized------------");
+        HikariDataSource dataSource = DataSourceBuilder.create()
+                .url(dataSourceUrl)
+                .username(dataSourceUsername)
+                .password(dataSourcePassword)
+                .driverClassName(dataSourceDriverClassName)
+                .type(HikariDataSource.class)
+                .build();
+        return dataSource;
+    }
+
+    @Bean
+    public HikariDataSource replicaDataSource2() {
+        log.info("------------replicaDB2_initialized------------");
+        HikariDataSource dataSource = DataSourceBuilder.create()
+                .url(dataSourceUrl)
+                .username(dataSourceUsername)
+                .password(dataSourcePassword)
+                .driverClassName(dataSourceDriverClassName)
+                .type(HikariDataSource.class)
+                .build();
+        return dataSource;
+    }
+
+
+    @Bean(name = "dataSource") // 'dataSource'로 명시적으로 지정
+    public DataSource routingDataSource(
+    ){
+        final DataSource mainDataSource = mainDataSource();
+        final DataSource replicaDataSource1 = replicaDataSource1();
+        final DataSource replicaDataSource2 = replicaDataSource2();
+        final RoutingDataSource routingDataSource = new RoutingDataSource();
+        final Map<Object, Object> dataSource = new HashMap<>();
+        dataSource.put("main", mainDataSource);
+        dataSource.put("replica1", replicaDataSource1);
+        dataSource.put("replica2", replicaDataSource2);
+        routingDataSource.setTargetDataSources(dataSource);
+        routingDataSource.setDefaultTargetDataSource(mainDataSource);
+        return routingDataSource;
+    }
+
 //    @Bean
-//    @DependsOn({MAIN_DATASOURCE, REPLICA_DATASOURCE_1, REPLICA_DATASOURCE_2})
-//    public DataSource routingDataSource(
-//        @Qualifier(MAIN_DATASOURCE) DataSource mainDataSource,
-//        @Qualifier(REPLICA_DATASOURCE_1) DataSource replicaDataSource_1,
-//        @Qualifier(REPLICA_DATASOURCE_2) DataSource replicaDataSource_2
-//    ){
-//        final RoutingDataSource routingDataSource = new RoutingDataSource();
-//        final Map<Object, Object> dataSource = new HashMap<>();
-//        dataSource.put("main", mainDataSource);
-//        dataSource.put("replica1", replicaDataSource_1);
-//        dataSource.put("replica2", replicaDataSource_2);
-//        routingDataSource.setTargetDataSources(dataSource);
-//        routingDataSource.setDefaultTargetDataSource(mainDataSource);
-//        return routingDataSource;
-//    }
-//
-//    @Bean
-//    @DependsOn("routingDataSource")
+//    @DependsOn("dataSource")
 //    public LazyConnectionDataSourceProxy dataSourceProxy(DataSource dataSource){
-//        return new LazyConnectionDataSourceProxy(dataSource);
+//        return new LazyConnectionDataSourceProxy(routingDataSource());
 //    }
+
+    @Bean(name = "transactionManager") //transactionManager라고 명시하지 않으면 찾지 못한다.
+    public JdbcTransactionManager batchTransactionManager() {
+        return new JdbcTransactionManager(routingDataSource());
+    }
 
 }

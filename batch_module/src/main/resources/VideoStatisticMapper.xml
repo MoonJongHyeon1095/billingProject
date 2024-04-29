@@ -1,79 +1,35 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.github.mapper.VideoStatisticMapper">
+<!--<?xml version="1.0" encoding="UTF-8"?>-->
+<!--<!DOCTYPE mapper-->
+<!--        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"-->
+<!--        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">-->
+<!--<mapper namespace="com.github.mapper.VideoStatisticMapper">-->
 
-    <!--  일간  -->
-    <insert id="insertDailyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">
-        INSERT INTO VideoStatistic (videoId, dailyWatchedTime, dailyViewCount, dailyAdViewCount, zScore)
-        VALUES (#{videoId}, #{dailyWatchedTime}, #{dailyViewCount}), #{dailyAdViewCount}, #{zScore}
-    </insert>
-    <update id="updateDailyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">
-        UPDATE VideoStatistic
-        SET dailyWatchedTime = #{dailyWatchedTime},
-        dailyViewCount = #{dailyViewCount},
-        dailyAdViewCount = #{dailyAdViewCount},
-        zScore = #{zScore}
-        WHERE videoId = #{videoId}
-    </update>
-
-    <!--  주간  -->
-<!--    <insert id="insertWeeklyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">-->
-<!--        INSERT INTO VideoStatistic (videoId, weeklyWatchedTime, weeklyViewCount, weeklyAdViewCount, zScore)-->
-<!--        VALUES (#{videoId}, #{weeklyWatchedTime}, #{weeklyViewCount}, #{weeklyAdViewCount}, #{zScore})-->
+<!--    &lt;!&ndash;  일간  &ndash;&gt;-->
+<!--    <insert id="insertDailyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">-->
+<!--        INSERT INTO VideoStatistic (videoId, dailyWatchedTime, dailyViewCount, dailyAdViewCount, zScore)-->
+<!--        VALUES (#{videoId}, #{dailyWatchedTime}, #{dailyViewCount}), #{dailyAdViewCount}, #{zScore}-->
 <!--    </insert>-->
-<!--    <update id="updateWeeklyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">-->
+<!--    <update id="updateDailyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">-->
 <!--        UPDATE VideoStatistic-->
-<!--        SET weeklyWatchedTime = #{weeklyWatchedTime},-->
-<!--        weeklyViewCount = #{weeklyViewCount},-->
-<!--        weeklyAdViewCount = #{weeklyAdViewCount},-->
+<!--        SET dailyWatchedTime = #{dailyWatchedTime},-->
+<!--        dailyViewCount = #{dailyViewCount},-->
+<!--        dailyAdViewCount = #{dailyAdViewCount},-->
 <!--        zScore = #{zScore}-->
 <!--        WHERE videoId = #{videoId}-->
 <!--    </update>-->
 
-    <!-- 월간   -->
-<!--    <update id="updateMonthlyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">-->
+<!--    <update id="updateDailyBill" parameterType="java.lang.Integer">-->
 <!--        UPDATE VideoStatistic-->
-<!--        SET monthlyWatchedTime = #{monthlyWatchedTime},-->
-<!--        monthlyViewCount = #{monthlyViewCount},-->
-<!--        monthlyAdViewCount = #{monthlyAdViewCount},-->
-<!--        zScore = #{zScore}-->
+<!--        SET dailyBill = #{dailyBill}-->
 <!--        WHERE videoId = #{videoId}-->
 <!--    </update>-->
 
-<!--    <insert id="insertMonthlyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">-->
-<!--        INSERT INTO VideoStatistic (videoId, monthlyWatchedTime, monthlyViewCount, monthlyAdViewCount, zScore)-->
-<!--        VALUES (#{videoId}, #{monthlyWatchedTime}, #{monthlyViewCount}, #{monthlyAdViewCount}, #{zScore})-->
-<!--    </insert>-->
+<!--    &lt;!&ndash;    존재여부만 확인    &ndash;&gt;-->
+<!--    <select id="existsVideoStatisticByVideoId" parameterType="java.lang.Integer" resultType="java.lang.Boolean">-->
+<!--        SELECT EXISTS(SELECT 1 FROM VideoStatistic WHERE videoId = #{videoId})-->
+<!--    </select>-->
 
-
-    <update id="updateDailyBill" parameterType="java.lang.Integer">
-        UPDATE VideoStatistic
-        SET dailyBill = #{dailyBill}
-        WHERE videoId = #{videoId}
-    </update>
-
-<!--    <update id="updateWeeklyBill" parameterType="java.lang.Integer">-->
-<!--        UPDATE VideoStatistic-->
-<!--        SET weeklyBill = #{weeklyBill}-->
-<!--        WHERE videoId = #{videoId}-->
-<!--    </update>-->
-
-<!--    <update id="updateMonthlyBill" parameterType="java.lang.Integer">-->
-<!--        UPDATE VideoStatistic-->
-<!--        SET monthlyBill = #{monthlyBill}-->
-<!--        WHERE videoId = #{videoId}-->
-<!--    </update>-->
-
-
-
-    <!--    존재여부만 확인    -->
-    <select id="existsVideoStatisticByVideoId" parameterType="java.lang.Integer" resultType="java.lang.Boolean">
-        SELECT EXISTS(SELECT 1 FROM VideoStatistic WHERE videoId = #{videoId})
-    </select>
-
-    <select id="findOneByVideoId" parameterType="java.lang.Integer" resultType="com.github.domain.statistic.VideoStatistic">
-        SELECT * FROM VideoStatistic WHERE videoId = #{videoId}
-    </select>
-</mapper>
+<!--    <select id="findOneByVideoId" parameterType="java.lang.Integer" resultType="com.github.domain.statistic.VideoStatistic">-->
+<!--        SELECT * FROM VideoStatistic WHERE videoId = #{videoId}-->
+<!--    </select>-->
+<!--</mapper>-->
