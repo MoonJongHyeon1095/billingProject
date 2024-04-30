@@ -3,6 +3,7 @@ package com.github.config;
 import com.github.config.db.DataSourceConfiguration;
 import com.github.config.executor.ExecutorServiceConfig;
 import com.github.config.listener.job_listener.DailyUpdateJobListener;
+import com.github.config.listener.job_listener.JobLoggerListener;
 import com.github.config.listener.step_listener.CacheClearStepListener;
 import com.github.config.listener.step_listener.LoggerListener;
 import com.github.config.partition.RangePartitioner;
@@ -10,7 +11,7 @@ import com.github.config.processor.DailyStatisticsProcessor;
 import com.github.config.reader.ReaderConfiguration;
 import com.github.config.writer.DailyStatisticWriter;
 import com.github.domain.*;
-import com.github.domain.statistic.VideoStatistic;
+import com.github.domain.VideoStatistic;
 import com.github.mapper.VideoMapper;
 import com.github.mapper.VideoStatisticMapper;
 import lombok.AllArgsConstructor;
@@ -46,6 +47,7 @@ public class StatisticBatchConfiguration {
         return new JobBuilder("dailyStaticJob", jobRepository)
                 .preventRestart()
                 .listener(new DailyUpdateJobListener(videoStatisticMapper))
+                .listener(new JobLoggerListener())
                 .start(dailyStatisticStep(jobRepository))
                 .build();
     }
@@ -88,10 +90,6 @@ public class StatisticBatchConfiguration {
      * 이 스텝에도 taskExecutor가 주어졌는데, 이는 스텝 내부에서 병렬 처리를 수행할 때 사용
      * 각 파티션은 독립적으로 실행되며, 이 내부에서 병렬로 처리할 때 taskExecutor를 사용
      * 이는 스텝 내부의 작업(예: 데이터 읽기, 처리, 쓰기)을 병렬로 수행하는 데 활용
-     *
-     *
-
-
      */
     @Bean
     public Step dailyStatisticStep(JobRepository jobRepository) {
@@ -102,7 +100,6 @@ public class StatisticBatchConfiguration {
                 .reader(readerConfiguration.dailyWatchHistoryReader())
                 .processor(dailyStatisticsProcessor)
                 .listener(new CacheClearStepListener(dailyStatisticsProcessor))
-                .listener(new LoggerListener())
                 .writer(dailyStatisticWriter)
                 .taskExecutor(
                     new ConcurrentTaskExecutor(

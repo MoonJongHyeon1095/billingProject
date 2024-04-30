@@ -3,20 +3,18 @@ package com.github.config.reader;
 import com.github.config.db.DataSourceConfiguration;
 import com.github.config.mapper.VideoStatisticRowMapper;
 import com.github.config.mapper.WatchHistoryRowMapper;
-import com.github.domain.statistic.VideoStatistic;
+import com.github.domain.VideoStatistic;
 import com.github.domain.WatchHistory;
 import com.github.util.DateColumnCalculator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -48,12 +46,11 @@ public class ReaderConfiguration {
 
     @Bean
     @StepScope
-    @Transactional(readOnly = true)
     public JdbcPagingItemReader<VideoStatistic> dailyBillingReader() {
         try {
             JdbcPagingItemReader<VideoStatistic> reader = new JdbcPagingItemReader<>();
             //String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            String today = "2024-04-04";
+            String today = "2024-04-29";
             SqlPagingQueryProviderFactoryBean queryProvider = new SqlPagingQueryProviderFactoryBean();
 
             queryProvider.setDataSource(dataSourceConfiguration.routingDataSource());
@@ -100,7 +97,7 @@ public class ReaderConfiguration {
         try {
             JdbcPagingItemReader<WatchHistory> reader = new JdbcPagingItemReader<>();
             //String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            String today = "2024-04-05";
+            String today = "2024-04-29";
 
             SqlPagingQueryProviderFactoryBean queryProvider = new SqlPagingQueryProviderFactoryBean();
             queryProvider.setDataSource(dataSourceConfiguration.routingDataSource());

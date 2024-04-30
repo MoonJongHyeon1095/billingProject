@@ -1,6 +1,6 @@
 package com.github.util;
 
-import com.github.domain.statistic.VideoStatistic;
+import com.github.domain.VideoStatistic;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -48,5 +48,5 @@ tasks.named('test') {
 }
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-    options.compilerArgs += '--enable-preview' // 프리뷰 해야 structured concurrency 사용 가능
+    options.compilerArgs += '--enable-preview' // 정식버전 포함 전의 java 실험적 기능들 프리뷰로 쓸 수 있도록
 }

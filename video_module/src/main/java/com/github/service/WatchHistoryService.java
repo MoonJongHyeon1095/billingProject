@@ -7,7 +7,6 @@ import com.github.exception.VideoErrorCode;
 import com.github.exception.VideoException;
 import com.github.feignclient.AdFeignClient;
 import com.github.mapper.WatchHistoryMapper;
-import com.github.util.DateColumnCalculator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

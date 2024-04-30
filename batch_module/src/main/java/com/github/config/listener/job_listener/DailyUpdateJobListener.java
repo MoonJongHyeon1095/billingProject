@@ -1,6 +1,6 @@
 package com.github.config.listener.job_listener;
 
-import com.github.domain.statistic.VideoStatistic;
+import com.github.domain.VideoStatistic;
 import com.github.mapper.VideoStatisticMapper;
 import com.github.util.GlobalSingletonCache;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +8,6 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.time.LocalDate;
@@ -30,7 +29,7 @@ public class DailyUpdateJobListener implements JobExecutionListener {
         List<VideoStatistic> statList = globalCache.getCacheData();
         for(VideoStatistic newStat: statList){
             //LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
-            LocalDate today = LocalDate.parse("2024-04-05");
+            LocalDate today = LocalDate.parse("2024-04-29");
             try {
                 // 먼저 업데이트 시도
                 Integer updated = videoStatisticMapper.updateDailyStatistic(

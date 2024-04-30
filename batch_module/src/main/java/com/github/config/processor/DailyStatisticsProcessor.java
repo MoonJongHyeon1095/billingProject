@@ -2,7 +2,7 @@ package com.github.config.processor;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.github.domain.statistic.VideoStatistic;
+import com.github.domain.VideoStatistic;
 import org.springframework.batch.item.ItemProcessor;
 import com.github.domain.WatchHistory;
 import org.springframework.stereotype.Component;

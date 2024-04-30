@@ -19,6 +19,8 @@ public class GatewayConfig {
                         .uri("http://localhost:8082"))
                 .route(r -> r.path("/v1/advertisement/**")
                         .uri("http://localhost:8083"))
+                .route(r-> r.path("/v1/info/**")
+                        .uri("http://localhost:8084"))
                 .build();
     }
 

@@ -10,4 +10,10 @@ public interface AdFeignClient {
             @PathVariable("videoId") int videoId,
             @PathVariable("adViewCount") int adViewCount
     );
+
+    @GetMapping("/errorful/case1")
+    void case1(
+            @PathVariable("videoId") int videoId,
+            @PathVariable("adViewCount") int adViewCount
+    );
 }

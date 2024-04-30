@@ -1,6 +1,6 @@
 package com.github.mapper;
 
-import com.github.domain.statistic.VideoStatistic;
+import com.github.domain.VideoStatistic;
 import org.apache.ibatis.annotations.*;
 
 import java.time.LocalDate;
@@ -25,11 +25,13 @@ public interface VideoStatisticMapper {
 
     @Update(
             "UPDATE VideoStatistic " +
-                    "SET dailyBill = #{dailyBill} " +
-                    "WHERE videoId = #{videoId} AND createdAt = #{createdAt}"
+                    "SET dailyVideoProfit = #{dailyVideoProfit}, " +
+                    "dailyAdProfit = #{dailyAdProfit} " +
+                    "WHERE createdAt = #{createdAt} AND videoId = #{videoId}"
     )
     void updateDailyBill(@Param("videoId")final Integer videoId,
-                         @Param("dailyBill")final Long dailyBill,
+                         @Param("dailyVideoProfit")final Integer dailyVideoProfit,
+                         @Param("dailyAdProfit")final Integer dailyAdProfit,
                          @Param("createdAt")final LocalDate createdAt);
 
     // videoId로 VideoStatistic 존재 여부 확인

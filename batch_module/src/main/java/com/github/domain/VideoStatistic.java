@@ -1,4 +1,4 @@
-package com.github.domain.statistic;
+package com.github.domain;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +19,8 @@ public class VideoStatistic  {
     private Integer dailyViewCount;
     private Integer dailyAdViewCount;
     //정산 배치작업
-    private Integer dailyBill;
+    private Integer dailyVideoProfit;
+    private Integer dailyAdProfit;
 
     //private double zScore;
     private LocalDate createdAt;

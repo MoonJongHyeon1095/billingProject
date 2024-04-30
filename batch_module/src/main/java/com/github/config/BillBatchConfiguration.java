@@ -7,7 +7,7 @@ import com.github.config.listener.step_listener.LoggerListener;
 import com.github.config.processor.DailyBillingProcessor;
 import com.github.config.reader.ReaderConfiguration;
 import com.github.config.writer.DailyBillingWriter;
-import com.github.domain.statistic.VideoStatistic;
+import com.github.domain.VideoStatistic;
 import lombok.AllArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;

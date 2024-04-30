@@ -1,6 +1,6 @@
 package com.github.config.writer;
 
-import com.github.domain.statistic.VideoStatistic;
+import com.github.domain.VideoStatistic;
 import com.github.util.GlobalSingletonCache;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;

@@ -1,11 +1,10 @@
 package com.github.config.mapper;
 
-import com.github.domain.statistic.VideoStatistic;
+import com.github.domain.VideoStatistic;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 
 public class VideoStatisticRowMapper implements RowMapper<VideoStatistic> {
     @Override

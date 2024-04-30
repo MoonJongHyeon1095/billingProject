@@ -1,16 +1,5 @@
 package com.github.config.listener.job_listener;
 
-import com.github.domain.statistic.VideoStatistic;
-import com.github.mapper.VideoStatisticMapper;
-import com.github.util.GlobalSingletonCache;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
-
-import java.util.List;
 //
 //@Slf4j
 //public class WeeklyUpdateJobListener implements JobExecutionListener {

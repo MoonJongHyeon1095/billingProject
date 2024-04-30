@@ -5,11 +5,11 @@
 <!--<mapper namespace="com.github.mapper.VideoStatisticMapper">-->
 
 <!--    &lt;!&ndash;  일간  &ndash;&gt;-->
-<!--    <insert id="insertDailyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">-->
+<!--    <insert id="insertDailyStatistic" parameterType="com.github.domain.VideoStatistic">-->
 <!--        INSERT INTO VideoStatistic (videoId, dailyWatchedTime, dailyViewCount, dailyAdViewCount, zScore)-->
 <!--        VALUES (#{videoId}, #{dailyWatchedTime}, #{dailyViewCount}), #{dailyAdViewCount}, #{zScore}-->
 <!--    </insert>-->
-<!--    <update id="updateDailyStatistic" parameterType="com.github.domain.statistic.VideoStatistic">-->
+<!--    <update id="updateDailyStatistic" parameterType="com.github.domain.VideoStatistic">-->
 <!--        UPDATE VideoStatistic-->
 <!--        SET dailyWatchedTime = #{dailyWatchedTime},-->
 <!--        dailyViewCount = #{dailyViewCount},-->
@@ -29,7 +29,7 @@
 <!--        SELECT EXISTS(SELECT 1 FROM VideoStatistic WHERE videoId = #{videoId})-->
 <!--    </select>-->
 
-<!--    <select id="findOneByVideoId" parameterType="java.lang.Integer" resultType="com.github.domain.statistic.VideoStatistic">-->
+<!--    <select id="findOneByVideoId" parameterType="java.lang.Integer" resultType="com.github.domain.VideoStatistic">-->
 <!--        SELECT * FROM VideoStatistic WHERE videoId = #{videoId}-->
 <!--    </select>-->
 <!--</mapper>-->

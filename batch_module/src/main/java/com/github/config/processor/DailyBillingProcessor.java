@@ -1,7 +1,7 @@
 package com.github.config.processor;
 
 import com.github.common.exception.GlobalException;
-import com.github.domain.statistic.VideoStatistic;
+import com.github.domain.VideoStatistic;
 import com.github.dto.VideoViewsDto;
 import com.github.mapper.VideoMapper;
 import com.github.util.ProfitCalculator;
@@ -42,7 +42,8 @@ public class DailyBillingProcessor implements ItemProcessor<VideoStatistic, Vide
 
         return VideoStatistic.builder()
                 .videoId(videoId)
-                .dailyBill(videoProfit+adProfit)
+                .dailyVideoProfit(videoProfit)
+                .dailyAdProfit(adProfit)
                 .build();
     }
 
