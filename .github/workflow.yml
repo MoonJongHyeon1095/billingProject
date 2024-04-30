@@ -10,7 +10,7 @@ jobs:
 
     strategy:
       matrix:
-        modules: [api_module, user_module, video_module, advertisement_module]
+        modules: [api_module, user_module, video_module, advertisement_module, batch_module, discovery_module, video_info_module]
 
     steps:
       - name: checkout
@@ -27,7 +27,21 @@ jobs:
         run: |
           cd ./src/main/resources
           touch ./application.properties
-          echo "${{ secrets.PROPERTIES }}" >> ./application.properties
+          if [ "${{ matrix.modules }}" == "api_module" ]; then
+            echo "${{ secrets.API_MODULE_PROPERTIES }}" > ./application.properties
+          elif [ "${{ matrix.modules }}" == "user_module" ]; then
+            echo "${{ secrets.USER_MODULE_PROPERTIES }}" > ./application.properties
+          elif [ "${{ matrix.modules }}" == "video_module" ]; then
+            echo "${{ secrets.VIDEO_MODULE_PROPERTIES }}" > ./application.properties
+          elif [ "${{ matrix.modules }}" == "advertisement_module" ]; then
+            echo "${{ secrets.ADVERTISEMENT_MODULE_PROPERTIES }}" > ./application.properties
+          elif [ "${{ matrix.modules }}" == "batch_module" ]; then
+            echo "${{ secrets.BATCH_MODULE_PROPERTIES }}" > ./application.properties
+          elif [ "${{ matrix.modules }}" == "discovery_module" ]; then
+            echo "${{ secrets.DISCOVERY_MODULE_PROPERTIES }}" > ./application.properties
+          elif [ "${{ matrix.modules }}" == "video_info_module" ]; then
+            echo "${{ secrets.VIDEO_INFO_MODULE_PROPERTIES }}" > ./application.properties
+          fi
         shell: bash
 
       # 각 모듈에 대한 작업을 병렬로 실행

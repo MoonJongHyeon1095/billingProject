@@ -48,7 +48,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final HttpServletResponse response,
             final FilterChain filterChain
     ) throws ServletException, IOException {
-
+        final String requestURI = request.getRequestURI();
+        log.info("필터를 우회합니다: " + requestURI);
+        if ("/v1/video/error".equals(requestURI)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         try{
             final String authorizationHeader = request.getHeader("Authorization");
             final String token = parseBearerToken(authorizationHeader);

@@ -41,6 +41,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests( auth -> auth
                         .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/v1/video/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/video/**").permitAll()
                         .anyRequest().authenticated())
                 //첫번째 인자로 받은 필터를 두번째 인자로 받은 필터 이전에 추가. 인증 과정에서 사용자의 요청이 처리되기 전에 JWT를 확인하여 인증을 수행하
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
