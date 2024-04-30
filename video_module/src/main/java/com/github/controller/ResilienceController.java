@@ -7,6 +7,7 @@ import com.github.service.ResilienceService;
 import com.github.util.UserDetailsImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,14 +19,11 @@ import java.util.Optional;
 @RequestMapping("/v1/video")
 public class ResilienceController {
     private final ResilienceService resilienceService;
-    /**
-     *
-     */
+
     @GetMapping("/error")
-    public Response<ViewResponse> checkResilience() {
+    public ResponseEntity checkResilience() {
 
-        resilienceService.case1();
+        return resilienceService.case1();
 
-        return Response.success();
     }
 }

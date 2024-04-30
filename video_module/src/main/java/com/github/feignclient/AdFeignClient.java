@@ -4,6 +4,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @FeignClient(name = "adFeignClient", url = "http://localhost:8083")
@@ -24,14 +25,7 @@ public interface AdFeignClient {
 
 
     @GetMapping("/v1/advertisement/error/case1")
-    void case1();
+    ResponseEntity case1();
 
-    default void fallbackCircuitBreakerCase1(Throwable t) {
-        System.out.println("fallbackCircuitBreakerCase1");
 
-    }
-
-    default void fallbackRetryErrorCase(Throwable t) {
-        System.out.println("retry fallback");
-    }
 }

@@ -1,19 +1,25 @@
 package com.github.service;
 
 import com.github.feignclient.AdFeignClient;
+
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import io.vavr.control.Try;
+import java.util.function.Supplier;
 
 @Slf4j
 @Service
 public class ResilienceService {
     private final AdFeignClient adFeignClient;
-    private final CircuitBreakerRegistry circuitBreakerRegistry;
-    public ResilienceService(AdFeignClient adFeignClient, CircuitBreakerRegistry circuitBreakerRegistry) {
+    private final CircuitBreaker circuitBreaker;
+
+    public ResilienceService(AdFeignClient adFeignClient,  CircuitBreakerRegistry circuitBreakerRegistry) {
         this.adFeignClient = adFeignClient;
-        this.circuitBreakerRegistry = circuitBreakerRegistry;
+        this.circuitBreaker = circuitBreakerRegistry.circuitBreaker("adFeignClient");
+
     }
 
     public void createAdDetail(int videoId, int adViewCount) {
@@ -24,13 +30,25 @@ public class ResilienceService {
     }
 
     //@Retry(name = "adFeignClient", fallbackMethod = "fallbackRetryErrorCase")
-    @io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker(name = "adFeignClient", fallbackMethod = "fallbackCircuitBreakerCase1")
-    public void case1() {
-        CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker("adFeignClient");
-        adFeignClient.case1();
-        log.info("Executing case1 method");
-        log.info("CircuitBreaker state for adFeignClient: {}", circuitBreaker.getState());
+    //@CircuitBreaker(name = "adFeignClient", fallbackMethod = "fallbackCase1")
+    public ResponseEntity<String> case1() {
+        // Supplier 를 CircuitBreaker 로 데코레이팅
+        Supplier<ResponseEntity<String>> supplier = CircuitBreaker
+                .decorateSupplier(circuitBreaker, () -> adFeignClient.case1());
+
+        // Try.ofSupplier로 Supplier 실행을 시도하고, 실패 시 fallback 메소드 호출
+        ResponseEntity<String> response = Try.ofSupplier(supplier)
+                .recover(throwable -> fallbackCase1(throwable)).get();
+
+        log.info("case1 method 111111 {}", response.getBody());
+        return response;
+}
+
+    private ResponseEntity<String> fallbackCase1(Throwable t) {
+        return ResponseEntity.internalServerError().body("fallbackCase1 "+t.getMessage());
     }
 
-
+    private String fallbackRetryErrorCase(Throwable t) {
+        return "fallbackRetryErrorCase "+t.getMessage();
+    }
 }

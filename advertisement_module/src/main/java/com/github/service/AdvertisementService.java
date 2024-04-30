@@ -1,5 +1,6 @@
 package com.github.service;
 
+import com.github.common.response.Response;
 import com.github.exception.AdErrorCode;
 import com.github.exception.AdException;
 import com.github.mapper.AdvertisementDetailMapper;
@@ -22,7 +23,7 @@ public class AdvertisementService {
     private final AdvertisementDetailMapper advertisementDetailMapper;
 
     @Transactional
-    public void countAdView( final int videoId, final int adViewCount) {
+    public Integer countAdView(final int videoId, final int adViewCount) {
         //해당 videoId의 영상에 5분 간격으로 광고가 몇개 붙어있는지
         List<Integer> adList = getAllAdByVideoId(videoId);
         int plusViewCount=0;
@@ -37,20 +38,30 @@ public class AdvertisementService {
         remainingViewCount = adViewCount % attachedAdNum;
 
         //1. 1시간 짜리 영상에 12개의 광고가 있고, adViewCount가 27회라면 일단 모든 광고 조회수 +2
-        updateAdDetailViewsByPriority(adList, videoId, plusViewCount);
+        int updatedRow = updateAdDetailViewsByPriority(adList, videoId, plusViewCount);
         //2. 이후 나머지만큼 오름차순 정렬된 adPriority(광고 우선순위) 순회하며 조회수 +1
+        int updatedRemainRow =0;
         if(remainingViewCount > 0) {
             List<Integer> remainingAds = adList.subList(0, remainingViewCount);
-            updateAdDetailViewsByPriority(remainingAds, videoId, 1);
+            updatedRemainRow = updateAdDetailViewsByPriority(remainingAds, videoId, 1);
         }
+        int result = 0;
+        if (updatedRow + updatedRemainRow == adViewCount) {
+            result = updatedRow + updatedRemainRow;
+        } else {
+            throw new AdException(AdErrorCode.INVALID_DATA_INTEGRITY);
+        }
+        return result;
     }
 
 
     //AdvertisementDetail 테이블 viewCount 칼럼 업데이트
-    private void updateAdDetailViewsByPriority(final List<Integer> adPriorities,final int videoId, final int plusView) {
+    private Integer updateAdDetailViewsByPriority(final List<Integer> adPriorities,final int videoId, final int plusView) {
+        int rowCount =0;
         for (int adPriority : adPriorities) {
-            advertisementDetailMapper.updateViewCountByPriority(adPriority, videoId, plusView);
+            rowCount += advertisementDetailMapper.updateViewCountByPriority(adPriority, videoId, plusView);
         }
+        return rowCount;
     }
     private List<Integer> getAllAdByVideoId(final int videoId){
         return advertisementDetailMapper.findAllByVideoId(videoId);

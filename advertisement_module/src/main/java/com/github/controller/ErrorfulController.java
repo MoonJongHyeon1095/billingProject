@@ -23,7 +23,7 @@ public class ErrorfulController {
 //        return ResponseEntity.ok("Normal response");
         log.info("111111");
         //100%
-        return ResponseEntity.status(400).body("Internal Server Error");
+        return ResponseEntity.status(500).body("Internal Server Error");
     }
 
     @GetMapping("/error/case2")

@@ -12,7 +12,7 @@ public interface AdvertisementDetailMapper {
 
     List<Integer> findAllByVideoId(@Param("videoId") Integer videoId);
 
-    void updateViewCountByPriority(@Param("adPriority") Integer adPriority,
+    Integer updateViewCountByPriority(@Param("adPriority") Integer adPriority,
                                    @Param("videoId") Integer videoId,
                                    @Param("plusViewCount") Integer plusViewCount);
 }
