@@ -31,6 +31,30 @@ public JwtTokenProvider (
     this.refreshTokenExpiredTime = Integer.parseInt(refreshTokenExpiredTime);
     }
 
+    public String createAccessToken(String email){
+    return createToken(email, accessTokenExpiredTime, TokenType.ACCESS);
+    }
+
+    public String createRefreshToken(String email){
+        return createToken(email, refreshTokenExpiredTime, TokenType.REFRESH);
+    }
+
+    private String createToken(String email, int expire, TokenType tokenType) {
+        Claims claims = Jwts.claims();
+        claims.put("email", email);
+        claims.put("tokenType", tokenType.name());
+
+        Date now = new Date();
+        Date expireTime = new Date(now.getTime() + expire);
+
+        String token = Jwts.builder()
+                    .setClaims(claims)
+                    .setIssuedAt(now)
+                    .setExpiration(expireTime)
+                    .signWith(getSigningkey(keyBytes))
+                    .compact();
+        return BEARER_PREFIX + token;
+    }
 
     public boolean isExpired(String token){
         Date expiredDate = extractClaims(token).getExpiration();
@@ -41,9 +65,17 @@ public JwtTokenProvider (
         return claims.get("email", String.class);
     }
 
+    public String getTokenType(Claims claims) {
+        return claims.get("tokenType", String.class);
+    }
+
     public Claims extractClaims(String token){
         return Jwts.parserBuilder().setSigningKey(getSigningkey(keyBytes))
                 .build().parseClaimsJws(token).getBody();
+    }
+
+    public Claims extractClaimsFromRefreshToken(String token){
+        return extractClaims(parseBearerToken(token));
     }
 
     private Key getSigningkey(byte[] keyBytes){

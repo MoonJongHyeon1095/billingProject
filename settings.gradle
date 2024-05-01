@@ -6,4 +6,5 @@ include 'advertisement_module'
 include 'batch_module'
 include 'discovery_module'
 include 'video_info_module'
+include 'watch_history_module'
 

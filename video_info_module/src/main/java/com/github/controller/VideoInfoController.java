@@ -5,13 +5,9 @@ import com.github.controller.response.DailyTopResponse;
 import com.github.controller.response.UserBillResponse;
 import com.github.service.BillingService;
 import com.github.service.StatisticService;
-import com.github.util.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -47,9 +43,11 @@ public class VideoInfoController {
      * @return Response<UserBillResponse> videoId, 해당영상수익, 해당영상 광고수익의 리스트
      */
     @GetMapping("/bill/daily")
-    public Response<UserBillResponse> getDailyUserBilling(){
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserBillResponse userBillResponse = billingService.findDailyBillingByEmail(userDetails.getUsername());
+    public Response<UserBillResponse> getDailyUserBilling(
+            @RequestHeader("X-User-Email") final String email
+    ){
+        if(email==null) Response.error("로그인 해주세요....");
+        UserBillResponse userBillResponse = billingService.findDailyBillingByEmail(email);
          return Response.success(userBillResponse);
     }
 
@@ -59,9 +57,9 @@ public class VideoInfoController {
      * @return Response<UserBillResponse> videoId, 해당영상수익, 해당영상 광고수익의 리스트
      */
     @GetMapping("/bill/weekly")
-    public Response<UserBillResponse> getWeeklyUserBilling(){
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserBillResponse response = billingService.findWeeklyBillingByEmail(userDetails.getUsername());
+    public Response<UserBillResponse> getWeeklyUserBilling(@RequestHeader("X-User-Email") final String email){
+        if(email==null) Response.error("로그인 해주세요....");
+        UserBillResponse response = billingService.findWeeklyBillingByEmail(email);
         return Response.success(response);
     }
 
@@ -71,9 +69,9 @@ public class VideoInfoController {
      * @return Response<UserBillResponse> videoId, 해당영상수익, 해당영상 광고수익의 리스트
      */
     @GetMapping("/bill/monthly")
-    public Response<UserBillResponse> getMonthlyUserBilling(){
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserBillResponse response = billingService.findMonthlyBillingByEmail(userDetails.getUsername());
+    public Response<UserBillResponse> getMonthlyUserBilling(@RequestHeader("X-User-Email") final String email){
+        if(email==null) Response.error("로그인 해주세요....");
+        UserBillResponse response = billingService.findMonthlyBillingByEmail(email);
         return Response.success(response);
     }
 

@@ -7,10 +7,8 @@ import com.github.dto.WatchHistoryDto;
 import com.github.dto.ViewDto;
 import com.github.service.ViewService;
 import com.github.service.WatchHistoryService;
-import com.github.util.UserDetailsImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -32,13 +30,11 @@ public class VideoController {
     @PostMapping("/play")
     public Response<ViewResponse> countView(
             @RequestBody final ViewDto viewDto,
+            @RequestHeader("X-User-Email") final String email,
             @RequestHeader("X-Device-UUID") final String deviceUUID
     ) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetailsImpl) {
-            UserDetailsImpl userDetails = (UserDetailsImpl) principal;
-            if (userDetails.getUsername() != null) viewDto.setEmail(Optional.of(userDetails.getUsername()));
-
+        if (email!=null) {
+          viewDto.setEmail(Optional.of(email));
         } else {
             // 로그인하지 않은 사용자일 경우, email 설정하지 않음
             viewDto.setEmail(Optional.empty());
@@ -59,16 +55,13 @@ public class VideoController {
     @PostMapping("/stop")
     public Response<VideoResponse> createWatchHistory(
             @RequestBody final WatchHistoryDto watchHistoryDto,
+            @RequestHeader("X-User-Email") final String email,
             @RequestHeader("X-Device-UUID") final String deviceUUID
     ){
-
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetailsImpl) {
-            UserDetailsImpl userDetails = (UserDetailsImpl) principal;
-            if (userDetails.getUsername() != null) watchHistoryDto.setEmail(Optional.of(userDetails.getUsername()));
-
+        if (email!=null) {
+            watchHistoryDto.setEmail(Optional.of(email));
         } else {
-            // 로그인하지 않은 사용자일 경우, userId를 설정하지 않음
+            // 로그인하지 않은 사용자일 경우, email 설정하지 않음
             watchHistoryDto.setEmail(Optional.empty());
         }
 
