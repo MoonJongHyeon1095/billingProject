@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -42,7 +43,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class ReaderConfiguration {
     private final DateColumnCalculator dateColumnCalculator;
-    private final DataSourceConfiguration dataSourceConfiguration;
+    private final DataSource dataSource;
 
     @Bean
     @StepScope
@@ -53,14 +54,14 @@ public class ReaderConfiguration {
             String today = "2024-05-01";
             SqlPagingQueryProviderFactoryBean queryProvider = new SqlPagingQueryProviderFactoryBean();
 
-            queryProvider.setDataSource(dataSourceConfiguration.routingDataSource());
+            queryProvider.setDataSource(dataSource);
             queryProvider.setSelectClause("SELECT videoId, dailyViewCount, dailyAdViewCount, createdAt");
             queryProvider.setFromClause("FROM VideoStatistic");
             //queryProvider.setWhereClause("WHERE createdAt = :today AND videoId BETWEEN :startVideoId AND :endVideoId");
             queryProvider.setWhereClause("WHERE createdAt = :today");
             queryProvider.setSortKey("videoId");
 
-            reader.setDataSource(dataSourceConfiguration.routingDataSource());
+            reader.setDataSource(dataSource);
             reader.setQueryProvider(queryProvider.getObject());
             reader.setRowMapper(new VideoStatisticRowMapper());
             reader.setParameterValues(Map.of(
@@ -97,14 +98,14 @@ public class ReaderConfiguration {
             String today = "2024-05-01";
 
             SqlPagingQueryProviderFactoryBean queryProvider = new SqlPagingQueryProviderFactoryBean();
-            queryProvider.setDataSource(dataSourceConfiguration.routingDataSource());
-            queryProvider.setSelectClause("SELECT videoId, playedTime, adViewCount, createdAt");
+            queryProvider.setDataSource(dataSource);
+            queryProvider.setSelectClause("SELECT videoId, playedTime, adViewCount, numericOrderKey, createdAt");
             queryProvider.setFromClause("FROM WatchHistory");
-            queryProvider.setWhereClause("WHERE createdAt = :today AND videoId BETWEEN :startVideoId AND :endVideoId");
-            //queryProvider.setWhereClause("WHERE createdAt = :today");
-            queryProvider.setSortKey("watchHistoryId");
+            //queryProvider.setWhereClause("WHERE createdAt = :today AND videoId BETWEEN :startVideoId AND :endVideoId");
+            queryProvider.setWhereClause("WHERE createdAt = :today");
+            queryProvider.setSortKey("numericOrderKey");
 
-            reader.setDataSource(dataSourceConfiguration.routingDataSource());
+            reader.setDataSource(dataSource);
             reader.setQueryProvider(queryProvider.getObject());
             reader.setRowMapper(new WatchHistoryRowMapper());
             reader.setParameterValues(Map.of(

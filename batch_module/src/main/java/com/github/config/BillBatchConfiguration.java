@@ -5,6 +5,7 @@ import com.github.config.executor.ExecutorServiceConfig;
 import com.github.config.listener.job_listener.JobLoggerListener;
 import com.github.config.listener.step_listener.LoggerListener;
 import com.github.config.processor.DailyBillingProcessor;
+import com.github.config.reader.BillReader;
 import com.github.config.reader.ReaderConfiguration;
 import com.github.config.writer.DailyBillingWriter;
 import com.github.domain.VideoStatistic;
@@ -28,6 +29,7 @@ public class BillBatchConfiguration {
     private final DailyBillingProcessor dailyBillingProcessor;
     private final DailyBillingWriter dailyBillingWriter;
     private final ExecutorServiceConfig executorServiceConfig;
+    private final BillReader billReader;
 
     @Bean
     public Job dailyBillingJob(JobRepository jobRepository) {
@@ -41,7 +43,7 @@ public class BillBatchConfiguration {
     public Step dailyBillingStep(JobRepository jobRepository) {
         return new StepBuilder("dailyBillingStep", jobRepository)
                 .<VideoStatistic, VideoStatistic>chunk(20, dataSourceConfiguration.batchTransactionManager())
-                .reader(readerConfiguration.dailyBillingReader())
+                .reader(billReader.reader())
                 .processor(dailyBillingProcessor)
                 .listener(new LoggerListener())
                 .writer(dailyBillingWriter)

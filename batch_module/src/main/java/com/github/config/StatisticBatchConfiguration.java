@@ -9,6 +9,7 @@ import com.github.config.listener.step_listener.LoggerListener;
 import com.github.config.partition.RangePartitioner;
 import com.github.config.processor.DailyStatisticsProcessor;
 import com.github.config.reader.ReaderConfiguration;
+import com.github.config.reader.StatisticReader;
 import com.github.config.writer.DailyStatisticWriter;
 import com.github.domain.*;
 import com.github.domain.VideoStatistic;
@@ -33,12 +34,11 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
 @AllArgsConstructor
 public class StatisticBatchConfiguration {
     private final DataSourceConfiguration dataSourceConfiguration;
-    private final ReaderConfiguration readerConfiguration;
     private final DailyStatisticsProcessor dailyStatisticsProcessor;
     private final DailyStatisticWriter dailyStatisticWriter;
     private final VideoStatisticMapper videoStatisticMapper;
-    private final RangePartitioner rangePartitioner;
     private final VideoMapper videoMapper;
+    private final StatisticReader statisticReader;
     //가상스레드 생성
     private final ExecutorServiceConfig executorServiceConfig;
 
@@ -97,7 +97,7 @@ public class StatisticBatchConfiguration {
                 .<WatchHistory, VideoStatistic>chunk(
                         20,
                         dataSourceConfiguration.batchTransactionManager())
-                .reader(readerConfiguration.dailyWatchHistoryReader())
+                .reader(statisticReader.reader())
                 .processor(dailyStatisticsProcessor)
                 .listener(new CacheClearStepListener(dailyStatisticsProcessor))
                 .writer(dailyStatisticWriter)

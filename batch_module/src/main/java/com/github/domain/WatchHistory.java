@@ -20,14 +20,7 @@ public class WatchHistory {
     private Date createdAt;
     private LocalDateTime watchedAt;
     private Integer adViewCount; //그냥 순서대로 나오는 광고 몇개 봤는지
-
-    public void setEmail(final Optional<String> emailOptional) {
-        if (emailOptional.isEmpty()) {
-            this.email = null;
-        } else {
-            this.email = emailOptional.orElse(null);
-        }
-    }
+    private Long numericOrderKey;
 
 }
 

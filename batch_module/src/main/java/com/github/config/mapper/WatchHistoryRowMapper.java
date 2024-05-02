@@ -14,6 +14,7 @@ public class WatchHistoryRowMapper implements RowMapper<WatchHistory> {
                 .playedTime(rs.getInt("playedTime"))
                 .adViewCount(rs.getInt("adViewCount"))
                 .createdAt(rs.getDate("createdAt"))
+                .numericOrderKey(rs.getLong("numericOrderKey"))
                 .build();
     }
 }
