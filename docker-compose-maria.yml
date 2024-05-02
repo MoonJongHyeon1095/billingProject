@@ -1,0 +1,21 @@
+#docker-compose -f docker-compose-maria.yml up -d
+version: '3'
+
+services:
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    restart: unless-stopped
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MARIA_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MARIA_DATABASE}
+      MYSQL_USER: ${MARIA_USER}
+      MYSQL_PASSWORD: ${MARIA_PASSWORD}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+volumes:
+  mariadb_data:
+    driver: local

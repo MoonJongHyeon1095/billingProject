@@ -27,7 +27,7 @@ dependencyManagement {
 //}
 
 springBoot {
-    mainClass = 'com.github.VideoModuleApplication'
+    mainClass = 'com.github.WatchHistoryModuleApplication'
 }
 
 dependencies {

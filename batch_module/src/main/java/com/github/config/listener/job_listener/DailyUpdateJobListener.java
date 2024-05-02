@@ -29,7 +29,7 @@ public class DailyUpdateJobListener implements JobExecutionListener {
         List<VideoStatistic> statList = globalCache.getCacheData();
         for(VideoStatistic newStat: statList){
             //LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
-            LocalDate today = LocalDate.parse("2024-04-29");
+            LocalDate today = LocalDate.parse("2024-05-01");
             try {
                 // 먼저 업데이트 시도
                 Integer updated = videoStatisticMapper.updateDailyStatistic(

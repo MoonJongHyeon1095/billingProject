@@ -30,6 +30,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
+    //Actuator, Prometheus
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
     //Eureka 클라이언트로 등록
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 

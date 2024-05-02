@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/v1/user/**").permitAll()
-                        .pathMatchers("/v1/video/play").permitAll()
+                        .pathMatchers("/v1/video/**").permitAll()
                         .pathMatchers("/v1/info/top5/**").permitAll()
                         .anyExchange().authenticated())
                 .addFilterAt(jwtAuthenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION);// 위치 주의

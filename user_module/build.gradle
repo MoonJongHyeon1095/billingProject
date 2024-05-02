@@ -1,18 +1,3 @@
-//이 설정을 활용할 경우 도커 이미지 빌드에 문제가 있다.
-//tasks.named('bootJar'){ // bootJar 세팅을 켜기
-//    enabled = true
-//}
-//
-//tasks.named('jar'){ // jar 설정은 끄기
-//    enabled = false
-//}
-
-//plugins {
-//    id 'application' // Application 플러그인 추가
-//}
-//application {
-//    mainClass = 'com.github.user_module.UserModuleApplication'
-//}
 
 plugins {
     id 'java'
@@ -45,6 +30,10 @@ springBoot {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    //Actuator, Prometheus
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 
     //Eureka 클라이언트로 등록
     //implementation 'org.springframework.cloud:spring-cloud-starter-eureka'

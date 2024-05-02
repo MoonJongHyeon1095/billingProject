@@ -58,7 +58,7 @@ public class ViewService {
         }
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ViewResponse getLastWatched(final ViewDto viewDto, final String deviceUUID) {
         //로그인을 하고 플레이한 경우
         if(viewDto.getEmail().isPresent()){
@@ -77,7 +77,6 @@ public class ViewService {
      * @param videoId
      * @return RedisViewRecord
      */
-    @Transactional
     private RedisViewRecord findAndUpdateRedisRecord(final int videoId) {
         // Redis에서 먼저 비디오 정보를 조회합니다.
         Map<String, String> currentHashMap = redisService.getRedisRecord(videoId);
@@ -107,8 +106,16 @@ public class ViewService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     protected Video findVideoById(final int videoId){
         return videoMapper.findOneVideoById(videoId).orElseThrow(()->new VideoException(VideoErrorCode.VIDEO_NOT_FOUND));
+    }
+
+    @Transactional
+    private void findViewCountAndIncrease(final int videoId){
+        final Integer viewCount = videoMapper.findViewCountByVideoIdForUpdate(videoId).orElseThrow(()->new VideoException(VideoErrorCode.VIDEO_NOT_FOUND));
+        final int newViewCount = viewCount+1;
+        videoMapper.updatedTotalViewCountPlusOne(newViewCount, videoId);
     }
 
 }

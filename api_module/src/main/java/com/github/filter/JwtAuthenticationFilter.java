@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         // 로그인과 관련된 경로는 필터링하지 않음
         String path = exchange.getRequest().getURI().getPath();
-        if (path.startsWith("/v1/user/") || path.equals("/v1/video/play") || path.startsWith("v1/info/top5/")) {
+        if (path.startsWith("/v1/user/") || path.startsWith("v1/info/top5/")) {
             return chain.filter(exchange);
         }
         return validateToken(exchange)

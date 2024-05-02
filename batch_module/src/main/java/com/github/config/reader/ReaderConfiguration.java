@@ -50,7 +50,7 @@ public class ReaderConfiguration {
         try {
             JdbcPagingItemReader<VideoStatistic> reader = new JdbcPagingItemReader<>();
             //String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            String today = "2024-04-29";
+            String today = "2024-05-01";
             SqlPagingQueryProviderFactoryBean queryProvider = new SqlPagingQueryProviderFactoryBean();
 
             queryProvider.setDataSource(dataSourceConfiguration.routingDataSource());
@@ -90,30 +90,25 @@ public class ReaderConfiguration {
      */
     @Bean
     @StepScope
-    public JdbcPagingItemReader<WatchHistory> dailyWatchHistoryReader(
-//            @Value("#{stepExecutionContext['startVideoId']}") Integer startVideoId,
-//            @Value("#{stepExecutionContext['endVideoId']}") Integer endVideoId
-    ) {
+    public JdbcPagingItemReader<WatchHistory> dailyWatchHistoryReader() {
         try {
             JdbcPagingItemReader<WatchHistory> reader = new JdbcPagingItemReader<>();
             //String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            String today = "2024-04-29";
+            String today = "2024-05-01";
 
             SqlPagingQueryProviderFactoryBean queryProvider = new SqlPagingQueryProviderFactoryBean();
             queryProvider.setDataSource(dataSourceConfiguration.routingDataSource());
             queryProvider.setSelectClause("SELECT videoId, playedTime, adViewCount, createdAt");
             queryProvider.setFromClause("FROM WatchHistory");
-            //queryProvider.setWhereClause("WHERE createdAt = :today AND videoId BETWEEN :startVideoId AND :endVideoId");
-            queryProvider.setWhereClause("WHERE createdAt = :today");
-            queryProvider.setSortKey("videoId");
+            queryProvider.setWhereClause("WHERE createdAt = :today AND videoId BETWEEN :startVideoId AND :endVideoId");
+            //queryProvider.setWhereClause("WHERE createdAt = :today");
+            queryProvider.setSortKey("watchHistoryId");
 
             reader.setDataSource(dataSourceConfiguration.routingDataSource());
             reader.setQueryProvider(queryProvider.getObject());
             reader.setRowMapper(new WatchHistoryRowMapper());
             reader.setParameterValues(Map.of(
                     "today", today
-//                    "startVideoId", startVideoId,
-//                    "endVideoId", endVideoId
             ));
             reader.setPageSize(20); //그냥 청크 크기 만큼
             return reader;

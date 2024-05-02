@@ -7,6 +7,7 @@ import com.github.mapper.VideoMapper;
 import com.github.util.DateCalculator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -22,6 +23,7 @@ public class BillingService {
      * @param email
      * @return
      */
+    @Transactional(readOnly = true)
     public UserBillResponse findDailyBillingByEmail(final String email){
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
         List<DailyBillDto> userBill = findDailyProfitByEmail(email, today);
@@ -32,6 +34,7 @@ public class BillingService {
      * 주간 정산
      * @param email
      */
+    @Transactional(readOnly = true)
     public UserBillResponse findWeeklyBillingByEmail(final String email) {
         List<Integer> videoIdList = findVideoIdListByEmail(email);
         LocalDate[] monDaySunDay = DateCalculator.getMonSun();
@@ -48,6 +51,7 @@ public class BillingService {
      * 월간 정산
      * @param email
      */
+    @Transactional(readOnly = true)
     public UserBillResponse findMonthlyBillingByEmail(final String email) {
         List<Integer> videoIdList = findVideoIdListByEmail(email);
         LocalDate[] firstAndLastDayOfMonth = DateCalculator.getFirstAndLastDayOfMonth();
