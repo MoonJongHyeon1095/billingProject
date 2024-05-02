@@ -30,16 +30,16 @@ public class DailyUpdateJobListener implements JobExecutionListener {
         List<VideoStatistic> statList = globalCache.getCacheData();
         for(VideoStatistic newStat: statList){
             //LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
-            LocalDate today = LocalDate.parse("2024-05-03");
+            LocalDate today = LocalDate.parse("2024-05-04");
             //행이 존재하면
-            Optional<VideoStatistic> foundStat = videoStatisticMapper.findOneByVideoId(newStat.getVideoId());
+            Optional<VideoStatistic> foundStat = videoStatisticMapper.findOneByVideoIdAndCreatedAt(today, newStat.getVideoId());
             if(foundStat.isPresent()){
                 videoStatisticMapper.updateDailyStatistic(
                         VideoStatistic.builder()
                                 .videoId(newStat.getVideoId())
                                 .dailyViewCount(foundStat.get().getDailyViewCount() + newStat.getDailyViewCount())
-                                .dailyWatchedTime(foundStat.get().getDailyViewCount() + newStat.getDailyWatchedTime())
-                                .dailyAdViewCount(foundStat.get().getDailyViewCount() + newStat.getDailyAdViewCount())
+                                .dailyWatchedTime(foundStat.get().getDailyWatchedTime() + newStat.getDailyWatchedTime())
+                                .dailyAdViewCount(foundStat.get().getDailyAdViewCount() + newStat.getDailyAdViewCount())
                                 .createdAt(today)
                                 .build()
                 );

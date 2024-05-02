@@ -24,7 +24,7 @@ public class WatchHistoryService {
     private final WatchHistoryMapper watchHistoryMapper;
     private final VideoMapper videoMapper;
     private final ResilienceService resilienceService;
-
+    private boolean assignedBatchServerFlag = true;
     @Transactional
     public void createWatchHistory(final WatchHistoryDto watchHistoryDto, final String deviceUUID) {
         //video 없으면 예외처리
@@ -33,7 +33,6 @@ public class WatchHistoryService {
         final String watchHistoryId = createdUniqueUUID();
         final LocalDateTime watchedAtKST = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         final LocalDate createdAtKST = LocalDate.now(ZoneId.of("Asia/Seoul"));
-        final Integer numericOrderKey = findMaxNumericOrderByCreatedAt(createdAtKST);
 
         WatchHistory watchHistory = WatchHistory.builder()
                 .watchHistoryId(watchHistoryId)
@@ -44,7 +43,7 @@ public class WatchHistoryService {
                 .deviceUUID(deviceUUID)
                 .createdAt(createdAtKST)
                 .watchedAt(watchedAtKST)
-                .numericOrderKey(numericOrderKey)
+                .assignedServer(generateBoolean())
                 .build();
         watchHistory.setEmail(watchHistoryDto.getEmail());
 
@@ -79,9 +78,9 @@ public class WatchHistoryService {
         return watchHistoryId;
     }
 
-    @Transactional(readOnly = true)
-    private Integer findMaxNumericOrderByCreatedAt(LocalDate createdAt){
-        return videoMapper.findMaxNumericOrderByCreatedAt(createdAt);
+    private boolean generateBoolean(){
+        assignedBatchServerFlag = !assignedBatchServerFlag;
+        return assignedBatchServerFlag;
     }
     @Transactional(readOnly = true)
     private void validateVideo(final int videoId){

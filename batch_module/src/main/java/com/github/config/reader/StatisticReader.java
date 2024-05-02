@@ -48,10 +48,11 @@ public class StatisticReader {
     @StepScope
     public JdbcPagingItemReader<WatchHistory> buildStatisticReader() {
         //String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String today = "2024-05-03";
+        String today = "2024-05-04";
         return new JdbcPagingItemReaderBuilder<WatchHistory>()
                 .name("reader")
-                .pageSize(1000)
+                .pageSize(100)
+                .fetchSize(100)
                 .dataSource(dataSource)
                 .rowMapper(new WatchHistoryRowMapper())
                 .queryProvider(statisticQueryProvider())
@@ -79,7 +80,7 @@ public class StatisticReader {
         queryProvider.setDataSource(dataSource);
         queryProvider.setSelectClause("SELECT videoId, playedTime, adViewCount, numericOrderKey, createdAt, assignedServer");
         queryProvider.setFromClause("FROM WatchHistory");
-        queryProvider.setWhereClause("WHERE createdAt = :today AND assignedServer = assignedServer");
+        queryProvider.setWhereClause("WHERE createdAt = :today AND assignedServer = :assignedServer");
         queryProvider.setSortKey("numericOrderKey");
 
         try {

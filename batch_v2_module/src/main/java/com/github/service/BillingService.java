@@ -26,7 +26,7 @@ public class BillingService {
      * 따라서 한국 서울 시간(KST)으로 설정하려면 UTC 시간에 9시간을 더하거나 타임존 명시
      * 초 분 시 일 월 요일
      */
-    @Scheduled(cron = "0 34 21 * * ?", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 11 23 * * ?", zone = "Asia/Seoul")
     public void runDailyBillingJob() throws Exception {
         try{
             JobParameters jobParameters = new JobParametersBuilder()

@@ -49,7 +49,7 @@ public class BillReader {
     public JdbcPagingItemReader<VideoStatistic> buildBillReader() {
 
         //String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String today = "2024-05-01";
+        String today = "2024-05-04";
         return new JdbcPagingItemReaderBuilder<VideoStatistic>()
                 .name("reader")
                 .pageSize(20)
@@ -58,8 +58,8 @@ public class BillReader {
                 .rowMapper(new VideoStatisticRowMapper())
                 .queryProvider(billQueryProvider())
                 .parameterValues(Map.of(
-                        "today", today,
-                        "range", 5000
+                        "today", today
+                        //"range", 5000
                 ))
                 .build();
     }
@@ -81,7 +81,8 @@ public class BillReader {
         queryProvider.setDataSource(dataSource);
         queryProvider.setSelectClause("SELECT videoId, dailyViewCount, dailyAdViewCount, createdAt");
         queryProvider.setFromClause("FROM VideoStatistic");
-        queryProvider.setWhereClause("WHERE createdAt = :today AND videoId >= :range");
+        queryProvider.setWhereClause("WHERE createdAt = :today");
+        //queryProvider.setWhereClause("WHERE createdAt = :today AND videoId >= :range");
         queryProvider.setSortKey("videoId");
 
         try {

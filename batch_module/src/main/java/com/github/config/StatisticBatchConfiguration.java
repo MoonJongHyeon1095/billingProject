@@ -96,7 +96,7 @@ public class StatisticBatchConfiguration {
     public Step dailyStatisticStep(JobRepository jobRepository) {
         return new StepBuilder("dailyStatisticStep", jobRepository)
                 .<WatchHistory, WatchHistory>chunk(
-                        1000,
+                        100,
                         dataSourceConfiguration.batchTransactionManager())
                 .reader(statisticReader.buildStatisticReader())
                 .writer(dailyStatisticWriter)

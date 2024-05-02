@@ -44,7 +44,10 @@ public interface VideoStatisticMapper {
 
     @Select(
             "SELECT * FROM VideoStatistic " +
-                    "WHERE videoId = #{videoId}"
+                    "WHERE createdAt = #{createdAt} AND videoId = #{videoId}"
     )
-    Optional<VideoStatistic> findOneByVideoId(@Param("videoId") final int videoId);
+    Optional<VideoStatistic> findOneByVideoIdAndCreatedAt(
+            @Param("createdAt") final LocalDate createdAt,
+            @Param("videoId") final int videoId
+    );
 }

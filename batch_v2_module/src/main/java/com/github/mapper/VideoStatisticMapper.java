@@ -1,7 +1,9 @@
 package com.github.mapper;
 
 import com.github.domain.VideoStatistic;
+import com.github.dto.VideoStatDto;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.type.JdbcType;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -43,8 +45,18 @@ public interface VideoStatisticMapper {
     boolean existsVideoStatisticByVideoId(@Param("videoId") final int videoId);
 
     @Select(
-            "SELECT * FROM VideoStatistic " +
-                    "WHERE videoId = #{videoId}"
+            "SELECT videoId, dailyViewCount, dailyWatchedTime, dailyAdViewCount, createdAt FROM VideoStatistic " +
+                    "WHERE createdAt = #{createdAt} AND videoId = #{videoId}"
     )
-    Optional<VideoStatistic> findOneByVideoId(@Param("videoId") final int videoId);
+    @Results(value = {
+            @Result(property = "videoId", column = "videoId"),
+            @Result(property = "dailyViewCount", column = "dailyViewCount"),
+            @Result(property = "dailyWatchedTime", column = "dailyWatchedTime"),
+            @Result(property = "dailyAdViewCount", column = "dailyAdViewCount"),
+            @Result(property = "createdAt", column = "createdAt", javaType = LocalDate.class, jdbcType = JdbcType.DATE)
+    })
+    Optional<VideoStatDto> findOneByVideoIdAndCreatedAt(
+            @Param("createdAt") final LocalDate createdAt,
+            @Param("videoId") final int videoId
+    );
 }

@@ -47,10 +47,11 @@ public class StatisticReader {
     @StepScope
     public JdbcPagingItemReader<WatchHistory> buildStatisticReader() {
         //String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String today = "2024-05-01";
+        String today = "2024-05-04";
         return new JdbcPagingItemReaderBuilder<WatchHistory>()
                 .name("reader")
                 .pageSize(1000)
+                .fetchSize(1000)
                 .dataSource(dataSource)
                 .rowMapper(new WatchHistoryRowMapper())
                 .queryProvider(statisticQueryProvider())
