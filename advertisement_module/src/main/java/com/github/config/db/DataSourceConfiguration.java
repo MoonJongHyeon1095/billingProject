@@ -18,19 +18,25 @@ import java.util.Map;
 @Configuration
 public class DataSourceConfiguration {
 
-    private final String dataSourceUrl;
+    private final String mainUrl;
+    private final String replicaUrl1;
+    private final String replicaUrl2;
     private final String dataSourceUsername;
     private final String dataSourcePassword;
     private final String dataSourceDriverClassName;
 
     @Autowired
     public DataSourceConfiguration(
-            @Value("${spring.datasource.url}") String dataSourceUrl,
+            @Value("${spring.datasource.master.hikari.jdbc-url}") String mainUrl,
+            @Value("${spring.datasource.slave2.hikari.jdbc-url}") String replicaUrl1,
+            @Value("${spring.datasource.slave2.hikari.jdbc-url}") String replicaUrl2,
             @Value("${spring.datasource.username}") String dataSourceUsername,
             @Value("${spring.datasource.password}") String dataSourcePassword,
             @Value("${spring.datasource.driver-class-name}") String dataSourceDriverClassName
     ) {
-        this.dataSourceUrl = dataSourceUrl;
+        this.mainUrl = mainUrl;
+        this.replicaUrl1 = replicaUrl1;
+        this.replicaUrl2 = replicaUrl2;
         this.dataSourceUsername = dataSourceUsername;
         this.dataSourcePassword = dataSourcePassword;
         this.dataSourceDriverClassName = dataSourceDriverClassName;
@@ -41,7 +47,7 @@ public class DataSourceConfiguration {
     public HikariDataSource mainDataSource() {
         log.info("------------mainDB_initialized------------");
         HikariDataSource dataSource = DataSourceBuilder.create()
-                .url(dataSourceUrl)
+                .url(mainUrl)
                 .username(dataSourceUsername)
                 .password(dataSourcePassword)
                 .driverClassName(dataSourceDriverClassName)
@@ -54,7 +60,7 @@ public class DataSourceConfiguration {
     public HikariDataSource replicaDataSource1() {
         log.info("------------replicaDB1_initialized------------");
         HikariDataSource dataSource = DataSourceBuilder.create()
-                .url(dataSourceUrl)
+                .url(replicaUrl1)
                 .username(dataSourceUsername)
                 .password(dataSourcePassword)
                 .driverClassName(dataSourceDriverClassName)
@@ -67,7 +73,7 @@ public class DataSourceConfiguration {
     public HikariDataSource replicaDataSource2() {
         log.info("------------replicaDB2_initialized------------");
         HikariDataSource dataSource = DataSourceBuilder.create()
-                .url(dataSourceUrl)
+                .url(replicaUrl2)
                 .username(dataSourceUsername)
                 .password(dataSourcePassword)
                 .driverClassName(dataSourceDriverClassName)
@@ -92,12 +98,6 @@ public class DataSourceConfiguration {
         routingDataSource.setDefaultTargetDataSource(mainDataSource);
         return routingDataSource;
     }
-
-//    @Bean
-//    @DependsOn("dataSource")
-//    public LazyConnectionDataSourceProxy dataSourceProxy(DataSource dataSource){
-//        return new LazyConnectionDataSourceProxy(routingDataSource());
-//    }
 
     @Bean(name = "transactionManager") //transactionManager라고 명시하지 않으면 찾지 못한다.
     public JdbcTransactionManager batchTransactionManager() {
