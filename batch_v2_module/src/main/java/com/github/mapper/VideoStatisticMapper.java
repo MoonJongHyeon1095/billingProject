@@ -14,7 +14,7 @@ public interface VideoStatisticMapper {
                     "dailyViewCount = #{dailyViewCount}, " +
                     "dailyAdViewCount = #{dailyAdViewCount} " +
                     "WHERE createdAt = #{createdAt} AND videoId = #{videoId}")
-    Integer updateDailyStatistic(final VideoStatistic videoStatistic);
+    void updateDailyStatistic(final VideoStatistic videoStatistic);
 
     @Insert(
             "INSERT INTO VideoStatistic " +

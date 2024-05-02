@@ -8,11 +8,13 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 public class DailyUpdateJobListener implements JobExecutionListener {
@@ -25,47 +27,30 @@ public class DailyUpdateJobListener implements JobExecutionListener {
 
     @Override
     public void afterJob(JobExecution jobExecution) {
-        //globalCache.setDailyZScores();
         List<VideoStatistic> statList = globalCache.getCacheData();
         for(VideoStatistic newStat: statList){
             //LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
             LocalDate today = LocalDate.parse("2024-05-03");
-            try {
-                // 먼저 업데이트 시도
-                Integer updated = videoStatisticMapper.updateDailyStatistic(
+            //행이 존재하면
+            Optional<VideoStatistic> foundStat = videoStatisticMapper.findOneByVideoId(newStat.getVideoId());
+            if(foundStat.isPresent()){
+                videoStatisticMapper.updateDailyStatistic(
                         VideoStatistic.builder()
                                 .videoId(newStat.getVideoId())
-                                .dailyViewCount(newStat.getDailyViewCount())
-                                .dailyWatchedTime(newStat.getDailyWatchedTime())
-                                .dailyAdViewCount(newStat.getDailyAdViewCount())
+                                .dailyViewCount(foundStat.get().getDailyViewCount() + newStat.getDailyViewCount())
+                                .dailyWatchedTime(foundStat.get().getDailyViewCount() + newStat.getDailyWatchedTime())
+                                .dailyAdViewCount(foundStat.get().getDailyViewCount() + newStat.getDailyAdViewCount())
                                 .createdAt(today)
-                                //.zScore(newStat.getZScore())
                                 .build()
                 );
-
-                if(updated==0){
-                    // 업데이트에 실패하면(행이 없어서) 삽입 시도
-                    videoStatisticMapper.insertDailyStatistic(
-                            VideoStatistic.builder()
-                                    .videoId(newStat.getVideoId())
-                                    .dailyViewCount(newStat.getDailyViewCount())
-                                    .dailyWatchedTime(newStat.getDailyWatchedTime())
-                                    .dailyAdViewCount(newStat.getDailyAdViewCount())
-                                    .createdAt(today)
-                                    //.zScore(newStat.getZScore())
-                                    .build()
-                    );
-                }
-
-            } catch (EmptyResultDataAccessException e) {
-                // 업데이트에 실패하면(행이 없어서) 삽입 시도
+            }else{
                 videoStatisticMapper.insertDailyStatistic(
                         VideoStatistic.builder()
                                 .videoId(newStat.getVideoId())
                                 .dailyViewCount(newStat.getDailyViewCount())
                                 .dailyWatchedTime(newStat.getDailyWatchedTime())
                                 .dailyAdViewCount(newStat.getDailyAdViewCount())
-                                //.zScore(newStat.getZScore())
+                                .createdAt(today)
                                 .build()
                 );
             }

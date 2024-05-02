@@ -47,7 +47,7 @@ public class StatisticReader {
     @StepScope
     public JdbcPagingItemReader<WatchHistory> buildStatisticReader() {
         //String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String today = "2024-05-03";
+        String today = "2024-05-01";
         return new JdbcPagingItemReaderBuilder<WatchHistory>()
                 .name("reader")
                 .pageSize(1000)
@@ -56,7 +56,7 @@ public class StatisticReader {
                 .queryProvider(statisticQueryProvider())
                 .parameterValues(Map.of(
                         "today", today,
-                        "range", 5000
+                        "assignedServer", false
                 ))
                 .build();
     }
@@ -76,9 +76,9 @@ public class StatisticReader {
 
         SqlPagingQueryProviderFactoryBean queryProvider = new SqlPagingQueryProviderFactoryBean();
         queryProvider.setDataSource(dataSource);
-        queryProvider.setSelectClause("SELECT videoId, playedTime, adViewCount, numericOrderKey, createdAt");
+        queryProvider.setSelectClause("SELECT videoId, playedTime, adViewCount, numericOrderKey, createdAt, assignedServer");
         queryProvider.setFromClause("FROM WatchHistory");
-        queryProvider.setWhereClause("WHERE createdAt = :today AND videoId >= :range");
+        queryProvider.setWhereClause("WHERE createdAt = :today AND assignedServer = :assignedServer");
         queryProvider.setSortKey("numericOrderKey");
 
         try {

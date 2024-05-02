@@ -19,5 +19,6 @@ public class WatchHistory {
     private LocalDateTime watchedAt;
     private Integer adViewCount; //그냥 순서대로 나오는 광고 몇개 봤는지
     private Long numericOrderKey;
+    private boolean assignedServer;
 }
 

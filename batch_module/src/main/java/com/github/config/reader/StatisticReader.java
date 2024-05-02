@@ -57,7 +57,7 @@ public class StatisticReader {
                 .queryProvider(statisticQueryProvider())
                 .parameterValues(Map.of(
                         "today", today,
-                        "range", 5000
+                        "assignedServer", true
                 ))
                 .build();
     }
@@ -77,9 +77,9 @@ public class StatisticReader {
 
         SqlPagingQueryProviderFactoryBean queryProvider = new SqlPagingQueryProviderFactoryBean();
         queryProvider.setDataSource(dataSource);
-        queryProvider.setSelectClause("SELECT videoId, playedTime, adViewCount, numericOrderKey, createdAt");
+        queryProvider.setSelectClause("SELECT videoId, playedTime, adViewCount, numericOrderKey, createdAt, assignedServer");
         queryProvider.setFromClause("FROM WatchHistory");
-        queryProvider.setWhereClause("WHERE createdAt = :today AND videoId < :range");
+        queryProvider.setWhereClause("WHERE createdAt = :today AND assignedServer = assignedServer");
         queryProvider.setSortKey("numericOrderKey");
 
         try {
