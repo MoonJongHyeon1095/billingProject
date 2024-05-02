@@ -1,7 +1,7 @@
 package com.github.config.reader;
 
-import com.github.config.mapper.VideoStatisticRowMapper;
-import com.github.domain.VideoStatistic;
+import com.github.config.mapper.WatchHistoryRowMapper;
+import com.github.domain.WatchHistory;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -41,24 +41,22 @@ import java.util.Map;
 @Slf4j
 @Configuration
 @AllArgsConstructor
-public class BillReader {
+public class StatisticReader {
     private final DataSource dataSource;
-
     @Bean
     @StepScope
-    public JdbcPagingItemReader<VideoStatistic> buildBillReader() {
-
+    public JdbcPagingItemReader<WatchHistory> buildStatisticReader() {
         //String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         String today = "2024-05-03";
-        return new JdbcPagingItemReaderBuilder<VideoStatistic>()
+        return new JdbcPagingItemReaderBuilder<WatchHistory>()
                 .name("reader")
-                .pageSize(20)
-                .fetchSize(20)
+                .pageSize(1000)
                 .dataSource(dataSource)
-                .rowMapper(new VideoStatisticRowMapper())
-                .queryProvider(billQueryProvider())
+                .rowMapper(new WatchHistoryRowMapper())
+                .queryProvider(statisticQueryProvider())
                 .parameterValues(Map.of(
-                        "today", today, "range", 5000
+                        "today", today,
+                        "range", 5000
                 ))
                 .build();
     }
@@ -74,14 +72,14 @@ public class BillReader {
 
      */
     @Bean
-    public PagingQueryProvider billQueryProvider() {
+    public PagingQueryProvider statisticQueryProvider() {
 
         SqlPagingQueryProviderFactoryBean queryProvider = new SqlPagingQueryProviderFactoryBean();
         queryProvider.setDataSource(dataSource);
-        queryProvider.setSelectClause("SELECT videoId, dailyViewCount, dailyAdViewCount, createdAt");
-        queryProvider.setFromClause("FROM VideoStatistic");
-        queryProvider.setWhereClause("WHERE createdAt = :today AND videoId < :range");
-        queryProvider.setSortKey("videoId");
+        queryProvider.setSelectClause("SELECT videoId, playedTime, adViewCount, numericOrderKey, createdAt");
+        queryProvider.setFromClause("FROM WatchHistory");
+        queryProvider.setWhereClause("WHERE createdAt = :today AND videoId >= :range");
+        queryProvider.setSortKey("numericOrderKey");
 
         try {
             return queryProvider.getObject();

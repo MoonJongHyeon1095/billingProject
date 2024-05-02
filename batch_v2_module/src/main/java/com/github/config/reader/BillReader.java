@@ -58,7 +58,8 @@ public class BillReader {
                 .rowMapper(new VideoStatisticRowMapper())
                 .queryProvider(billQueryProvider())
                 .parameterValues(Map.of(
-                        "today", today, "range", 5000
+                        "today", today,
+                        "range", 5000
                 ))
                 .build();
     }
@@ -80,7 +81,7 @@ public class BillReader {
         queryProvider.setDataSource(dataSource);
         queryProvider.setSelectClause("SELECT videoId, dailyViewCount, dailyAdViewCount, createdAt");
         queryProvider.setFromClause("FROM VideoStatistic");
-        queryProvider.setWhereClause("WHERE createdAt = :today AND videoId < :range");
+        queryProvider.setWhereClause("WHERE createdAt = :today AND videoId >= :range");
         queryProvider.setSortKey("videoId");
 
         try {

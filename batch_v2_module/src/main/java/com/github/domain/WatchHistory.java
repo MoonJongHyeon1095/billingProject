@@ -3,10 +3,8 @@ package com.github.domain;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Optional;
 
 @Getter
 @Builder
