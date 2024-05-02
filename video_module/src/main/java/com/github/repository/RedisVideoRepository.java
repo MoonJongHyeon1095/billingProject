@@ -7,7 +7,7 @@ public interface RedisVideoRepository {
 
     Set<String> getAllVideoRecords();
 
-    void saveHash(String key, int viewCount, int deltaViewCount, long ttl);
+    void saveHash(String key, int viewCount, long ttl);
 
     Integer getFromHashMap(String videoId, String key);
 

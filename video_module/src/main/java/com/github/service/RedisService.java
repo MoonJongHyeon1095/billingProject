@@ -1,15 +1,10 @@
 package com.github.service;
 
 import com.github.config.redis.RedisLockManager;
-import com.github.domain.RedisViewRecord;
-import com.github.domain.Video;
 import com.github.exception.VideoErrorCode;
 import com.github.exception.VideoException;
-import com.github.mapper.VideoMapper;
 import com.github.repository.RedisVideoRepositoryImpl;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.Set;
@@ -18,38 +13,10 @@ import java.util.Set;
 public class RedisService {
     private final RedisLockManager redisLockManager;
     private final RedisVideoRepositoryImpl redisVideoRepository;
-    private final VideoMapper videoMapper;
 
-    public RedisService(RedisLockManager redisLockManager, RedisVideoRepositoryImpl redisVideoRepository, VideoMapper videoMapper) {
+    public RedisService(RedisLockManager redisLockManager, RedisVideoRepositoryImpl redisVideoRepository) {
         this.redisLockManager = redisLockManager;
         this.redisVideoRepository = redisVideoRepository;
-        this.videoMapper = videoMapper;
-    }
-
-    // 매일 0시와 12시에 실행
-    @Scheduled(cron = "0 0 0,12 * * ?", zone = "Asia/Seoul")
-    @Transactional
-    public void updateRecords(){
-        // Redis 내의 모든 키 가져오기
-        final Set<String> keys = redisVideoRepository.getAllVideoRecords(); // 키 패턴에 따라 적절히 조정
-
-        if (keys != null) {
-            for (String key : keys) {
-                final Map<String, String> videoData = redisVideoRepository.getHashMap(key);
-                if (videoData != null && !videoData.isEmpty()) {
-                    final int viewCount = Integer.parseInt(videoData.get("viewCount"));
-                    final int increment =  Integer.parseInt(videoData.get("increment"));
-
-                    videoMapper.updatedTotalViewCount(
-                            Video.builder()
-                                    .videoId(getVideoIdFromKey(key))
-                                    .totalViewCount(viewCount)
-                            .build());
-
-                    redisVideoRepository.saveHash(key, viewCount, increment, 86400);
-                }
-            }
-        }
     }
 
     /**
@@ -85,6 +52,10 @@ public class RedisService {
 
     protected Map<String, String> getRedisRecord(final int videoId) {
         return redisVideoRepository.getHashMap("video:"+videoId);
+    }
+
+    protected Integer getViewCountValue(final int videoId){
+        return redisVideoRepository.getFromHashMap("video:"+videoId, "viewCount");
     }
 
     private static int getVideoIdFromKey(String key) {
