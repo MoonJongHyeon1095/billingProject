@@ -14,7 +14,8 @@ import org.springframework.security.web.server.header.XFrameOptionsServerHttpHea
 
 /**
  SpringSecurity 설정
-
+ - Authentication 인증 : 사용자의 정보를 확인
+ - Authorization 인가 : 그 사용자가 리소스에 접근할 권한
  */
 @Configuration
 @EnableWebFluxSecurity
@@ -33,7 +34,6 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .cors(ServerHttpSecurity.CorsSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance()) //session STATELESS
@@ -43,7 +43,7 @@ public class SecurityConfig {
                         .pathMatchers("/v1/info/top5/**").permitAll()
                         .anyExchange().authenticated()
                 )
-                .addFilterBefore(jwtAuthenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+                .addFilterAt(jwtAuthenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .exceptionHandling(handle -> handle.authenticationEntryPoint(authenticationEntryPoint));
 
         return http.build();
