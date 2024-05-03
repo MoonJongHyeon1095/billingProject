@@ -1,6 +1,7 @@
 package com.github.config.listener.job_listener;
 
 import com.github.domain.VideoStatistic;
+import com.github.dto.VideoStatDto;
 import com.github.mapper.VideoStatisticMapper;
 import com.github.util.GlobalSingletonCache;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,7 @@ public class DailyUpdateJobListener implements JobExecutionListener {
             //LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
             LocalDate today = LocalDate.parse("2024-05-04");
             //행이 존재하면
-            Optional<VideoStatistic> foundStat = videoStatisticMapper.findOneByVideoIdAndCreatedAt(today, newStat.getVideoId());
+            Optional<VideoStatDto> foundStat = videoStatisticMapper.findOneByVideoIdAndCreatedAt(today, newStat.getVideoId());
             if(foundStat.isPresent()){
                 videoStatisticMapper.updateDailyStatistic(
                         VideoStatistic.builder()

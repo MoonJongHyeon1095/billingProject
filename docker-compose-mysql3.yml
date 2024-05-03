@@ -1,22 +1,21 @@
-#docker-compose -f docker-compose-mysql.yml up -d
-version: '3'
+#docker-compose -f docker-compose-mysql3.yml up -d
+version: '3.8'
 
 services:
-  db001:
+  mysql:
     image: mysql:8.0.33
-    container_name: db001
-    hostname: db001
+    container_name: db003
+    hostname: db003
     environment:
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-    # Where our data will be persisted
     volumes:
-      - master:/var/lib/mysql
-      - master:/var/lib/mysql-files
-      - ./db001/conf:/etc/mysql/conf.d
+      - slave:/var/lib/mysql
+      - slave:/var/lib/mysql-files
+      - ./db003/conf:/etc/mysql/conf.d
     ports:
       - "3306:3306"
 volumes:
-  master:
+  slave:
