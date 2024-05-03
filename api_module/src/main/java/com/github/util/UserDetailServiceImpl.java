@@ -44,7 +44,7 @@ public class UserDetailServiceImpl implements ReactiveUserDetailsService {
                                 .authorities(Collections.singleton(new SimpleGrantedAuthority("USER")))
                                 .build())
                         .map(Mono::just) // UserDetailsImpl을 Mono<UserDetails>로 변환
-                        .orElseGet(() -> Mono.error(new UserException.UserNotFoundException(UserErrorCode.USER_NOT_FOUND)))); // UserDetails 타입으로 캐스팅합니다.
+                        .orElseGet(() -> Mono.error(new UserException.UserNotFoundException(UserErrorCode.USER_NOT_FOUND))));
     }
 
     @Bean
