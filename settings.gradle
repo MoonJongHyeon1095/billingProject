@@ -8,5 +8,4 @@ include 'discovery_module'
 include 'video_info_module'
 include 'watch_history_module'
 include 'batch_v2_module'
-include 'watch_history_v2_module'
 

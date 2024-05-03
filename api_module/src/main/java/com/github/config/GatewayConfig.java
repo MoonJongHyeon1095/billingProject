@@ -34,20 +34,20 @@ public class GatewayConfig {
                 .route(r -> r.path("/v1/video/play")
                         //X-User-Email or X-Device-UUID
                         .filters(f -> f.filter(userContextFilter.apply(new UserContextFilter.Config())))
-                        .uri("http://localhost:8082"))
-                        //.uri("lb://VIDEO"))
+                        //.uri("http://localhost:8082"))
+                        .uri("lb://VIDEO"))
 
                 //정산내역 조회는 인증 인가 필요
                 .route(r-> r.path("/v1/info/bill/**")
                         //X-User-Email
                         .filters(f -> f.filter(userContextFilter.apply(new UserContextFilter.Config()))
                         )
-                        .uri("http://localhost:8084"))
-                        //.uri("lb://VIDEO-INFO"))
+                        //.uri("http://localhost:8084"))
+                        .uri("lb://VIDEO-INFO"))
                 //top5 조회는 인증 인가 필요 X
                 .route(r-> r.path("/v1/info/top5/**")
-                        .uri("http://localhost:8084"))
-                        //.uri("lb://VIDEO-INFO"))
+                        //.uri("http://localhost:8084"))
+                        .uri("lb://VIDEO-INFO"))
                 .build();
     }
 }

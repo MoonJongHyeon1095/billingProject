@@ -1,9 +1,11 @@
 package com.github.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.common.exception.ErrorResponse;
 import com.github.common.response.Response;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,7 +17,10 @@ import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CustomAuthenticationEntryPoint implements ServerAuthenticationEntryPoint {
@@ -24,23 +29,23 @@ public class CustomAuthenticationEntryPoint implements ServerAuthenticationEntry
 
     @Override
     public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException e) {
-        return Mono.defer(() -> {
-            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-            exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
-            final Response<ErrorResponse> body = Response.error(ErrorResponse.builder()
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .message("[ERROR] 인증(autentication) 실패. 토큰을 제대로 넣어보십시오.")
-                    .timestamp(LocalDateTime.now())
-                    .build());
+        log.error("Auth 에러 핸들링 entry point: {}", e.getMessage(), e);
+        Map<String, Object> errorDetails = new HashMap<>();
+        errorDetails.put("error", "Unauthorized");
+        errorDetails.put("message", "Access Denied");
+        errorDetails.put("detail", e.getMessage());
 
-            byte[] bytes;
-            try {
-                bytes = objectMapper.writeValueAsBytes(body);
-            } catch (Exception ex) {
-                bytes = ("{\"error\": \"" + ex.getMessage() + "\"}").getBytes(StandardCharsets.UTF_8);
-            }
-            DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
-            return exchange.getResponse().writeWith(Mono.just(buffer));
-        });
+        byte[] errorResponse;
+        try {
+            errorResponse = objectMapper.writeValueAsString(errorDetails).getBytes(StandardCharsets.UTF_8);
+        } catch (JsonProcessingException ex) {
+            log.error("Error writing JSON output", ex);
+            errorResponse = "{\"error\":\"Internal Server Error\",\"message\":\"Unable to process JSON\"}".getBytes(StandardCharsets.UTF_8);
+        }
+
+        exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+        DataBuffer dataBuffer = exchange.getResponse().bufferFactory().wrap(errorResponse);
+        return exchange.getResponse().writeWith(Mono.just(dataBuffer));
     }
 }

@@ -18,9 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 public class UserService {
     private final UserMapper userMapper;
-    private final BCryptPasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
-
+    private final BCryptPasswordEncoder passwordEncoder;
     @Transactional
     public LoginResponse login(final UserDto userDto) {
         final String email = userDto.getEmail();

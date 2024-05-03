@@ -7,10 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
-import org.springframework.security.web.server.header.XFrameOptionsServerHttpHeadersWriter;
 
 /**
  SpringSecurity 설정
@@ -35,7 +33,7 @@ public class SecurityConfig {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
-                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
+                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable) //WWW-Authenticate 비활성화, jwt사용
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance()) //session STATELESS
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/v1/user/**").permitAll()
