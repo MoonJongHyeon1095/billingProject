@@ -13,7 +13,7 @@ import java.util.Optional;
 @Slf4j
 @RestController
 @AllArgsConstructor
-@RequestMapping("/v1/video")
+@RequestMapping("/v1/play")
 public class VideoController {
     private final ViewService viewService;
 
@@ -23,7 +23,7 @@ public class VideoController {
      * @param deviceUUID 로그인을 하지 않은 유저를 식별하는 데에 사용
      * @return
      */
-    @PostMapping("/play")
+    @PostMapping
     public Response<ViewResponse> countView(
             @RequestBody final ViewDto viewDto,
             @RequestHeader("X-User-Email") final String email,

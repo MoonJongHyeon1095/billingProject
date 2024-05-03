@@ -4,6 +4,7 @@ import com.github.feignclient.AdFeignClient;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.vavr.control.Try;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,6 @@ public class ResilienceService {
     public ResilienceService(AdFeignClient adFeignClient, CircuitBreakerRegistry circuitBreakerRegistry) {
         this.adFeignClient = adFeignClient;
         this.circuitBreaker = circuitBreakerRegistry.circuitBreaker("adFeignClient");
-
     }
 
     /**

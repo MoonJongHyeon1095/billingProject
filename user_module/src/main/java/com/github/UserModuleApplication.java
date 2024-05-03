@@ -6,8 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
-@EnableDiscoveryClient
-@MapperScan("com.github.mapper")
 public class UserModuleApplication {
     public static void main(String[] args) {
         SpringApplication.run(UserModuleApplication.class, args);

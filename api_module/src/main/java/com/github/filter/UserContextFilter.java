@@ -1,5 +1,6 @@
 package com.github.filter;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -15,6 +16,7 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @Component
 public class UserContextFilter extends AbstractGatewayFilterFactory<UserContextFilter.Config> {
     public UserContextFilter() {
@@ -35,12 +37,16 @@ public class UserContextFilter extends AbstractGatewayFilterFactory<UserContextF
                         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
                             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
                             String email = userDetails.getUsername();
+                            log.info("GateFilter{}", email);
                             // Add the email to the request header
-                            exchange.getRequest().mutate().header("X-User-Email", email).build();
+                            ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
+                                    .header("X-User-Email", email)
+                                    .build();
+                            return exchange.mutate().request(modifiedRequest).build();
                         }
                         return exchange;
                     })
-                    .defaultIfEmpty(exchange)
+                    .defaultIfEmpty(exchange) //인증 정보가 없어도 계속 exchange 진행
                     .flatMap(chain::filter);  // Proceed with the modified or original exchange
         };
     }

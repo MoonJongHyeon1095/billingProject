@@ -1,6 +1,7 @@
 package com.github.util;
 
 import lombok.Builder;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -8,15 +9,15 @@ import java.util.Collection;
 import java.util.Collections;
 
 @Builder
+@Getter
 public class UserDetailsImpl implements UserDetails {
     final String email;
     final String password;
-
+    final Collection<? extends GrantedAuthority> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 여기서는 유저의 권한을 반환해야 합니다. 실제 어플리케이션에서는 해당 유저의 권한 목록을 로딩하여 반환합니다.
-        return Collections.emptyList(); // 현재는 권한 없음으로 설정
+        return authorities;
     }
     @Override
     public String getPassword() {

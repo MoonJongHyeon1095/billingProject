@@ -19,12 +19,18 @@ import java.time.ZoneId;
 import java.util.UUID;
 
 @Service
-@AllArgsConstructor
 public class WatchHistoryService {
     private final WatchHistoryMapper watchHistoryMapper;
     private final VideoMapper videoMapper;
     private final ResilienceService resilienceService;
-    private boolean assignedBatchServerFlag = true;
+    private boolean assignedBatchServerFlag = false;
+
+    public WatchHistoryService(WatchHistoryMapper watchHistoryMapper, VideoMapper videoMapper, ResilienceService resilienceService) {
+        this.watchHistoryMapper = watchHistoryMapper;
+        this.videoMapper = videoMapper;
+        this.resilienceService = resilienceService;
+    }
+
     @Transactional
     public void createWatchHistory(final WatchHistoryDto watchHistoryDto, final String deviceUUID) {
         //video 없으면 예외처리

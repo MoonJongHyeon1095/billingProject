@@ -28,7 +28,7 @@ public class DataSourceConfiguration {
     @Autowired
     public DataSourceConfiguration(
             @Value("${spring.datasource.master.hikari.jdbc-url}") String mainUrl,
-            @Value("${spring.datasource.slave2.hikari.jdbc-url}") String replicaUrl1,
+            @Value("${spring.datasource.slave1.hikari.jdbc-url}") String replicaUrl1,
             @Value("${spring.datasource.slave2.hikari.jdbc-url}") String replicaUrl2,
             @Value("${spring.datasource.username}") String dataSourceUsername,
             @Value("${spring.datasource.password}") String dataSourcePassword,

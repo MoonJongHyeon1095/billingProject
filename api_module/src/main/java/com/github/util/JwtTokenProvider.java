@@ -56,8 +56,8 @@ public JwtTokenProvider (
         return BEARER_PREFIX + token;
     }
 
-    public boolean isExpired(String token){
-        Date expiredDate = extractClaims(token).getExpiration();
+    public boolean isExpired(Claims c){
+        Date expiredDate = c.getExpiration();
         return expiredDate.before(new Date()); //이전 날짜면 true 반환
     }
 

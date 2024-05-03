@@ -4,11 +4,16 @@ import com.github.domain.User;
 import com.github.exception.UserErrorCode;
 import com.github.exception.UserException;
 import com.github.mapper.UserMapper;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+
+import java.util.Collections;
 
 /**
  * map 함수는 스트림의 각 요소를 변환하는 연산입니다.
@@ -36,9 +41,15 @@ public class UserDetailServiceImpl implements ReactiveUserDetailsService {
                         .map(user -> UserDetailsImpl.builder()
                                 .password(user.getPassword())
                                 .email(user.getEmail())
+                                .authorities(Collections.singleton(new SimpleGrantedAuthority("USER")))
                                 .build())
                         .map(Mono::just) // UserDetailsImpl을 Mono<UserDetails>로 변환
-                        .orElseGet(() -> Mono.error(new UserException.UserNotFoundException(UserErrorCode.USER_NOT_FOUND))))
-                .cast(UserDetails.class); // UserDetails 타입으로 캐스팅합니다.
+                        .orElseGet(() -> Mono.error(new UserException.UserNotFoundException(UserErrorCode.USER_NOT_FOUND)))); // UserDetails 타입으로 캐스팅합니다.
     }
+
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
+
 }
