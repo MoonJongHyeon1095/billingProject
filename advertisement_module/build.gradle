@@ -40,6 +40,9 @@ dependencies {
 
     //Eureka 클라이언트로 등록
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
+
+
 }
 
 tasks.named('test') {

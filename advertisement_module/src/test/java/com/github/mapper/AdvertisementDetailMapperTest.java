@@ -1,4 +1,4 @@
-package mapper;
+package com.github.mapper;
 
 import com.github.config.db.MyBatisConfig;
 import com.github.mapper.AdvertisementDetailMapper;
@@ -16,13 +16,14 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(SpringExtension.class)
+//./gradlew test --tests com.github.mapper.AdvertisementDetailMapperTest
+//./gradlew clean test --tests com.github.mapper.AdvertisementDetailMapperTest
 @MybatisTest
 @ContextConfiguration(classes = MyBatisConfig.class)
-@MapperScan("com.github.mapper")
+//@MapperScan("com.github.mapper")
 public class AdvertisementDetailMapperTest {
     @Autowired
-    private AdvertisementDetailMapper advertisementDetailMapper;
+    AdvertisementDetailMapper advertisementDetailMapper;
 
     @Test
     public void countByVideoIdTest() {

@@ -30,7 +30,7 @@ public class StatisticService {
      * 따라서 한국 서울 시간(KST)으로 설정하려면 UTC 시간에 9시간을 더하거나 타임존 명시
      * 초 분 시 일 월 요일
      */
-    @Scheduled(cron = "0 14 0 * * ?", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 44 14 * * ?", zone = "Asia/Seoul")
     public void runDailyStatisticJob() throws Exception {
         try{
             JobParameters jobParameters = new JobParametersBuilder()

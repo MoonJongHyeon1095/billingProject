@@ -1,6 +1,5 @@
 package com.github.service;
 
-import com.github.common.response.Response;
 import com.github.exception.AdErrorCode;
 import com.github.exception.AdException;
 import com.github.mapper.AdvertisementDetailMapper;
