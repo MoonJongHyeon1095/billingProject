@@ -30,8 +30,8 @@ public class BillBatchConfiguration {
     private final BillReader billReader;
 
     @Bean
-    public Job dailyBillingJob(JobRepository jobRepository) {
-        return new JobBuilder("dailyBillingJob", jobRepository)
+    public Job dailyBillingJobV2(JobRepository jobRepository) {
+        return new JobBuilder("dailyBillingJobV2", jobRepository)
                 .preventRestart()
                 .listener(new JobLoggerListener())
                 .start(dailyBillingStep(jobRepository))

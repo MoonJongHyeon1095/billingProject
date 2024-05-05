@@ -47,8 +47,8 @@ public class StatisticReader {
     @Bean
     @StepScope
     public JdbcPagingItemReader<WatchHistory> buildStatisticReader() {
-        //String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String today = "2024-05-04";
+        String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+//        String today = "2024-05-04";
         return new JdbcPagingItemReaderBuilder<WatchHistory>()
                 .name("reader")
                 .pageSize(100)

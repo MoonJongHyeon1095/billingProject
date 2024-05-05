@@ -32,7 +32,6 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
 @AllArgsConstructor
 public class StatisticBatchConfiguration {
     private final DataSourceConfiguration dataSourceConfiguration;
-    private final DailyStatisticsProcessor dailyStatisticsProcessor;
     private final DailyStatisticWriter dailyStatisticWriter;
     private final VideoStatisticMapper videoStatisticMapper;
     private final VideoMapper videoMapper;
@@ -41,12 +40,12 @@ public class StatisticBatchConfiguration {
     private final ExecutorServiceConfig executorServiceConfig;
 
     @Bean
-    public Job dailyStatisticJob(JobRepository jobRepository) {
-        return new JobBuilder("dailyStaticJob", jobRepository)
+    public Job dailyStatisticJobV1(JobRepository jobRepository) {
+        return new JobBuilder("dailyStatisticJobV1", jobRepository)
                 .preventRestart()
                 .listener(new DailyUpdateJobListener(videoStatisticMapper))
                 .listener(new JobLoggerListener())
-                .start(dailyStatisticStep(jobRepository))
+                .start(dailyStatisticStepV1(jobRepository))
                 .build();
     }
 
@@ -76,7 +75,7 @@ public class StatisticBatchConfiguration {
 
         return new StepBuilder("partitionedStep", jobRepository)
                 .partitioner("dailyStatisticStep", partitioner())
-                .step(dailyStatisticStep(jobRepository))
+                .step(dailyStatisticStepV1(jobRepository))
                 .taskExecutor(executorServiceConfig.taskExecutor())
                 //.partitionHandler(partitionHandler)
                 .build();
@@ -93,8 +92,8 @@ public class StatisticBatchConfiguration {
      * processor 제거, 전역 캐시 객체에 바로 누적
      */
     @Bean
-    public Step dailyStatisticStep(JobRepository jobRepository) {
-        return new StepBuilder("dailyStatisticStep", jobRepository)
+    public Step dailyStatisticStepV1(JobRepository jobRepository) {
+        return new StepBuilder("dailyStatisticStepV1", jobRepository)
                 .<WatchHistory, WatchHistory>chunk(
                         100,
                         dataSourceConfiguration.batchTransactionManager())

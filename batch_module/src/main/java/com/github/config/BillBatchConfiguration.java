@@ -30,16 +30,16 @@ public class BillBatchConfiguration {
     private final BillReader billReader;
 
     @Bean
-    public Job dailyBillingJob(JobRepository jobRepository) {
-        return new JobBuilder("dailyBillingJob", jobRepository)
+    public Job dailyBillingJobV1(JobRepository jobRepository) {
+        return new JobBuilder("dailyBillingJobV1", jobRepository)
                 .preventRestart()
                 .listener(new JobLoggerListener())
-                .start(dailyBillingStep(jobRepository))
+                .start(dailyBillingStepV1(jobRepository))
                 .build();
     }
     @Bean
-    public Step dailyBillingStep(JobRepository jobRepository) {
-        return new StepBuilder("dailyBillingStep", jobRepository)
+    public Step dailyBillingStepV1(JobRepository jobRepository) {
+        return new StepBuilder("dailyBillingStepV1", jobRepository)
                 .<VideoStatistic, VideoStatistic>chunk(20, dataSourceConfiguration.batchTransactionManager())
                 .reader(billReader.buildBillReader())
                 .processor(dailyBillingProcessor)

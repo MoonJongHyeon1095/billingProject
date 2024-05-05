@@ -41,12 +41,12 @@ public class StatisticBatchConfiguration {
     private final ExecutorServiceConfig executorServiceConfig;
 
     @Bean
-    public Job dailyStatisticJob(JobRepository jobRepository) {
-        return new JobBuilder("dailyStaticJob", jobRepository)
+    public Job dailyStatisticJobV2(JobRepository jobRepository) {
+        return new JobBuilder("dailyStatisticJobV2", jobRepository)
                 .preventRestart()
                 .listener(new DailyUpdateJobListener(videoStatisticMapper))
                 .listener(new JobLoggerListener())
-                .start(dailyStatisticStep(jobRepository))
+                .start(dailyStatisticStepV2(jobRepository))
                 .build();
     }
 
@@ -75,8 +75,8 @@ public class StatisticBatchConfiguration {
 //        partitionHandler.setGridSize(2);
 
         return new StepBuilder("partitionedStep", jobRepository)
-                .partitioner("dailyStatisticStep", partitioner())
-                .step(dailyStatisticStep(jobRepository))
+                .partitioner("dailyStatisticStepV2", partitioner())
+                .step(dailyStatisticStepV2(jobRepository))
                 .taskExecutor(executorServiceConfig.taskExecutor())
                 //.partitionHandler(partitionHandler)
                 .build();
@@ -93,8 +93,8 @@ public class StatisticBatchConfiguration {
      * processor 제거, 전역 캐시 객체에 바로 누적
      */
     @Bean
-    public Step dailyStatisticStep(JobRepository jobRepository) {
-        return new StepBuilder("dailyStatisticStep", jobRepository)
+    public Step dailyStatisticStepV2(JobRepository jobRepository) {
+        return new StepBuilder("dailyStatisticStepV2", jobRepository)
                 .<WatchHistory, WatchHistory>chunk(
                         1000,
                         dataSourceConfiguration.batchTransactionManager())

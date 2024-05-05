@@ -10,14 +10,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class BillingService {
-    private final Job dailyBillingJob;
+    private final Job dailyBillingJobV1;
     private final JobLauncher jobLauncher;
 
     public BillingService(
             JobLauncher jobLauncher,
-            @Qualifier("dailyBillingJob") Job dailyBillingJob
+            @Qualifier("dailyBillingJobV1") Job dailyBillingJobV1
     ) {
-        this.dailyBillingJob = dailyBillingJob;
+        this.dailyBillingJobV1 = dailyBillingJobV1;
         this.jobLauncher = jobLauncher;
     }
 
@@ -26,13 +26,13 @@ public class BillingService {
      * 따라서 한국 서울 시간(KST)으로 설정하려면 UTC 시간에 9시간을 더하거나 타임존 명시
      * 초 분 시 일 월 요일
      */
-    @Scheduled(cron = "0 49 14 * * ?", zone = "Asia/Seoul")
-    public void runDailyBillingJob() throws Exception {
+    @Scheduled(cron = "0 16 15 * * ?", zone = "Asia/Seoul")
+    public void runDailyBillingJob1() throws Exception {
         try{
             JobParameters jobParameters = new JobParametersBuilder()
                     .addLong("timestamp", System.currentTimeMillis()) // Job parameter에 고유한 값 추가
                     .toJobParameters();
-            jobLauncher.run(dailyBillingJob, jobParameters);
+            jobLauncher.run(dailyBillingJobV1, jobParameters);
         }catch (Exception e){
             e.printStackTrace();
         }

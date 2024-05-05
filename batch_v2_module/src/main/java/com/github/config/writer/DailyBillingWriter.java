@@ -21,8 +21,8 @@ public class DailyBillingWriter implements ItemWriter<VideoStatistic> {
     }
     @Override
     public void write(Chunk<? extends VideoStatistic> chunk) throws Exception {
-        //LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
-        LocalDate today = LocalDate.parse("2024-05-04");
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+        //LocalDate today = LocalDate.parse("2024-05-04");
         for (VideoStatistic stat : chunk) {
             videoStatisticMapper.updateDailyBill(
                     stat.getVideoId(),

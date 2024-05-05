@@ -28,8 +28,8 @@ public class DailyUpdateJobListener implements JobExecutionListener {
     public void afterJob(JobExecution jobExecution) {
         List<VideoStatistic> statList = globalCache.getCacheData();
         for(VideoStatistic newStat: statList){
-            //LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
-            LocalDate today = LocalDate.parse("2024-05-04");
+            LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+            //LocalDate today = LocalDate.parse("2024-05-04");
             //행이 존재하면
             Optional<VideoStatDto> foundStat = videoStatisticMapper.findOneByVideoIdAndCreatedAt(today, newStat.getVideoId());
             if(foundStat.isPresent()){
