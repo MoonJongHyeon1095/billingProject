@@ -46,9 +46,12 @@ public class BillBatchConfiguration {
                 .listener(new LoggerListener())
                 .writer(dailyBillingWriter)
                 .taskExecutor(
-                        new ConcurrentTaskExecutor(
-                                executorServiceConfig.virtualThreadExecutor()
-                        )
+                        //가상 스레드
+//                    new ConcurrentTaskExecutor(
+//                            executorServiceConfig.virtualThreadExecutor()
+//                    )
+                        //플랫폼 스레드
+                        executorServiceConfig.taskExecutor()
                 )
                 .build();
     }

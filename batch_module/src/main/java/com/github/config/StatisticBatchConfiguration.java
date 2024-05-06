@@ -4,13 +4,10 @@ import com.github.config.db.DataSourceConfiguration;
 import com.github.config.executor.ExecutorServiceConfig;
 import com.github.config.listener.job_listener.DailyUpdateJobListener;
 import com.github.config.listener.job_listener.JobLoggerListener;
-import com.github.config.listener.step_listener.CacheClearStepListener;
 import com.github.config.partition.RangePartitioner;
-import com.github.config.processor.DailyStatisticsProcessor;
 import com.github.config.reader.StatisticReader;
 import com.github.config.writer.DailyStatisticWriter;
 import com.github.domain.*;
-import com.github.domain.VideoStatistic;
 import com.github.mapper.VideoMapper;
 import com.github.mapper.VideoStatisticMapper;
 import lombok.AllArgsConstructor;
@@ -67,17 +64,12 @@ public class StatisticBatchConfiguration {
     public Step partitionStep(
             JobRepository jobRepository
     ) {
-//        TaskExecutorPartitionHandler partitionHandler = new TaskExecutorPartitionHandler();
-//        TaskExecutor taskExecutor = executorServiceConfig.taskExecutor(); //플랫폼 스레드로 스레드 풀 생성
-//        partitionHandler.setTaskExecutor(taskExecutor);
-//        partitionHandler.setStep(dailyStatisticStep(jobRepository));
-//        partitionHandler.setGridSize(2);
 
         return new StepBuilder("partitionedStep", jobRepository)
                 .partitioner("dailyStatisticStep", partitioner())
                 .step(dailyStatisticStepV1(jobRepository))
                 .taskExecutor(executorServiceConfig.taskExecutor())
-                //.partitionHandler(partitionHandler)
+                .gridSize(2)
                 .build();
     }
 
@@ -100,9 +92,12 @@ public class StatisticBatchConfiguration {
                 .reader(statisticReader.buildStatisticReader())
                 .writer(dailyStatisticWriter)
                 .taskExecutor(
-                    new ConcurrentTaskExecutor(
-                            executorServiceConfig.virtualThreadExecutor()
-                    )
+//                    //가상 스레드
+//                    new ConcurrentTaskExecutor(
+//                            executorServiceConfig.virtualThreadExecutor()
+//                    )
+                        //플랫폼 스레드
+                        executorServiceConfig.taskExecutor()
                 )
                 .build();
     }

@@ -68,17 +68,12 @@ public class StatisticBatchConfiguration {
     public Step partitionStep(
             JobRepository jobRepository
     ) {
-//        TaskExecutorPartitionHandler partitionHandler = new TaskExecutorPartitionHandler();
-//        TaskExecutor taskExecutor = executorServiceConfig.taskExecutor(); //플랫폼 스레드로 스레드 풀 생성
-//        partitionHandler.setTaskExecutor(taskExecutor);
-//        partitionHandler.setStep(dailyStatisticStep(jobRepository));
-//        partitionHandler.setGridSize(2);
 
         return new StepBuilder("partitionedStep", jobRepository)
                 .partitioner("dailyStatisticStepV2", partitioner())
                 .step(dailyStatisticStepV2(jobRepository))
                 .taskExecutor(executorServiceConfig.taskExecutor())
-                //.partitionHandler(partitionHandler)
+                .gridSize(2)
                 .build();
     }
 
@@ -96,14 +91,17 @@ public class StatisticBatchConfiguration {
     public Step dailyStatisticStepV2(JobRepository jobRepository) {
         return new StepBuilder("dailyStatisticStepV2", jobRepository)
                 .<WatchHistory, WatchHistory>chunk(
-                        1000,
+                        2000,
                         dataSourceConfiguration.batchTransactionManager())
                 .reader(statisticReader.buildStatisticReader())
                 .writer(dailyStatisticWriter)
                 .taskExecutor(
+                        //가상 스레드
                     new ConcurrentTaskExecutor(
                             executorServiceConfig.virtualThreadExecutor()
                     )
+                        //플랫폼 스레드
+//                        executorServiceConfig.taskExecutor()
                 )
                 .build();
     }

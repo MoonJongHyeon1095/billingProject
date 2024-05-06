@@ -34,8 +34,8 @@ public class ExecutorServiceConfig {
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(2);
-        executor.setThreadNamePrefix("partition-thread");
+        executor.setMaxPoolSize(4);
+        executor.setThreadNamePrefix("platform-thread");
         executor.setWaitForTasksToCompleteOnShutdown(Boolean.TRUE);
         executor.initialize();
         return executor;

@@ -5,8 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class WeeklyBillDto {
+public class PeriodViewDto {
     private Integer videoId;
-    private Integer weeklyVideoProfit;
-    private Integer weeklyAdProfit;
+    private Integer dailyViewCount;
 }

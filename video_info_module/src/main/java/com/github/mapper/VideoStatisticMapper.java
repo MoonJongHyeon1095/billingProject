@@ -1,8 +1,10 @@
 package com.github.mapper;
 
 import com.github.domain.VideoStatistic;
+import com.github.dto.DailyBillDto;
 import com.github.dto.DailyViewTop5Dto;
 import com.github.dto.DailyWatchedTimeTop5Dto;
+import com.github.dto.PeriodViewDto;
 import org.apache.ibatis.annotations.*;
 
 import java.time.LocalDate;
@@ -63,4 +65,21 @@ public interface VideoStatisticMapper {
             @Result(property = "dailyWatchedTime", column = "dailyWatchedTime"),
     })
     List<DailyWatchedTimeTop5Dto> findVideoOrderByDailyWatchedTime(@Param("createdAt") final LocalDate createdAt);
+
+    /**
+     * 기간별 조회수
+     *
+     * @return List<PeriodViewDto>
+     */
+    @Select("SELECT v.videoId, v.dailyViewCount " +
+            "FROM VideoStatistic v " +
+            "WHERE v.createdAt >= #{start} " +
+            "AND v.createdAt <= #{end}")
+    @Results(value = {
+            @Result(property = "dailyViewCount", column = "v.dailyViewCount")
+    })
+    List<PeriodViewDto> findAllPeriodViewCountByVideoId(
+            @Param("start") LocalDate start,
+            @Param("end") LocalDate end
+    );
 }

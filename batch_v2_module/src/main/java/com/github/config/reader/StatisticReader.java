@@ -50,8 +50,8 @@ public class StatisticReader {
         //String today = "2024-05-04";
         return new JdbcPagingItemReaderBuilder<WatchHistory>()
                 .name("reader")
-                .pageSize(1000)
-                .fetchSize(1000)
+                .pageSize(2000)
+                .fetchSize(2000)
                 .dataSource(dataSource)
                 .rowMapper(new WatchHistoryRowMapper())
                 .queryProvider(statisticQueryProvider())
