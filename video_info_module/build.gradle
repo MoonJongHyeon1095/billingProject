@@ -30,6 +30,17 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
+    //Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    //Redis 서버와의 실질적인 통신을 담당
+    implementation 'redis.clients:jedis:3.6.0'
+
+    //Mail
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    //PDF
+    implementation 'com.itextpdf:itext7-core:7.2.1'
+
     //Actuator, Prometheus
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'

@@ -1,8 +1,11 @@
 package com.github.util;
 
 import com.github.dto.PeriodViewDto;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 public class GlobalSingletonCache {
     private static volatile GlobalSingletonCache globalSingletonCache;
     private ConcurrentHashMap<Integer, Integer> cacheData;

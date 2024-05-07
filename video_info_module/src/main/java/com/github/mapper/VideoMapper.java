@@ -9,8 +9,14 @@ import org.apache.ibatis.annotations.Select;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface VideoMapper {
+
+    @Select("SELECT v.title " +
+            "FROM Video v " +
+            "WHERE v.videoId = #{videoId}")
+    Optional<String> findVideoTitleByVideoId(@Param("videoId") Integer videoId);
 
     /**
      * email로 소유 videoId 리스트 반환

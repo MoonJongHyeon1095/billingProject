@@ -67,6 +67,7 @@ public class JwtAuthenticationFilter implements WebFilter {
                     Claims claims = jwtTokenProvider.extractClaims(token);
                     if (!jwtTokenProvider.isExpired(claims)) {
                         String email = jwtTokenProvider.getEmail(claims);
+                        log.info("jwt 필터: {}", email);
                         return userDetailsService.findByUsername(email)
                                 .map(userDetails -> new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
                     } else {

@@ -37,7 +37,7 @@ public class UserContextFilter extends AbstractGatewayFilterFactory<UserContextF
                         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
                             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
                             String email = userDetails.getUsername();
-                            // Add the email to the request header
+                            log.info("게이트웨이 필터: " + email);
                             exchange.getRequest().mutate().header("X-User-Email", email).build();
                         }
                         return exchange;

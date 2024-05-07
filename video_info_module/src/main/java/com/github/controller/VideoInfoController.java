@@ -2,8 +2,10 @@ package com.github.controller;
 
 import com.github.common.response.Response;
 import com.github.controller.response.DailyTopResponse;
+import com.github.controller.response.PeriodTop5Response;
 import com.github.controller.response.UserBillResponse;
 import com.github.service.BillingService;
+import com.github.service.ReportService;
 import com.github.service.StatisticService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class VideoInfoController {
     private final BillingService billingService;
     private final StatisticService statisticService;
+    private final ReportService reportService;
 
     /**
      * 일간 통계
@@ -28,13 +31,28 @@ public class VideoInfoController {
     }
 
     @GetMapping("/top5/weekly")
-    public Response getWeeklyTop5(){
-        return Response.success();
+    public Response<PeriodTop5Response> getWeeklyTop5(){
+        PeriodTop5Response response = statisticService.findWeeklyTop5();
+        return Response.success(response);
     }
     @GetMapping("/top5/monthly")
-    public Response getMonthlyTop5(){
+    public Response<PeriodTop5Response> getMonthlyTop5(){
+        PeriodTop5Response response = statisticService.findMonthlyTop5();
+        return Response.success(response);
+    }
 
-        return Response.success();
+    /**
+     * 주간 통계 이메일 발송
+     * @return Response<DailyTopResponse>  일간 조회수 Top5, 재생시간 Top5 리스트 반환
+     */
+    @GetMapping("/bill/mail")
+    public Response<String> sendMail(
+            @RequestHeader("X-User-Email") final String email
+    ){
+        if(email==null) Response.error("로그인 해주세요....");
+        String testEmail = "zin354@gmail.com";
+        reportService.sendEmailWithAttachment(testEmail);
+        return Response.success(email+ " 로 발송 되었음");
     }
 
     /**
