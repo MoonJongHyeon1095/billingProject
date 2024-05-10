@@ -8,12 +8,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        modules: [api_module, user_module, video_module, advertisement_module, batch_module, discovery_module, video_info_module]
-
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v3
         with:
           submodules: 'true'  # 서브모듈을 포함하여 체크아웃
@@ -24,29 +20,26 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: make application.properties
-        if: matrix.modules == 'discovery_module'
+      - name: Make application.properties
         run: |
-          cd ./${{ matrix.modules }}/src/main/resources
-          touch ./application.properties
-          echo "${{ secrets.DISCOVERY_MODULE_PROPERTIES }}" > ./application.properties
+          cd ./discovery_module/src/main/resources
+          touch application.properties
+          echo "${{ secrets.DISCOVERY_MODULE_PROPERTIES }}" > application.properties
         shell: bash
 
       - name: Build and push Docker images
-        if: matrix.modules == 'discovery_module'
         run: |
-          cd ${{ matrix.modules }}
+          cd discovery_module
           ./gradlew bootJar
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker build -f ./docker/Dockerfile_Discovery -t ${{ secrets.DOCKER_USERNAME }}/${{ matrix.modules }} .
-          docker push ${{ secrets.DOCKER_USERNAME }}/${{ matrix.modules }}
+          docker build -f ./Dockerfile_Discovery -t ${{ secrets.DOCKER_USERNAME }}/discovery_module .
+          docker push ${{ secrets.DOCKER_USERNAME }}/discovery_module
 
       - name: Execute Docker Compose
-        if: matrix.modules == 'discovery_module'
         run: |
           sudo docker rm -f $(docker ps -qa)
-          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ matrix.modules }}
+          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/discovery_module
           ssh -i ${{ secrets.KEY }} ubuntu@${{ secrets.DISCOVERY_MODULE_HOST }} 'bash -s' << EOF
-            docker-compose -f ./docker/docker-compose-${{ matrix.modules }}.yml up -d
+            docker-compose -f ./docker/docker-compose-discovery_module.yml up -d
             docker image prune -f
           EOF
