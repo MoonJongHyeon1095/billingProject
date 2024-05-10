@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Bean;
 @LoadBalancerClients({
         @LoadBalancerClient(name = "WATCH-HISTORY", configuration = CustomLoadBalancerConfig.class),
         @LoadBalancerClient(name = "VIDEO-INFO", configuration = CustomLoadBalancerConfig.class),
-        @LoadBalancerClient(name = "VIDEO", configuration = CustomLoadBalancerConfig.class),
+        @LoadBalancerClient(name = "VIEW", configuration = CustomLoadBalancerConfig.class),
         @LoadBalancerClient(name = "USER", configuration = CustomLoadBalancerConfig.class)
 })
 public class CustomLoadBalancerConfig {

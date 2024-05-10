@@ -14,6 +14,8 @@ import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Table;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import com.itextpdf.layout.element.Paragraph;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -29,15 +31,27 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 @Service
-@AllArgsConstructor
 public class ReportService {
     private final JavaMailSender javaMailSender;
     private final StatisticService statisticService;
     private final BillingService billingService;
     private final RedisInfoRepository redisInfoRepository;
-//    @Value("${mail.recipients}")
-//    private final String recipients;
+    @Value("${mail.test}")
+    private final String test;
+
+    public ReportService(JavaMailSender javaMailSender,
+                         StatisticService statisticService,
+                         BillingService billingService,
+                         RedisInfoRepository redisInfoRepository,
+                         @Value("${mail.test}") String test) {
+        this.javaMailSender = javaMailSender;
+        this.statisticService = statisticService;
+        this.billingService = billingService;
+        this.redisInfoRepository = redisInfoRepository;
+        this.test = test;
+    }
 
     public void sendEmailWithAttachment(String email) {
         UserBillResponse bill = billingService.findWeeklyBillingByEmail(email);
@@ -53,7 +67,7 @@ public class ReportService {
 
             // 수신자 설정
             String[] toArr = new String[1];
-            toArr[0] = email;
+            toArr[0] = test;
             helper.setTo(toArr);
 
             // 제목 설정
@@ -95,6 +109,7 @@ public class ReportService {
         ) {
 
             document.add(new Paragraph("weekly view Top 5"));
+            document.add(new Paragraph("\n")); // 여백 추가
             Table table = new Table(3);
             table.addCell(new Cell().add(new Paragraph("video ID")));
             table.addCell(new Cell().add(new Paragraph("title")));
@@ -105,8 +120,12 @@ public class ReportService {
                 table.addCell(new Cell().add(new Paragraph(dto.getTitle())));
                 table.addCell(new Cell().add(new Paragraph(String.valueOf(dto.getTotalViewCount()))));
             }
+            // 문서에 테이블 추가
+            document.add(table);
+            document.add(new Paragraph("\n")); // 여백 추가
 
             document.add(new Paragraph("weekly billing"));
+            document.add(new Paragraph("\n")); // 여백 추가
             Table table2 = new Table(4);
             table2.addCell(new Cell().add(new Paragraph("video ID")));
             table2.addCell(new Cell().add(new Paragraph("video profit")));
@@ -119,9 +138,6 @@ public class ReportService {
                 table2.addCell(new Cell().add(new Paragraph(String.valueOf(dto.getDailyAdProfit()))));
                 table2.addCell(new Cell().add(new Paragraph(String.valueOf(dto.getCreatedAt()))));
             }
-
-            // 문서에 테이블 추가
-            document.add(table);
             document.add(table2);
 
         } catch (FileNotFoundException e) {
@@ -133,6 +149,6 @@ public class ReportService {
 
     private String generatePdfPath(final String email) {
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
-        return "./Top5WeeklyReport_" + today + email + ".pdf";
+        return "./pdf/Top5WeeklyReport_" + today + email + ".pdf";
     }
 }

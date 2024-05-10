@@ -87,17 +87,17 @@ public class StatisticBatchConfiguration {
     public Step dailyStatisticStepV1(JobRepository jobRepository) {
         return new StepBuilder("dailyStatisticStepV1", jobRepository)
                 .<WatchHistory, WatchHistory>chunk(
-                        100,
+                        1000,
                         dataSourceConfiguration.batchTransactionManager())
                 .reader(statisticReader.buildStatisticReader())
                 .writer(dailyStatisticWriter)
                 .taskExecutor(
-//                    //가상 스레드
-//                    new ConcurrentTaskExecutor(
-//                            executorServiceConfig.virtualThreadExecutor()
-//                    )
-                        //플랫폼 스레드
-                        executorServiceConfig.taskExecutor()
+                    //가상 스레드
+                    new ConcurrentTaskExecutor(
+                            executorServiceConfig.virtualThreadExecutor()
+                    )
+//                        //플랫폼 스레드
+//                        executorServiceConfig.taskExecutor()
                 )
                 .build();
     }

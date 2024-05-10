@@ -9,8 +9,6 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -30,8 +28,9 @@ public class DailyUpdateJobListener implements JobExecutionListener {
     public void afterJob(JobExecution jobExecution) {
         List<VideoStatistic> statList = globalCache.getCacheData();
         for(VideoStatistic newStat: statList){
+
             LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
-            //LocalDate today = LocalDate.parse("2024-05-04");
+            //LocalDate today = LocalDate.parse("2024-05-09");
             //행이 존재하면
             Optional<VideoStatDto> foundStat = videoStatisticMapper.findOneByVideoIdAndCreatedAt(today, newStat.getVideoId());
             if(foundStat.isPresent()){

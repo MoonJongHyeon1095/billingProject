@@ -1,5 +1,6 @@
 package com.github.service;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -27,7 +28,7 @@ public class StatisticService {
      * 따라서 한국 서울 시간(KST)으로 설정하려면 UTC 시간에 9시간을 더하거나 타임존 명시
      * 초 분 시 일 월 요일
      */
-    @Scheduled(cron = "0 7 13 * * ?", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 58 11 * * ?", zone = "Asia/Seoul")
     public void runDailyStatisticJob1() throws Exception {
         try{
             JobParameters jobParameters = new JobParametersBuilder()
@@ -37,7 +38,23 @@ public class StatisticService {
         }catch (Exception e){
             e.printStackTrace();
         }
-
     }
+
+//    @PostConstruct
+//    public void runJobAtStartupForDebug() {
+//        // 애플리케이션 시작 시 Job 실행
+//        try {
+//            runJob(dailyStaticJobV1);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    private void runJob(Job job) throws Exception {
+//        JobParameters jobParameters = new JobParametersBuilder()
+//                .addLong("timestamp", System.currentTimeMillis()) // Job parameter에 고유한 값 추가
+//                .toJobParameters();
+//        jobLauncher.run(job, jobParameters);
+//    }
 
 }

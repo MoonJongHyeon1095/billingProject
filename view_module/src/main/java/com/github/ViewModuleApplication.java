@@ -1,14 +1,13 @@
 package com.github;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-public class VideoModuleApplication {
+public class ViewModuleApplication {
     public static void main(String[] args) {
-        SpringApplication.run(VideoModuleApplication.class, args);
+        SpringApplication.run(ViewModuleApplication.class, args);
     }
 }

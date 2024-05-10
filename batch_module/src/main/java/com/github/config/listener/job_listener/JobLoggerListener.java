@@ -1,11 +1,18 @@
 package com.github.config.listener.job_listener;
 
+import com.github.config.writer.DailyStatisticWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 
 @Slf4j
 public class JobLoggerListener implements JobExecutionListener {
+
+
+    @Override
+    public void beforeJob(JobExecution jobExecution) {
+        DailyStatisticWriter.clearThreadCounts();
+    }
 
     @Override
     public void afterJob(JobExecution jobExecution) {
@@ -17,6 +24,7 @@ public class JobLoggerListener implements JobExecutionListener {
                 .mapToLong(stepExecution -> stepExecution.getWriteCount())
                 .sum();
 
+        DailyStatisticWriter.logThreadCounts();
         log.info("Total records read: {}", readCount);
         log.info("Total records written: {}", writeCount);
 

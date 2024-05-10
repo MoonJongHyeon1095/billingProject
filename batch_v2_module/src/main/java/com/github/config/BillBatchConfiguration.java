@@ -15,6 +15,7 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
@@ -39,7 +40,7 @@ public class BillBatchConfiguration {
     }
     @Bean
     public Step dailyBillingStep(JobRepository jobRepository) {
-        return new StepBuilder("dailyBillingStep", jobRepository)
+        TaskletStep dailyBillingStep = new StepBuilder("dailyBillingStep", jobRepository)
                 .<VideoStatistic, VideoStatistic>chunk(20, dataSourceConfiguration.batchTransactionManager())
                 .reader(billReader.buildBillReader())
                 .processor(dailyBillingProcessor)
@@ -54,5 +55,6 @@ public class BillBatchConfiguration {
                         executorServiceConfig.taskExecutor()
                 )
                 .build();
+        return dailyBillingStep;
     }
 }

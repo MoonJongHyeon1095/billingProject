@@ -50,8 +50,7 @@ public class VideoInfoController {
             @RequestHeader("X-User-Email") final String email
     ){
         if(email==null) Response.error("로그인 해주세요....");
-        String testEmail = "zin354@gmail.com";
-        reportService.sendEmailWithAttachment(testEmail);
+        reportService.sendEmailWithAttachment(email);
         return Response.success(email+ " 로 발송 되었음");
     }
 

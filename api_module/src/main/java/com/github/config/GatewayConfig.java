@@ -35,7 +35,7 @@ public class GatewayConfig {
                         //X-User-Email or X-Device-UUID
                         .filters(f -> f.filter(userContextFilter.apply(new UserContextFilter.Config())))
                         //.uri("http://localhost:8082"))
-                        .uri("lb://VIDEO"))
+                        .uri("lb://VIEW"))
 
                 //정산내역 조회는 인증 인가 필요
                 .route(r-> r.path("/v1/info/bill/**")

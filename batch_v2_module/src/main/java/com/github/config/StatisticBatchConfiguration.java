@@ -100,7 +100,7 @@ public class StatisticBatchConfiguration {
                     new ConcurrentTaskExecutor(
                             executorServiceConfig.virtualThreadExecutor()
                     )
-                        //플랫폼 스레드
+//                        //플랫폼 스레드
 //                        executorServiceConfig.taskExecutor()
                 )
                 .build();
