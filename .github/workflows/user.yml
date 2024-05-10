@@ -16,7 +16,7 @@ jobs:
 
       - name: Create resources directory if missing
         run: |
-          mkdir -p api_module/src/main/resources
+          mkdir -p user_module/src/main/resources
 
       - name: Set up JDK 21
         uses: actions/setup-java@v3
@@ -26,27 +26,27 @@ jobs:
 
       - name: Make application.properties
         run: |
-          cd /home/runner/work/billingProject/billingProject/api_module/src/main/resources
+          cd /home/runner/work/billingProject/billingProject/user_module/src/main/resources
           touch application.properties
-          echo "${{ secrets.API_MODULE_PROPERTIES }}" > application.properties
+          echo "${{ secrets.USER_MODULE_PROPERTIES }}" > application.properties
         shell: bash
 
       - name: Build and push Docker images
         run: |
-          ./gradlew bootJar -p api_module
+          ./gradlew bootJar -p user_module
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker build -f ./Dockerfile_Api -t ${{ secrets.DOCKER_USERNAME }}/api_module .
-          docker push ${{ secrets.DOCKER_USERNAME }}/api_module
+          docker build -f ./Dockerfile_User -t ${{ secrets.DOCKER_USERNAME }}/user_module .
+          docker push ${{ secrets.DOCKER_USERNAME }}/user_module
 
       - name: Execute Docker Compose
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.API_MODULE_HOST }}
+          host: ${{ secrets.USER_MODULE_HOST }}
           username: ubuntu
           key: ${{ secrets.KEY }}
           script: |
             docker-compose down
-            docker rmi ${{ secrets.DOCKER_USERNAME }}/api_module
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/api_module
+            docker rmi ${{ secrets.DOCKER_USERNAME }}/user_module
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/user_module
             docker-compose up -d
             docker image prune -f
