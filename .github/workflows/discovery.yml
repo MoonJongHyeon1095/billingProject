@@ -23,8 +23,7 @@ jobs:
         run: ls -la discovery_module
       - name: List contents of discovery_module/src/main
         run: ls -la discovery_module/src/main
-      - name: List contents of discovery_module/src/main/resources
-        run: ls -la discovery_module/src/main/resources
+
       - name: Create resources directory if missing
         run: |
           mkdir -p discovery_module/src/main/resources
