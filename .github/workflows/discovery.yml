@@ -44,7 +44,7 @@ jobs:
         run: |
           sudo docker rm -f $(docker ps -qa)
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ matrix.modules }}
-          ssh -i ${{ secrets.KEY }} ubuntu@${{ secrets["${{ matrix.modules^^ }}_HOST"] }} 'bash -s' << EOF
+          ssh -i ${{ secrets.KEY }} ubuntu@${{ secrets.DISCOVERY_MODULE_HOST }} 'bash -s' << EOF
             docker-compose -f ./docker/docker-compose-${{ matrix.modules }}.yml up -d
             docker image prune -f
           EOF
