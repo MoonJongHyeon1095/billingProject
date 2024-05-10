@@ -28,22 +28,25 @@ jobs:
         run: |
           cd /home/runner/work/billingProject/billingProject/api_module/src/main/resources
           touch application.properties
-          echo "${{ secrets.DISCOVERY_MODULE_PROPERTIES }}" > application.properties
+          echo "${{ secrets.API_MODULE_PROPERTIES }}" > application.properties
         shell: bash
 
       - name: Build and push Docker images
         run: |
-          ./gradlew bootJar -p discovery_module
+          ./gradlew bootJar -p api_module
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker build -f ./Dockerfile_Api -t ${{ secrets.DOCKER_USERNAME }}/api_module .
           docker push ${{ secrets.DOCKER_USERNAME }}/api_module
 
       - name: Execute Docker Compose
-        run: |
-          docker-compose down
-          docker rmi ${{ secrets.DOCKER_USERNAME }}/api_module
-          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/api_module
-          ssh -i ${{ secrets.KEY }} ubuntu@${{ secrets.DISCOVERY_MODULE_HOST }} 'bash -s' << EOF
-          docker-compose -f ./docker/docker-compose-api_module.yml up -d
-          docker image prune -f
-          EOF
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.API_MODULE_HOST }}
+          username: ubuntu
+          key: ${{ secrets.KEY }}
+          script: |
+            docker-compose down
+            docker rmi ${{ secrets.DOCKER_USERNAME }}/api_module
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/api_module
+            docker-compose up -d
+            docker image prune -f
