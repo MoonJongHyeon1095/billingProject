@@ -22,7 +22,7 @@ jobs:
 
       - name: Make application.properties
         run: |
-          cd ./discovery_module/src/main/resources
+          cd ./src/main/resources
           touch application.properties
           echo "${{ secrets.DISCOVERY_MODULE_PROPERTIES }}" > application.properties
         shell: bash
