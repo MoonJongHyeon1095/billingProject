@@ -25,6 +25,9 @@ jobs:
         run: ls -la discovery_module/src/main
       - name: List contents of discovery_module/src/main/resources
         run: ls -la discovery_module/src/main/resources
+      - name: Create resources directory if missing
+        run: |
+          mkdir -p discovery_module/src/main/resources
 
       - name: Set up JDK 21
         uses: actions/setup-java@v3
