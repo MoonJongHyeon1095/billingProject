@@ -3,4 +3,4 @@ services:
   user_module:
     image: zin354/user_module:latest
     ports:
-      - "8081:8081"
+      - "8080:8080"
