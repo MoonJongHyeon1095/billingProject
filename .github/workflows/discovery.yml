@@ -11,12 +11,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          submodules: 'true'  # 서브모듈을 포함하여 체크아웃
 
-      - name: Display working directory
-        run: pwd
+      - name: Check directory structure
+        run: |
+          pwd
+          ls -la
 
-      - name: List directory contents
-        run: ls -la
+      - name: List contents of discovery_module
+        run: ls -la discovery_module
 
       - name: Set up JDK 21
         uses: actions/setup-java@v3
