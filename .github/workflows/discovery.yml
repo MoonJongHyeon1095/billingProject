@@ -50,9 +50,12 @@ jobs:
 
       - name: Execute Docker Compose
         run: |
-          sudo docker rm -f $(docker ps -qa)
+          CONTAINERS=$(docker ps -qa)
+          if [ -n "$CONTAINERS" ]; then
+          sudo docker rm -f $CONTAINERS
+          fi
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/discovery_module
           ssh -i ${{ secrets.KEY }} ubuntu@${{ secrets.DISCOVERY_MODULE_HOST }} 'bash -s' << EOF
-            docker-compose -f ./docker/docker-compose-discovery_module.yml up -d
-            docker image prune -f
+          docker-compose -f ./docker/docker-compose-discovery_module.yml up -d
+          docker image prune -f
           EOF
