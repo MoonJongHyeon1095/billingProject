@@ -1,0 +1,50 @@
+name: billing_project
+
+on:
+  push:
+    branches: [ "main_discovery" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        modules: [api_module, user_module, video_module, advertisement_module, batch_module, discovery_module, video_info_module]
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: make application.properties
+        if: matrix.modules == 'discovery_module'
+        run: |
+          cd ./src/main/resources
+          touch ./application.properties
+          echo "${{ secrets.DISCOVERY_MODULE_PROPERTIES }}" > ./application.properties
+        shell: bash
+
+      - name: Build and push Docker images
+        if: matrix.modules == 'discovery_module'
+        run: |
+          cd ${{ matrix.modules }}
+          ./gradlew bootJar
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -f ./docker/Dockerfile_Discovery -t ${{ secrets.DOCKER_USERNAME }}/${{ matrix.modules }} .
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ matrix.modules }}
+
+      - name: Execute Docker Compose
+        if: matrix.modules == 'discovery_module'
+        run: |
+          sudo docker rm -f $(docker ps -qa)
+          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ matrix.modules }}
+          ssh -i ${{ secrets.KEY }} ubuntu@${{ secrets["${{ matrix.modules^^ }}_HOST"] }} 'bash -s' << EOF
+            docker-compose -f ./docker/docker-compose-${{ matrix.modules }}.yml up -d
+            docker image prune -f
+          EOF
