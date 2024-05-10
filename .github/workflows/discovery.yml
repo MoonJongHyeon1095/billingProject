@@ -43,8 +43,7 @@ jobs:
 
       - name: Build and push Docker images
         run: |
-          cd discovery_module
-          ./gradlew bootJar
+          ./gradlew bootJar -p discovery_module
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker build -f ./Dockerfile_Discovery -t ${{ secrets.DOCKER_USERNAME }}/discovery_module .
           docker push ${{ secrets.DOCKER_USERNAME }}/discovery_module
