@@ -1,20 +1,20 @@
 package com.github.util;
 
 import com.github.domain.VideoStatistic;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 public class GlobalSingletonCache {
     private static volatile GlobalSingletonCache globalSingletonCache;
     private ConcurrentHashMap<Integer, VideoStatistic> cacheData;
-    private long totalAdViewCount;// AdViewCount의 누적값을 저장하는 변수
 
 
     private GlobalSingletonCache() {
         cacheData = new ConcurrentHashMap<Integer, VideoStatistic>();
-        totalAdViewCount = 0;
     }
 
     /**
@@ -59,8 +59,6 @@ public class GlobalSingletonCache {
         } else {
             cacheData.put(videoId, data);
         }
-        // 전체 누적값 업데이트
-        totalAdViewCount += data.getDailyAdViewCount();
     }
 
     // 전체 캐시 데이터를 반환하는 메소드
@@ -70,53 +68,7 @@ public class GlobalSingletonCache {
 
     public void clearCache() {
         cacheData.clear();
-        totalAdViewCount = 0; // 초기화
     }
-
-//    // 일간 Z-스코어 설정
-//    public void setDailyZScores() {
-//        double average = getDailyAverage();
-//        double stdDev = getDailyStandardDeviation();
-//
-//        if (stdDev == 0) {
-//            return; // Z-스코어를 계산할 수 없음 //모든 데이터가 같은 비현실적인 경우
-//        }
-//
-//        for (VideoStatistic data : cacheData.values()) {
-//            double zScore = (data.getDailyAdViewCount() - average) / stdDev; // Z-스코어 계산
-//            data.setZScore(zScore); // VideoStatistic 객체에 Z-스코어 설정
-//        }
-//    }
-
-
-    public double getDailyStandardDeviation() {
-        int dataCount = getCacheSize();
-        if (dataCount == 0) {
-            return 0;
-        }
-
-        double average = getDailyAverage();
-        double variance = 0;
-
-        for (VideoStatistic data : cacheData.values()) {
-            double deviation = data.getDailyAdViewCount() - average;
-            variance += deviation * deviation;
-        }
-
-        variance /= dataCount;
-        return Math.sqrt(variance);
-    }
-
-
-    public double getDailyAverage() {
-        int dataCount = getCacheSize();
-        if (dataCount == 0) {
-            return 0;
-        }
-        return (double) totalAdViewCount / dataCount;
-    }
-
-
 
     public int getCacheSize() {
         return cacheData.size();

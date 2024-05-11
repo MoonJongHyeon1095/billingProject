@@ -10,17 +10,27 @@ import java.time.LocalDate;
 
 public interface VideoStatisticRepository extends ReactiveCrudRepository<VideoStatistic, Integer> {
 
-    @Query("UPDATE VideoStatistic SET dailyWatchedTime = :#{#vs.dailyWatchedTime}, " +
-            "dailyViewCount = :#{#vs.dailyViewCount}, " +
-            "dailyAdViewCount = :#{#vs.dailyAdViewCount} " +
-            "WHERE createdAt = :#{#vs.createdAt} AND videoId = :#{#vs.videoId}")
-    Mono<Integer> updateDailyStatistic(final VideoStatistic vs);
+    @Query("UPDATE VideoStatistic SET dailyWatchedTime = :dailyWatchedTime, " +
+            "dailyViewCount = :dailyViewCount, dailyAdViewCount = :dailyAdViewCount " +
+            "WHERE createdAt = :createdAt AND videoId = :videoId")
+    Mono<Integer> updateDailyStatistic(
+            @Param("dailyWatchedTime") Long dailyWatchedTime,
+            @Param("dailyViewCount") Integer dailyViewCount,
+            @Param("dailyAdViewCount") Integer dailyAdViewCount,
+            @Param("createdAt") LocalDate createdAt,
+            @Param("videoId") Integer videoId);
+
 
     @Query("INSERT INTO VideoStatistic " +
             "(videoId, dailyWatchedTime, dailyViewCount, dailyAdViewCount, createdAt) " +
-            "VALUES (:#{#vs.videoId}, :#{#vs.dailyWatchedTime}, :#{#vs.dailyViewCount}, " +
-            ":#{#vs.dailyAdViewCount}, :#{#vs.createdAt})")
-    Mono<Void> insertDailyStatistic(final VideoStatistic vs);
+            "VALUES (:videoId, :dailyWatchedTime, :dailyViewCount, :dailyAdViewCount, :createdAt)")
+    Mono<Integer> insertDailyStatistic(
+            @Param("videoId") final Integer videoId,
+            @Param("dailyWatchedTime") final Long dailyWatchedTime,
+            @Param("dailyViewCount") final Integer dailyViewCount,
+            @Param("dailyAdViewCount") final Integer dailyAdViewCount,
+            @Param("createdAt") final LocalDate createdAt);
+
 
     @Query("UPDATE VideoStatistic SET dailyVideoProfit = :dailyVideoProfit, dailyAdProfit = :dailyAdProfit " +
             "WHERE createdAt = :createdAt AND videoId = :videoId")

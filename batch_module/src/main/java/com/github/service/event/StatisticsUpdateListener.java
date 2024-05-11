@@ -21,7 +21,7 @@ import java.util.List;
 public class StatisticsUpdateListener {
     private final VideoStatisticRepository videoStatisticRepository;
     private final TransactionalOperator transactionalOperator;
-
+    private final GlobalSingletonCache globalCache = GlobalSingletonCache.getInstance();
     public StatisticsUpdateListener(VideoStatisticRepository videoStatisticRepository, TransactionalOperator transactionalOperator) {
         this.videoStatisticRepository = videoStatisticRepository;
         this.transactionalOperator = transactionalOperator;
@@ -29,7 +29,7 @@ public class StatisticsUpdateListener {
 
     @EventListener
     public void handleUpdateStatisticsEvent(UpdateStatisticsEvent event) {
-        List<VideoStatistic> statList = GlobalSingletonCache.getInstance().getCacheData();
+        List<VideoStatistic> statList = globalCache.getCacheData();
         //log.info("캐시사이즈: " + statList.size());
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 
@@ -39,7 +39,7 @@ public class StatisticsUpdateListener {
                     GlobalSingletonCache.getInstance().clearCache();
                     log.info("Cache cleared after processing UpdateStatisticsEvent.");
                 })
-                .as(transactionalOperator::transactional)  // 하나의 큰 트랜잭션으로 처리
+                //.as(transactionalOperator::transactional)  // 하나의 큰 트랜잭션으로 처리
                 .subscribe(
                         null,
                         error -> log.error("Error updating statistics: " + error.getMessage(), error),
@@ -48,27 +48,30 @@ public class StatisticsUpdateListener {
     }
 
     private Mono<Void> processStatistic(VideoStatistic stat, LocalDate today) {
-        //log.info("processStatistic: " + stat.getVideoId());
         return videoStatisticRepository.findOneByVideoIdAndCreatedAt(today, stat.getVideoId())
-                .flatMap(foundStat -> updateOrInsertStatistic(stat, foundStat, today))
+                .flatMap(foundStat -> updateStatistic(stat, foundStat, today))
+                .switchIfEmpty(insertStatistic(stat, today))
                 .then();  // 이전 단계의 결과를 Void로 변환하여 반환
     }
 
-    private Mono<Void> updateOrInsertStatistic(VideoStatistic stat, VideoStatDto foundStat, LocalDate today) {
-        if (foundStat != null) {
-            log.info("Updating statistics for video ID: " + stat.getVideoId());
-            return videoStatisticRepository.updateDailyStatistic(
-                    VideoStatistic.builder()
-                            .videoId(stat.getVideoId())
-                            .dailyViewCount(foundStat.getDailyViewCount() + stat.getDailyViewCount())
-                            .dailyWatchedTime(foundStat.getDailyWatchedTime() + stat.getDailyWatchedTime())
-                            .dailyAdViewCount(foundStat.getDailyAdViewCount() + stat.getDailyAdViewCount())
-                            .createdAt(today)
-                            .build()
-            ).then();
-        } else {
-            log.info("Inserting new statistics for video ID: " + stat.getVideoId());
-            return videoStatisticRepository.insertDailyStatistic(stat);
-        }
+    private Mono<Void> updateStatistic(VideoStatistic stat, VideoStatDto foundStat, LocalDate today) {
+        return videoStatisticRepository.updateDailyStatistic(
+                stat.getDailyWatchedTime() + foundStat.getDailyWatchedTime(),
+                stat.getDailyViewCount() + foundStat.getDailyViewCount(),
+                stat.getDailyAdViewCount() + foundStat.getDailyAdViewCount(),
+                today,
+                stat.getVideoId()
+        ).then();
+    }
+
+
+    private Mono<Void> insertStatistic(VideoStatistic stat, LocalDate today) {
+        return videoStatisticRepository.insertDailyStatistic(
+                stat.getVideoId(),
+                stat.getDailyWatchedTime(),
+                stat.getDailyViewCount(),
+                stat.getDailyAdViewCount(),
+                today
+        ).then();
     }
 }

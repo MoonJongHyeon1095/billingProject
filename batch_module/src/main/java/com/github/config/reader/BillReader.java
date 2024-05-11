@@ -9,6 +9,7 @@ import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -40,9 +41,12 @@ import java.util.Map;
  */
 @Slf4j
 @Configuration
-@AllArgsConstructor
 public class BillReader {
     private final DataSource dataSource;
+
+    public BillReader(@Qualifier("mysqlDataSource") DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     @Bean
     @StepScope

@@ -53,7 +53,7 @@ public class DataSourceConfiguration {
         this.mariaDriver = mariaDriver;
     }
 
-    @Primary
+//    @Primary
     @Bean
     public HikariDataSource mainDataSource() {
         log.info("------------mainDB_initialized------------");
@@ -93,7 +93,7 @@ public class DataSourceConfiguration {
         return dataSource;
     }
 
-    @Bean
+    @Bean(name = "mariaDataSource")
     public HikariDataSource mariaDataSource() {
         log.info("------------MariaDB_initialized------------");
         HikariDataSource dataSource = DataSourceBuilder.create()
@@ -107,7 +107,7 @@ public class DataSourceConfiguration {
     }
 
 
-    @Bean(name = "dataSource") // 'dataSource'로 명시적으로 지정
+    @Bean(name = "mysqlDataSource") // 'dataSource'로 명시적으로 지정
     public DataSource routingDataSource(
     ){
         final DataSource mainDataSource = mainDataSource();
@@ -123,7 +123,7 @@ public class DataSourceConfiguration {
         return routingDataSource;
     }
 
-    @Bean(name = "transactionManager") //transactionManager라고 명시하지 않으면 찾지 못한다.
+    @Bean(name = "mysqlTransactionManager") //transactionManager라고 명시하지 않으면 찾지 못한다.
     public JdbcTransactionManager batchTransactionManager() {
         return new JdbcTransactionManager(routingDataSource());
     }

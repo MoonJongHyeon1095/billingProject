@@ -2,6 +2,7 @@ package com.github.config.reader;
 
 import com.github.config.mapper.WatchHistoryRowMapper;
 import com.github.domain.WatchHistory;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
@@ -38,33 +39,82 @@ import java.util.Map;
  - 병렬 처리
 
  */
+//@Slf4j
+//@Configuration
+//@AllArgsConstructor
+//public class StatisticReader {
+//    private final DataSource dataSource;
+//    @Bean
+//    @StepScope
+//    public JdbcPagingItemReader<WatchHistory> buildStatisticReader() {
+//        String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+//        //String today = "2024-05-09";
+//        return new JdbcPagingItemReaderBuilder<WatchHistory>()
+//                .name("reader")
+//                .pageSize(2000)
+//                .fetchSize(2000)
+//                .dataSource(dataSource)
+//                .rowMapper(new WatchHistoryRowMapper())
+//                .queryProvider(statisticQueryProvider())
+//                .parameterValues(Map.of(
+//                        "today", today,
+//                        "assignedServer", true
+//                ))
+//                .build();
+//    }
+//    /**
+//     queryProvider.setDataSource
+//     - qlPagingQueryProviderFactoryBean에서 데이터베이스와 상호작용하는 쿼리 프로바이더를 생성하는데 사용
+//     - 쿼리 프로바이더는 페이징 쿼리를 생성하고, 데이터 소스에 연결하여 쿼리 실행을 담당
+//     - 데이터 소스를 설정함으로써 데이터베이스 유형과 설정에 맞는 적절한 페이징 쿼리를 생성
+//
+//     reader.setDataSource(dataSource):
+//     - JdbcPagingItemReader에서 직접 데이터베이스 연결을 설정하는 데 사용
+//     - 이 설정은 실제로 데이터베이스에 접속하여 데이터를 읽어오는 역할
+//
+//     */
+//    @Bean
+//    public PagingQueryProvider statisticQueryProvider() {
+//
+//        SqlPagingQueryProviderFactoryBean queryProvider = new SqlPagingQueryProviderFactoryBean();
+//        queryProvider.setDataSource(dataSource);
+//        queryProvider.setSelectClause("SELECT videoId, playedTime, adViewCount, numericOrderKey, createdAt, assignedServer");
+//        queryProvider.setFromClause("FROM WatchHistory");
+//        queryProvider.setWhereClause("WHERE createdAt = :today AND assignedServer = :assignedServer");
+//        queryProvider.setSortKey("numericOrderKey");
+//
+//        try {
+//            return queryProvider.getObject();
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+//}
 @Slf4j
 @Configuration
 public class StatisticReader {
-//    private final DataSource dataSource;
 
-    @Qualifier("mariaDataSource") // MariaDB용 DataSource를 명시적으로 지정
     private final DataSource mariaDataSource;
 
-    public StatisticReader(DataSource mariaDataSource) {
+    public StatisticReader(@Qualifier("mariaDataSource")DataSource mariaDataSource) {
         this.mariaDataSource = mariaDataSource;
     }
 
     @Bean
     @StepScope
     public JdbcPagingItemReader<WatchHistory> buildStatisticReader() {
-        String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        //String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         //String today = "2024-05-09";
-
+        String partitionStr = generatePartitionString();
+        log.info(partitionStr);
         return new JdbcPagingItemReaderBuilder<WatchHistory>()
                 .name("reader")
                 .pageSize(2000)
                 .fetchSize(2000)
                 .dataSource(mariaDataSource)
                 .rowMapper(new WatchHistoryRowMapper())
-                .queryProvider(statisticQueryProvider())
+                .queryProvider(statisticQueryProvider(partitionStr))
                 .parameterValues(Map.of(
-                        "today", today,
                         "assignedServer", true
                 ))
                 .build();
@@ -81,19 +131,33 @@ public class StatisticReader {
 
      */
     @Bean
-    public PagingQueryProvider statisticQueryProvider() {
-
+    public PagingQueryProvider statisticQueryProvider(String partitionStr) {
         SqlPagingQueryProviderFactoryBean queryProvider = new SqlPagingQueryProviderFactoryBean();
         queryProvider.setDataSource(mariaDataSource);
-        queryProvider.setSelectClause("SELECT videoId, playedTime, adViewCount, numericOrderKey, createdAt, assignedServer");
-        queryProvider.setFromClause("FROM WatchHistory");
-        queryProvider.setWhereClause("WHERE createdAt = :today AND assignedServer = :assignedServer");
+        queryProvider.setSelectClause("SELECT videoId, playedTime, adViewCount, numericOrderKey, assignedServer");
+        //queryProvider.setFromClause("FROM WatchHistory");
+        queryProvider.setFromClause("FROM WatchHistory PARTITION (" + partitionStr + ")");
+        queryProvider.setWhereClause("WHERE assignedServer = :assignedServer");
         queryProvider.setSortKey("numericOrderKey");
+
+        queryProvider.setDatabaseType("MARIADB");
 
         try {
             return queryProvider.getObject();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Bean
+    public String generatePartitionString() {
+        LocalDate today = LocalDate.parse(LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+
+        int year = today.getYear() % 100; // 년도의 마지막 두 자리
+        int month = today.getMonthValue();
+        int day = today.getDayOfMonth();
+
+        // 문자열 형태로 변환하고, 필요에 따라 0을 채워서 반환
+        return String.format("p%02d%02d%02d", year, month, day);
     }
 }
