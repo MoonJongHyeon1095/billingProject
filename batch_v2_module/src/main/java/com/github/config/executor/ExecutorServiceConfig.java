@@ -41,13 +41,13 @@ public class ExecutorServiceConfig {
         return executor;
     }
 
-    @Bean
-    @ConditionalOnThreading(Threading.VIRTUAL)
-    public ExecutorService virtualThreadExecutor(){
-        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-        executor.submit(() -> log.info("가상 스레드 생성"));
-        return executor;
-    }
+//    @Bean
+//    @ConditionalOnThreading(Threading.VIRTUAL)
+//    public ExecutorService virtualThreadExecutor(){
+//        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+//        executor.submit(() -> log.info("가상 스레드 생성"));
+//        return executor;
+//    }
 
     @Bean
     @ConditionalOnThreading(Threading.PLATFORM)
