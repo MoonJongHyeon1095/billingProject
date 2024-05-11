@@ -8,7 +8,9 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.support.JdbcTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -24,15 +26,22 @@ public class DataSourceConfiguration {
     private final String dataSourceUsername;
     private final String dataSourcePassword;
     private final String dataSourceDriverClassName;
+    private final String mariaUrl;
+    private final String mariaDriver;
 
     @Autowired
     public DataSourceConfiguration(
+            //mysql
             @Value("${spring.datasource.master.hikari.jdbc-url}") String mainUrl,
             @Value("${spring.datasource.slave2.hikari.jdbc-url}") String replicaUrl1,
             @Value("${spring.datasource.slave2.hikari.jdbc-url}") String replicaUrl2,
             @Value("${spring.datasource.username}") String dataSourceUsername,
             @Value("${spring.datasource.password}") String dataSourcePassword,
-            @Value("${spring.datasource.driver-class-name}") String dataSourceDriverClassName
+            @Value("${spring.datasource.driver-class-name}") String dataSourceDriverClassName,
+
+            //maria db
+            @Value("${spring.datasource.url}") String mariaUrl,
+            @Value("${spring.datasource.driver-maria}") String mariaDriver
     ) {
         this.mainUrl = mainUrl;
         this.replicaUrl1 = replicaUrl1;
@@ -40,6 +49,8 @@ public class DataSourceConfiguration {
         this.dataSourceUsername = dataSourceUsername;
         this.dataSourcePassword = dataSourcePassword;
         this.dataSourceDriverClassName = dataSourceDriverClassName;
+        this.mariaUrl = mariaUrl;
+        this.mariaDriver = mariaDriver;
     }
 
     @Primary
@@ -82,6 +93,19 @@ public class DataSourceConfiguration {
         return dataSource;
     }
 
+    @Bean
+    public HikariDataSource mariaDataSource() {
+        log.info("------------MariaDB_initialized------------");
+        HikariDataSource dataSource = DataSourceBuilder.create()
+                .url(mariaUrl) // MariaDB URL
+                .username(dataSourceUsername) // 공통 사용자 이름
+                .password(dataSourcePassword) // 공통 비밀번호
+                .driverClassName(mariaDriver) // MariaDB JDBC 드라이버
+                .type(HikariDataSource.class)
+                .build();
+        return dataSource;
+    }
+
 
     @Bean(name = "dataSource") // 'dataSource'로 명시적으로 지정
     public DataSource routingDataSource(
@@ -102,6 +126,11 @@ public class DataSourceConfiguration {
     @Bean(name = "transactionManager") //transactionManager라고 명시하지 않으면 찾지 못한다.
     public JdbcTransactionManager batchTransactionManager() {
         return new JdbcTransactionManager(routingDataSource());
+    }
+
+    @Bean(name = "mariaTransactionManager")
+    public PlatformTransactionManager mariaTransactionManager() {
+        return new DataSourceTransactionManager(mariaDataSource());
     }
 
 }

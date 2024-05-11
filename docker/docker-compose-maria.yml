@@ -1,4 +1,4 @@
-#docker-compose -f docker-compose-maria.yml up -d
+#docker-compose -f ./docker/docker-compose-maria.yml up -d
 version: '3'
 
 services:

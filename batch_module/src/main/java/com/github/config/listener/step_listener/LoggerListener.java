@@ -10,12 +10,6 @@ public class LoggerListener implements StepExecutionListener {
 
 
     @Override
-    public void beforeStep(StepExecution stepExecution){
-
-
-    }
-
-    @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
         long selectedCount = stepExecution.getReadCount();
         log.info("Selected {} records", selectedCount);

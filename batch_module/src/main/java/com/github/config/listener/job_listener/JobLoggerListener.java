@@ -8,12 +8,6 @@ import org.springframework.batch.core.JobExecutionListener;
 @Slf4j
 public class JobLoggerListener implements JobExecutionListener {
 
-
-    @Override
-    public void beforeJob(JobExecution jobExecution) {
-        DailyStatisticWriter.clearThreadCounts();
-    }
-
     @Override
     public void afterJob(JobExecution jobExecution) {
         // Job 완료 후 로깅
@@ -24,7 +18,6 @@ public class JobLoggerListener implements JobExecutionListener {
                 .mapToLong(stepExecution -> stepExecution.getWriteCount())
                 .sum();
 
-        DailyStatisticWriter.logThreadCounts();
         log.info("Total records read: {}", readCount);
         log.info("Total records written: {}", writeCount);
 

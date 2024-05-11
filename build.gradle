@@ -37,11 +37,13 @@ subprojects {
 		testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
 
 		compileOnly 'org.projectlombok:lombok'
+		annotationProcessor 'org.projectlombok:lombok'
+
 		runtimeOnly 'com.mysql:mysql-connector-j'
 		// Database driver for MariaDB
 		runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.3.3'
 
-		annotationProcessor 'org.projectlombok:lombok'
+
 
 	}
 }

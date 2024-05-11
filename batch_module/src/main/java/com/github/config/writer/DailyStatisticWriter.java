@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class DailyStatisticWriter implements ItemWriter<WatchHistory> {
     private final GlobalSingletonCache globalCache;
-    private static final ConcurrentHashMap<String, Integer> threadCountMap = new ConcurrentHashMap<>();
+
     // 생성자 주입
     @Autowired
     public DailyStatisticWriter() {
@@ -31,8 +31,7 @@ public class DailyStatisticWriter implements ItemWriter<WatchHistory> {
 
     @Override
     public void write(Chunk<? extends WatchHistory> chunk) throws Exception {
-        String threadName = Thread.currentThread().getName();
-        threadCountMap.compute(threadName, (key, value) -> (value == null) ? 1 : value + 1);
+
         for (WatchHistory stat : chunk) {
             globalCache.addDailyData(
                     //stat
@@ -44,15 +43,6 @@ public class DailyStatisticWriter implements ItemWriter<WatchHistory> {
                         .build()
             ); // 데이터 전역 캐시에 추가
         }
-    }
-
-    public static void logThreadCounts() {
-        threadCountMap.forEach((key, value) -> log.info("threadName: {} , executedTimes: {} times", key, value));
-    }
-
-    public static void clearThreadCounts() {
-        threadCountMap.clear();  // ConcurrentHashMap의 모든 키와 값을 삭제
-        log.info("All thread counts have been cleared.");
     }
 
 }

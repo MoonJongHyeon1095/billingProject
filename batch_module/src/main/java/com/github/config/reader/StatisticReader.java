@@ -2,14 +2,13 @@ package com.github.config.reader;
 
 import com.github.config.mapper.WatchHistoryRowMapper;
 import com.github.domain.WatchHistory;
-import com.github.util.GlobalSingletonCache;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -41,9 +40,16 @@ import java.util.Map;
  */
 @Slf4j
 @Configuration
-@AllArgsConstructor
 public class StatisticReader {
-    private final DataSource dataSource;
+//    private final DataSource dataSource;
+
+    @Qualifier("mariaDataSource") // MariaDB용 DataSource를 명시적으로 지정
+    private final DataSource mariaDataSource;
+
+    public StatisticReader(DataSource mariaDataSource) {
+        this.mariaDataSource = mariaDataSource;
+    }
+
     @Bean
     @StepScope
     public JdbcPagingItemReader<WatchHistory> buildStatisticReader() {
@@ -54,7 +60,7 @@ public class StatisticReader {
                 .name("reader")
                 .pageSize(2000)
                 .fetchSize(2000)
-                .dataSource(dataSource)
+                .dataSource(mariaDataSource)
                 .rowMapper(new WatchHistoryRowMapper())
                 .queryProvider(statisticQueryProvider())
                 .parameterValues(Map.of(
@@ -78,7 +84,7 @@ public class StatisticReader {
     public PagingQueryProvider statisticQueryProvider() {
 
         SqlPagingQueryProviderFactoryBean queryProvider = new SqlPagingQueryProviderFactoryBean();
-        queryProvider.setDataSource(dataSource);
+        queryProvider.setDataSource(mariaDataSource);
         queryProvider.setSelectClause("SELECT videoId, playedTime, adViewCount, numericOrderKey, createdAt, assignedServer");
         queryProvider.setFromClause("FROM WatchHistory");
         queryProvider.setWhereClause("WHERE createdAt = :today AND assignedServer = :assignedServer");
