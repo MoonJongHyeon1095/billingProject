@@ -9,6 +9,7 @@ import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -40,23 +41,29 @@ import java.util.Map;
  */
 @Slf4j
 @Configuration
-@AllArgsConstructor
 public class StatisticReader {
-    private final DataSource dataSource;
+
+    private final DataSource mariaDataSource;
+
+    public StatisticReader(@Qualifier("mariaDataSource")DataSource mariaDataSource) {
+        this.mariaDataSource = mariaDataSource;
+    }
+
     @Bean
     @StepScope
     public JdbcPagingItemReader<WatchHistory> buildStatisticReader() {
-        String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        //String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         //String today = "2024-05-09";
+        String partitionStr = generatePartitionString();
+        log.info(partitionStr);
         return new JdbcPagingItemReaderBuilder<WatchHistory>()
                 .name("reader")
                 .pageSize(2000)
                 .fetchSize(2000)
-                .dataSource(dataSource)
+                .dataSource(mariaDataSource)
                 .rowMapper(new WatchHistoryRowMapper())
-                .queryProvider(statisticQueryProvider())
+                .queryProvider(statisticQueryProvider(partitionStr))
                 .parameterValues(Map.of(
-                        "today", today,
                         "assignedServer", false
                 ))
                 .build();
@@ -73,19 +80,33 @@ public class StatisticReader {
 
      */
     @Bean
-    public PagingQueryProvider statisticQueryProvider() {
-
+    public PagingQueryProvider statisticQueryProvider(String partitionStr) {
         SqlPagingQueryProviderFactoryBean queryProvider = new SqlPagingQueryProviderFactoryBean();
-        queryProvider.setDataSource(dataSource);
-        queryProvider.setSelectClause("SELECT videoId, playedTime, adViewCount, numericOrderKey, createdAt, assignedServer");
-        queryProvider.setFromClause("FROM WatchHistory");
-        queryProvider.setWhereClause("WHERE createdAt = :today AND assignedServer = :assignedServer");
+        queryProvider.setDataSource(mariaDataSource);
+        queryProvider.setSelectClause("SELECT videoId, playedTime, adViewCount, numericOrderKey, assignedServer");
+        //queryProvider.setFromClause("FROM WatchHistory");
+        queryProvider.setFromClause("FROM WatchHistory PARTITION (" + partitionStr + ")");
+        queryProvider.setWhereClause("WHERE assignedServer = :assignedServer");
         queryProvider.setSortKey("numericOrderKey");
+
+        queryProvider.setDatabaseType("MARIADB");
 
         try {
             return queryProvider.getObject();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Bean
+    public String generatePartitionString() {
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+
+        int year = today.getYear() % 100; // 년도의 마지막 두 자리
+        int month = today.getMonthValue();
+        int day = today.getDayOfMonth();
+
+        // 문자열 형태로 변환하고, 필요에 따라 0을 채워서 반환
+        return String.format("p%02d%02d%02d", year, month, day);
     }
 }

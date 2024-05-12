@@ -5,7 +5,6 @@ import com.github.dto.VideoStatDto;
 import com.github.repository.VideoStatisticRepository;
 import com.github.util.GlobalSingletonCache;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.reactive.TransactionalOperator;
@@ -35,11 +34,11 @@ public class StatisticsUpdateListener {
 
         Flux.fromIterable(statList)
                 .flatMap(stat -> processStatistic(stat, today))
-                .doFinally(signalType -> {
-                    GlobalSingletonCache.getInstance().clearCache();
-                    log.info("Cache cleared after processing UpdateStatisticsEvent.");
+                .doFinally(_ -> {
+                    globalCache.clearCache();
+                    log.info("작업이 성공하든 실패하든 Cache cleared after UpdateStatisticsEvent.");
                 })
-                //.as(transactionalOperator::transactional)  // 하나의 큰 트랜잭션으로 처리
+                .as(transactionalOperator::transactional)  // 하나의 큰 트랜잭션으로 처리
                 .subscribe(
                         null,
                         error -> log.error("Error updating statistics: " + error.getMessage(), error),
@@ -55,6 +54,7 @@ public class StatisticsUpdateListener {
     }
 
     private Mono<Void> updateStatistic(VideoStatistic stat, VideoStatDto foundStat, LocalDate today) {
+        log.info("update stat: " + stat.getVideoId());
         return videoStatisticRepository.updateDailyStatistic(
                 stat.getDailyWatchedTime() + foundStat.getDailyWatchedTime(),
                 stat.getDailyViewCount() + foundStat.getDailyViewCount(),
@@ -66,6 +66,7 @@ public class StatisticsUpdateListener {
 
 
     private Mono<Void> insertStatistic(VideoStatistic stat, LocalDate today) {
+        log.info("insert stat: " + stat.getVideoId());
         return videoStatisticRepository.insertDailyStatistic(
                 stat.getVideoId(),
                 stat.getDailyWatchedTime(),

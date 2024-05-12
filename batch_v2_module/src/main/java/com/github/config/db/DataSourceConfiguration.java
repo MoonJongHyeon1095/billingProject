@@ -53,7 +53,7 @@ public class DataSourceConfiguration {
         this.mariaDriver = mariaDriver;
     }
 
-    @Primary
+    //    @Primary
     @Bean
     public HikariDataSource mainDataSource() {
         log.info("------------mainDB_initialized------------");
@@ -93,7 +93,7 @@ public class DataSourceConfiguration {
         return dataSource;
     }
 
-    @Bean
+    @Bean(name = "mariaDataSource")
     public HikariDataSource mariaDataSource() {
         log.info("------------MariaDB_initialized------------");
         HikariDataSource dataSource = DataSourceBuilder.create()

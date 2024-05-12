@@ -43,7 +43,6 @@ public class R2dbcConfig extends AbstractR2dbcConfiguration {
                 .option(USER, username)
                 .option(PASSWORD, password)
                 .option(DATABASE, database)
-                .option(Option.valueOf("serverTimezone"), "Asia/Seoul")
                 .build());
 
         ConnectionPoolConfiguration configuration = ConnectionPoolConfiguration.builder(connectionFactory)

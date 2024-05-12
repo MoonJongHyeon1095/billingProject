@@ -1,5 +1,6 @@
 package com.github.config.reader;
 
+import com.github.config.db.DataSourceConfiguration;
 import com.github.config.mapper.VideoStatisticRowMapper;
 import com.github.domain.VideoStatistic;
 import lombok.AllArgsConstructor;
@@ -42,11 +43,15 @@ import java.util.Map;
 @Slf4j
 @Configuration
 public class BillReader {
-    private final DataSource dataSource;
+    private final DataSourceConfiguration dataSourceConfiguration;
 
-    public BillReader(@Qualifier("mysqlDataSource") DataSource dataSource) {
-        this.dataSource = dataSource;
+    public BillReader(DataSourceConfiguration dataSourceConfiguration) {
+        this.dataSourceConfiguration = dataSourceConfiguration;
     }
+
+//    public BillReader(@Qualifier("mysqlDataSource") DataSource dataSource) {
+//        this.dataSource = dataSource;
+//    }
 
     @Bean
     @StepScope
@@ -58,7 +63,7 @@ public class BillReader {
                 .name("reader")
                 .pageSize(20)
                 .fetchSize(20)
-                .dataSource(dataSource)
+                .dataSource(dataSourceConfiguration.mainDataSource())
                 .rowMapper(new VideoStatisticRowMapper())
                 .queryProvider(billQueryProvider())
                 .parameterValues(Map.of(
@@ -81,7 +86,7 @@ public class BillReader {
     public PagingQueryProvider billQueryProvider() {
 
         SqlPagingQueryProviderFactoryBean queryProvider = new SqlPagingQueryProviderFactoryBean();
-        queryProvider.setDataSource(dataSource);
+        queryProvider.setDataSource(dataSourceConfiguration.mainDataSource());
         queryProvider.setSelectClause("SELECT videoId, dailyViewCount, dailyAdViewCount, createdAt");
         queryProvider.setFromClause("FROM VideoStatistic");
         queryProvider.setWhereClause("WHERE createdAt = :today AND videoId < :range");
