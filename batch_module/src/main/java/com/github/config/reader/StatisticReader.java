@@ -2,7 +2,6 @@ package com.github.config.reader;
 
 import com.github.config.mapper.WatchHistoryRowMapper;
 import com.github.domain.WatchHistory;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
@@ -135,7 +134,6 @@ public class StatisticReader {
         SqlPagingQueryProviderFactoryBean queryProvider = new SqlPagingQueryProviderFactoryBean();
         queryProvider.setDataSource(mariaDataSource);
         queryProvider.setSelectClause("SELECT videoId, playedTime, adViewCount, numericOrderKey, assignedServer");
-        //queryProvider.setFromClause("FROM WatchHistory");
         queryProvider.setFromClause("FROM WatchHistory PARTITION (" + partitionStr + ")");
         queryProvider.setWhereClause("WHERE assignedServer = :assignedServer");
         queryProvider.setSortKey("numericOrderKey");
@@ -151,7 +149,7 @@ public class StatisticReader {
 
     @Bean
     public String generatePartitionString() {
-        LocalDate today = LocalDate.parse(LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 
         int year = today.getYear() % 100; // 년도의 마지막 두 자리
         int month = today.getMonthValue();

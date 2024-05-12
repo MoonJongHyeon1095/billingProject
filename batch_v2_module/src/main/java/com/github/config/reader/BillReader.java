@@ -3,7 +3,6 @@ package com.github.config.reader;
 import com.github.config.db.DataSourceConfiguration;
 import com.github.config.mapper.VideoStatisticRowMapper;
 import com.github.domain.VideoStatistic;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
@@ -13,7 +12,6 @@ import org.springframework.batch.item.database.support.SqlPagingQueryProviderFac
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -86,7 +84,6 @@ public class BillReader {
         queryProvider.setDataSource(dataSourceConfiguration.mainDataSource());
         queryProvider.setSelectClause("SELECT videoId, dailyViewCount, dailyAdViewCount, createdAt");
         queryProvider.setFromClause("FROM VideoStatistic");
-//        queryProvider.setWhereClause("WHERE createdAt = :today");
         queryProvider.setWhereClause("WHERE createdAt = :today AND videoId >= :range");
         queryProvider.setSortKey("videoId");
 

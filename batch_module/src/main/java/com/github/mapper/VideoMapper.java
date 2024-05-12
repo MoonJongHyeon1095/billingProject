@@ -1,6 +1,5 @@
 package com.github.mapper;
 
-import com.github.domain.Video;
 import com.github.dto.VideoRangeDto;
 import com.github.dto.VideoViewsDto;
 import org.apache.ibatis.annotations.*;
@@ -11,7 +10,6 @@ import java.util.Optional;
 public interface VideoMapper {
     @Select(
             "SELECT totalViewCount, totalAdViewCount " +
-                    //"SELECT * " +
                     "FROM Video " +
                     "WHERE videoId = #{videoId}")
     @Results({

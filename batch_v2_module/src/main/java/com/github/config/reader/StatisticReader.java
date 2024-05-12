@@ -2,7 +2,6 @@ package com.github.config.reader;
 
 import com.github.config.mapper.WatchHistoryRowMapper;
 import com.github.domain.WatchHistory;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
@@ -16,7 +15,6 @@ import org.springframework.context.annotation.Configuration;
 import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 /**
@@ -84,7 +82,6 @@ public class StatisticReader {
         SqlPagingQueryProviderFactoryBean queryProvider = new SqlPagingQueryProviderFactoryBean();
         queryProvider.setDataSource(mariaDataSource);
         queryProvider.setSelectClause("SELECT videoId, playedTime, adViewCount, numericOrderKey, assignedServer");
-        //queryProvider.setFromClause("FROM WatchHistory");
         queryProvider.setFromClause("FROM WatchHistory PARTITION (" + partitionStr + ")");
         queryProvider.setWhereClause("WHERE assignedServer = :assignedServer");
         queryProvider.setSortKey("numericOrderKey");

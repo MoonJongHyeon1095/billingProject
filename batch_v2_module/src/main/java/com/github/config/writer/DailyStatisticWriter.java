@@ -22,7 +22,6 @@ public class DailyStatisticWriter implements ItemWriter<WatchHistory> {
     public void write(Chunk<? extends WatchHistory> chunk) throws Exception {
         for (WatchHistory stat : chunk) {
             globalCache.addDailyData(
-                    //stat
                     VideoStatistic.builder()
                         .videoId(stat.getVideoId())
                         .dailyViewCount(1)
