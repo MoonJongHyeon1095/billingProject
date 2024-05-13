@@ -57,8 +57,8 @@ public class BillReader {
     @StepScope
     public JdbcPagingItemReader<VideoStatistic> buildBillReader() {
 
-        String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        //String today = "2024-05-09";
+        //String today = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String today = "2024-05-11";
         return new JdbcPagingItemReaderBuilder<VideoStatistic>()
                 .name("reader")
                 .pageSize(20)

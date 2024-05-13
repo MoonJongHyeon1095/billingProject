@@ -59,12 +59,12 @@ public class StatisticBatchConfiguration {
                 .reader(statisticReader.buildStatisticReader())
                 .writer(dailyStatisticWriter)
                 .taskExecutor(
-//                        //가상 스레드
-//                    new ConcurrentTaskExecutor(
-//                            executorServiceConfig.virtualThreadExecutor()
-//                    )
-                        //플랫폼 스레드
-                        executorServiceConfig.taskExecutor()
+                        //가상 스레드
+                    new ConcurrentTaskExecutor(
+                            executorServiceConfig.virtualThreadExecutor()
+                    )
+//                        //플랫폼 스레드
+//                        executorServiceConfig.taskExecutor()
                 )
                 .build();
     }

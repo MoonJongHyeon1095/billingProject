@@ -12,16 +12,13 @@ import org.springframework.stereotype.Service;
 public class StatisticService {
     private final Job dailyStatisticJobV2;
     private final JobLauncher jobLauncher;
-    private final Job clearDataJob;
 
     public StatisticService(
             JobLauncher jobLauncher,
-            @Qualifier("dailyStatisticJobV2") Job dailyStatisticJobV2,
-            @Qualifier("clearDataJob") Job clearDataJob
+            @Qualifier("dailyStatisticJobV2") Job dailyStatisticJobV2
     ) {
         this.dailyStatisticJobV2 = dailyStatisticJobV2;
         this.jobLauncher = jobLauncher;
-        this.clearDataJob = clearDataJob;
     }
 
 
@@ -30,7 +27,7 @@ public class StatisticService {
      * 따라서 한국 서울 시간(KST)으로 설정하려면 UTC 시간에 9시간을 더하거나 타임존 명시
      * 초 분 시 일 월 요일
      */
-    @Scheduled(cron = "0 17 12 * * ?", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 28 19 * * ?", zone = "Asia/Seoul")
     public void runDailyStatisticJob2() throws Exception {
         try{
             JobParameters jobParameters = new JobParametersBuilder()

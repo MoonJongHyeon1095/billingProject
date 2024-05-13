@@ -22,6 +22,5 @@ public class VideoStatistic  {
     private Integer dailyVideoProfit;
     private Integer dailyAdProfit;
 
-    //private double zScore;
     private LocalDate createdAt;
 }

@@ -47,4 +47,5 @@ public interface VideoStatisticRepository extends ReactiveCrudRepository<VideoSt
             "WHERE createdAt = :createdAt AND videoId = :videoId")
     Mono<VideoStatDto> findOneByVideoIdAndCreatedAt(@Param("createdAt") final LocalDate createdAt,
                                                     @Param("videoId") final int videoId);
+
 }

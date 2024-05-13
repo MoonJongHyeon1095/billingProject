@@ -29,12 +29,11 @@ public class StatisticsUpdateListener {
     @EventListener
     public void handleUpdateStatisticsEvent(UpdateStatisticsEvent event) {
         List<VideoStatistic> statList = globalCache.getCacheData();
-        //log.info("캐시사이즈: " + statList.size());
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
-
+        //LocalDate today = LocalDate.parse("2024-05-10");
         Flux.fromIterable(statList)
                 .flatMap(stat -> processStatistic(stat, today))
-                .doFinally(_ -> {
+                .doFinally(signalType -> {
                     globalCache.clearCache();
                     log.info("작업이 성공하든 실패하든 Cache cleared after UpdateStatisticsEvent.");
                 })
@@ -54,7 +53,7 @@ public class StatisticsUpdateListener {
     }
 
     private Mono<Void> updateStatistic(VideoStatistic stat, VideoStatDto foundStat, LocalDate today) {
-        log.info("update stat: " + stat.getVideoId());
+
         return videoStatisticRepository.updateDailyStatistic(
                 stat.getDailyWatchedTime() + foundStat.getDailyWatchedTime(),
                 stat.getDailyViewCount() + foundStat.getDailyViewCount(),
@@ -66,7 +65,7 @@ public class StatisticsUpdateListener {
 
 
     private Mono<Void> insertStatistic(VideoStatistic stat, LocalDate today) {
-        log.info("insert stat: " + stat.getVideoId());
+
         return videoStatisticRepository.insertDailyStatistic(
                 stat.getVideoId(),
                 stat.getDailyWatchedTime(),

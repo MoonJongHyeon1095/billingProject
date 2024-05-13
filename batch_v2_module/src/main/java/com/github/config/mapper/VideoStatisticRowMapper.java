@@ -14,7 +14,6 @@ public class VideoStatisticRowMapper implements RowMapper<VideoStatistic> {
                 .dailyViewCount(rs.getInt("dailyViewCount"))
                 .dailyAdViewCount(rs.getInt("dailyAdViewCount"))
                 .createdAt(rs.getDate("createdAt").toLocalDate())
-                //.zScore(rs.getDouble("zScore"))
                 .build();
     }
 }

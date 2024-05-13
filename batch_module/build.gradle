@@ -64,6 +64,5 @@ tasks.named('test') {
 }
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-    options.compilerArgs += ['--enable-preview', '-parameters']
-    // enable-preview정식버전 포함 전의 java 실험적 기능들 프리뷰로 쓸 수 있도록
+    options.compilerArgs += ['-parameters']
 }

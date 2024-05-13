@@ -43,7 +43,7 @@ public class StatisticBatchConfiguration {
         return new StepBuilder("dailyStatisticStepV1", jobRepository)
                 .<WatchHistory, WatchHistory>chunk(
                         2000,
-                        dataSourceConfiguration.mariaTransactionManager())
+                        dataSourceConfiguration.batchTransactionManager())
                 .reader(statisticReader.buildStatisticReader())
                 .writer(dailyStatisticWriter)
                 .taskExecutor(
