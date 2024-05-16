@@ -1,15 +1,11 @@
 package com.github.service;
 
-import com.github.domain.Video;
 import com.github.domain.WatchHistory;
 import com.github.dto.WatchHistoryDto;
 import com.github.exception.VideoErrorCode;
 import com.github.exception.VideoException;
-import com.github.feignclient.AdFeignClient;
 import com.github.mapper.VideoMapper;
 import com.github.mapper.WatchHistoryMapper;
-import lombok.AllArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,24 +1,31 @@
 package com.github.service;
 
 import com.github.feignclient.AdFeignClient;
+import com.github.feignclient.AdFeignClientReserve;
+import feign.Feign;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.vavr.control.Try;
-import lombok.AllArgsConstructor;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import java.util.function.Supplier;
 
 @Slf4j
 @Service
 public class ResilienceService {
     private final AdFeignClient adFeignClient;
+    private final AdFeignClientReserve adFeignClientReserve;
     private final CircuitBreaker circuitBreaker;
 
-    public ResilienceService(AdFeignClient adFeignClient, CircuitBreakerRegistry circuitBreakerRegistry) {
+    public ResilienceService(
+            AdFeignClient adFeignClient,
+            AdFeignClientReserve adFeignClientReserve,
+            CircuitBreakerRegistry circuitBreakerRegistry
+            ) {
         this.adFeignClient = adFeignClient;
+        this.adFeignClientReserve = adFeignClientReserve;
         this.circuitBreaker = circuitBreakerRegistry.circuitBreaker("adFeignClient");
     }
 
@@ -33,20 +40,19 @@ public class ResilienceService {
      * @param videoId
      * @param adViewCount
      */
-    protected void createAdDetail(int videoId, int adViewCount) {
-        // 이 메소드는 Feign 클라이언트가 실제로 호출되는 부분입니다.
-        // 실제 구현에서는 여기에 HTTP 요청을 보내는 로직이 포함됩니다.
+    protected void createAdDetail(final int videoId, final int adViewCount) {
         Supplier<ResponseEntity<String>> supplier = CircuitBreaker
                 .decorateSupplier(
                         circuitBreaker, () -> adFeignClient.createAdDetail(videoId, adViewCount));
 
         // Try.ofSupplier로 Supplier 실행을 시도하고, 실패 시 fallback 메소드 호출
-        ResponseEntity<String> response = Try.ofSupplier(supplier)
-                .recover(throwable -> fallbackCreatedAd(throwable)).get();
+        Try.ofSupplier(supplier)
+                .recover(throwable -> fallbackCreatedAd(throwable, videoId, adViewCount)).get();
 
     }
 
-    private ResponseEntity<String> fallbackCreatedAd(Throwable t) {
+    private ResponseEntity<String> fallbackCreatedAd(Throwable t, final int videoId, final int adViewCount) {
+        adFeignClientReserve.createAdDetail(videoId, adViewCount);
         return ResponseEntity.internalServerError().body("fallbackCreatedAd "+t.getMessage());
     }
 
@@ -59,7 +65,7 @@ public class ResilienceService {
         ResponseEntity<String> response = Try.ofSupplier(supplier)
                 .recover(throwable -> fallbackCase1(throwable)).get();
 
-        log.info("case1 method 111111 {}", response.getBody());
+        log.info("case1 method 1 {}", response.getBody());
         return response;
 }
 
