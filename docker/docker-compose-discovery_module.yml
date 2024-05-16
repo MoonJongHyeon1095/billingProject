@@ -1,6 +1,0 @@
-version: '3.8'
-services:
-  api_module:
-    image: zin354/discovery_module:latest
-    ports:
-      - "8761:8761"
