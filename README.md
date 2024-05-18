@@ -35,15 +35,15 @@
 
 ## 📚 기술적 의사결정
 #### 가상스레드
-- [Batch 작업 멀티스레드 도입 : 플랫폼 스레드 vs 가상스레드](https://www.notion.so/BillingProject-2024-0e94e88952b24e95a99bb799d2377008?pvs=4#497977a420de41c28c33f17145619643)
+- [Batch 작업 멀티스레드 도입 : 플랫폼 스레드 vs 가상스레드](https://foggy-unicorn-28d.notion.site/Batch-vs-f4520db77a054b81bee6b2210e620c45?pvs=4)
 #### DB Partitioning
-- [수억건의 시청기록 통계 및 정산 : 날짜별 파티션 vs 인덱스 일치검색](https://www.notion.so/BillingProject-2024-0e94e88952b24e95a99bb799d2377008?pvs=4#f18414da6c1b447a89ca2a715221aa39)
+- [수억건의 시청기록 통계 및 정산 : 날짜별 파티션 vs 인덱스 일치검색](https://foggy-unicorn-28d.notion.site/vs-43cf5d57050c4fb8a45b0f2db5bfe4d3?pvs=4)
 
 <br>
 
 ## 🕹️ 성능 개선
-- [SpringBatch: 전역 캐시 객체 사용, 통계 작업  22s458ms → 3s402ms ](https://www.notion.so/BillingProject-2024-0e94e88952b24e95a99bb799d2377008?pvs=4#4c47024cb04e4985b5009752f4aa2265)
-- [SpringBatch: 가상 스레드 활용, 플랫폼 스레드 대비 CPU Load 약 10% 절약, 수행시간 약 24% 단축](https://www.notion.so/BillingProject-2024-0e94e88952b24e95a99bb799d2377008?pvs=4#f6921637fe124560939036ae9dfdb300)
+- [SpringBatch: 전역 캐시 객체 사용, 통계 작업  22s458ms → 3s402ms ](https://foggy-unicorn-28d.notion.site/Batch-bf180a139be045a8bb2dc42321331973?pvs=4)
+- [SpringBatch: 가상 스레드 활용, 플랫폼 스레드 대비 CPU Load 약 10% 절약, 수행시간 약 24% 단축](https://foggy-unicorn-28d.notion.site/Batch-3294e9ced0eb42cf8d88c711811f4235?pvs=4)
 
 <br>
 
