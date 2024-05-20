@@ -1,7 +1,16 @@
 # 정산 프로젝트 ( BillingProject )
 [**📚 Notion**](https://foggy-unicorn-28d.notion.site/BillingProject-2024-0e94e88952b24e95a99bb799d2377008?pvs=4) |
-**Apr 2024 ~ May 2024**
+**Apr 2024 ~ May 2024**  
 
+<img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white">
+<img src="https://img.shields.io/badge/Spring Cloud-6DB33F?style=for-the-badge&logo=&logoColor=white">
+<img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=MySQL&logoColor=white">
+<img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=Redis&logoColor=white">
+<img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=Docker&logoColor=white">
+<img src="https://img.shields.io/badge/AWS EC2-FF9900?style=for-the-badge&logo=Amazon EC2&logoColor=white">
+<img src="https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=Prometheus&logoColor=white">
+<img src="https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=Grafana&logoColor=white">
+<img src="https://img.shields.io/badge/GitHub Actions-2088FF?style=for-the-badge&logo=GitHub Actions&logoColor=white">
 <br>
 
 ## 🌱 프로젝트 소개
@@ -94,7 +103,9 @@
 <summary>복합적인 문제원인
 </summary>
 
-1. 날짜별 DB Partition으로 인해 **auto increment PK 사용 불가**  
+1. 날짜별 DB Partition으로 인해 **auto increment PK 사용 불가**
+
+ 
 2. chunk read 동시성 처리를 위한 새로운 sort 방식 필요  
       a. chunk paging을 위한 추가정렬 : **FileSort 발생시 성능 대폭 저하**  
       b. sort의 기준 칼럼이 unique 하지 않을 경우 잘못된 통계 결과 산출
@@ -105,6 +116,8 @@
 </summary>
 
 1. chunk paging을 위한 별도의 정렬 칼럼 **인덱스 별도 생성 및 쿼리 최적화**
+
+
 2. 사용중인 인터페이스(JdbcPagingItemReader)가 **off-set 방식의 페이징을 하지 않는 것**을 확인
 </details>  
 
@@ -116,6 +129,8 @@
 </summary>
 
 1. synchronized 블록 안에서 `VirtualThread.park()` 가 발생하면 가상스레드는 CarrierThread에서 unmount 되지 않는다.
+
+
 2. MySQL JDBC 연결은 synchronized 키워드로 구현된 부분이 많다.
 </details>
 <details>
@@ -123,11 +138,22 @@
 </summary>
 
 1. MySQL R2DBC 연결과 대조    
+
+
 2. MariaDB JDBC 연결과 대조
+
+
 3. 대조결과  
-a. 현재의 환경에서 **MariaDB나 R2DBC를 통해 Virtual Thread Pinned가 눈에 띄게 감소하는 일은 없었다.**  
-b. **Virtual Thread Pinned 지표와 성능(수행시간, CPU부하 등) 사이에도 유의미한 관계는 발견되지 않았다.**
-4. 기존의 JDBC 기반 Batch 작업 유지
+a. 현재의 환경에서 MariaDB나 R2DBC를 통해 Virtual Thread Pinned가 눈에 띄게 감소하는 일은 없었다.  
+b. Virtual Thread Pinned 지표와 성능(수행시간, CPU부하 등) 사이에도 유의미한 관계는 발견되지 않았다.
+
+
+4. VirtualThread pinned issue를 완전히 해결하는 것은 시기상조라고 판단  
+   a. DB연결과 관련된 것이 아니더라도, 다른 인터페이스에서 pinning 현상이 발생 가능  
+b. 예컨대 ConcurrentHashMap 구현체 등의 내부 메서드에서도 synchronized 블록 사용 
+
+
+5. 기존의 JDBC 기반 Batch 작업 유지
 </details>
 
 상세 기록: [VirtualThread pinned issue](https://foggy-unicorn-28d.notion.site/Virtual-Thread-Pinned-Issue-59caf6e9dd784700bb84b4e6514bb564?pvs=4)
