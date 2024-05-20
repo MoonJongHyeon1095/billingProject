@@ -34,24 +34,103 @@
 <br>
 
 ## 📚 기술적 의사결정
-#### 가상스레드
-- [Batch 작업 멀티스레드 도입 : 플랫폼 스레드 vs 가상스레드](https://foggy-unicorn-28d.notion.site/Batch-vs-f4520db77a054b81bee6b2210e620c45?pvs=4)
-#### DB Partitioning
-- [수억건의 시청기록 통계 및 정산 : 날짜별 파티션 vs 인덱스 일치검색](https://foggy-unicorn-28d.notion.site/vs-43cf5d57050c4fb8a45b0f2db5bfe4d3?pvs=4)
+### 가상스레드
+[Batch 작업 멀티스레드 도입 : 플랫폼 스레드 vs 가상스레드](https://foggy-unicorn-28d.notion.site/Batch-vs-f4520db77a054b81bee6b2210e620c45?pvs=4)
+### DB Partitioning
+[수억건의 시청기록 통계 및 정산 : 날짜별 파티션 vs 인덱스 일치검색](https://foggy-unicorn-28d.notion.site/vs-43cf5d57050c4fb8a45b0f2db5bfe4d3?pvs=4)
 
 <br>
 
-## 🕹️ 성능 개선
-- [SpringBatch: 전역 캐시 객체 사용, 통계 작업  22s458ms → 3s402ms ](https://foggy-unicorn-28d.notion.site/Batch-bf180a139be045a8bb2dc42321331973?pvs=4)
-- [SpringBatch: 가상 스레드 활용, 플랫폼 스레드 대비 CPU Load 약 10% 절약, 수행시간 약 24% 단축](https://foggy-unicorn-28d.notion.site/Batch-3294e9ced0eb42cf8d88c711811f4235?pvs=4)
+## 🕹️ 성능 개선  
+### Batch 작업: **가상스레드 도입 성능개선**  
+<details><summary>I/O 집약적인 프로젝트의 특징에 따른 가설
+</summary>
+
+가설 1. 이 프로젝트는 CPU 사용에 있어 가상 스레드가 우위를 보일 것이다. 
+
+가설 2. 이 프로젝트는 메모리 사용에 있어 가상 스레드가 우위를 보일 것이다.  
+
+가설 3. 이 프로젝트는 처리량(동일 작업에 대한 Batch 작업 수행시간으로 측정)에 있어 가상 스레드가 우위를 보일 것이다.
+</details>
+<details>
+<summary>검증  및 성능개선 : 플랫폼 스레드 대비 CPU Load 약 10% 절약 & 수행시간 약 24% 단축
+</summary>  
+
+1. jdk.CPULoad의 JVM User 지표 : 가상스레드가 유의미한 우위를 보임
+2. JVM Heap 사용량 : 가상스레드가 전반적으로 더 많이 사용
+3. 처리량 : 가상스레드가 전반적으로 더 빠른 시간 내에 작업 처리
+4. 하루 시청기록 300만건, chunkSize 2000일 때의 비교
+
+   |   | jdk.CPULoad <br/>JVM User | JVM Heap used      | Batch job compeleted         |
+          |---|---------------------------|--------------------|------------------------------|
+   | Platform Thread  | 52.2 % | 26.8 MiB – 137 MiB | 약 9~11초<br/>9s56ms, 10s922ms |
+   | Virtual Thread  | 42.8 % | 27.5 MiB – 190 MiB | 약 8~9초<br/>8s308ms, 8s832ms  |
+
+
+</details>
+
+상세기록 : [Batch: 가상 스레드 성능개선](https://foggy-unicorn-28d.notion.site/Batch-3294e9ced0eb42cf8d88c711811f4235?pvs=4)
+
+
+
+### Batch 작업: 전역 캐시객체 사용 성능개선
+<details><summary>통계작업 처리시간 단축 : 22s458ms → 3s402ms
+</summary>
+
+1. Singleton 패턴의 전역 캐시객체 도입  
+2. processor 삭제 & writer 단계 전역 캐시 저장
+3. JobListener 활용, JobScope로 DB 갱신 작업  
+4. 총 100만 행의 테이블, chunk size 20일 때 일간 통계 **22s458ms → 3s402ms**
+
+</details>
+
+상세기록 : [전역 캐시도입 성능개선](https://foggy-unicorn-28d.notion.site/Batch-bf180a139be045a8bb2dc42321331973?pvs=4)
 
 <br>
 
 ## 🐞 트러블 슈팅
-#### chunk read 동시성 제어
-- [SpringBatch: chunk read 동시성 제어(JdbcPagingItemReader)](https://foggy-unicorn-28d.notion.site/SpringBatch-chunk-read-JdbcPagingItemReader-sortKey-df25e96ae7c2494891bfc039b79592ab?pvs=4)
-#### VirtualThread 관련
-- [VirtualThread pinned issue](https://foggy-unicorn-28d.notion.site/Virtual-Thread-Pinned-Issue-59caf6e9dd784700bb84b4e6514bb564?pvs=4)
+### chunk read 동시성 제어  
+<details>
+<summary>복합적인 문제원인
+</summary>
+
+1. 날짜별 DB Partition으로 인해 **auto increment PK 사용 불가**  
+2. chunk read 동시성 처리를 위한 새로운 sort 방식 필요  
+      a. chunk paging을 위한 추가정렬 : **FileSort 발생시 성능 대폭 저하**  
+      b. sort의 기준 칼럼이 unique 하지 않을 경우 잘못된 통계 결과 산출
+</details>
+
+<details>
+<summary>해결방법
+</summary>
+
+1. chunk paging을 위한 별도의 정렬 칼럼 **인덱스 별도 생성 및 쿼리 최적화**
+2. 사용중인 인터페이스(JdbcPagingItemReader)가 **off-set 방식의 페이징을 하지 않는 것**을 확인
+</details>  
+
+상세 기록 : [SpringBatch: chunk read 동시성 제어(JdbcPagingItemReader)](https://foggy-unicorn-28d.notion.site/SpringBatch-chunk-read-JdbcPagingItemReader-sortKey-df25e96ae7c2494891bfc039b79592ab?pvs=4)
+
+### VirtualThread pinned issue  
+<details>
+<summary>문제원인
+</summary>
+
+1. synchronized 블록 안에서 `VirtualThread.park()` 가 발생하면 가상스레드는 CarrierThread에서 unmount 되지 않는다.
+2. MySQL JDBC 연결은 synchronized 키워드로 구현된 부분이 많다.
+</details>
+<details>
+<summary>대안모색 및 결정
+</summary>
+
+1. MySQL R2DBC 연결과 대조    
+2. MariaDB JDBC 연결과 대조
+3. 대조결과  
+a. 현재의 환경에서 **MariaDB나 R2DBC를 통해 Virtual Thread Pinned가 눈에 띄게 감소하는 일은 없었다.**  
+b. **Virtual Thread Pinned 지표와 성능(수행시간, CPU부하 등) 사이에도 유의미한 관계는 발견되지 않았다.**
+4. 기존의 JDBC 기반 Batch 작업 유지
+</details>
+
+상세 기록: [VirtualThread pinned issue](https://foggy-unicorn-28d.notion.site/Virtual-Thread-Pinned-Issue-59caf6e9dd784700bb84b4e6514bb564?pvs=4)
 
 <br>
 
