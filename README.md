@@ -61,10 +61,10 @@
 3. 처리량 : 가상스레드가 전반적으로 더 빠른 시간 내에 작업 처리
 4. 하루 시청기록 300만건, chunkSize 2000일 때의 비교
 
-   |   | jdk.CPULoad <br/>JVM User | JVM Heap used      | Batch job compeleted         |
-          |---|---------------------------|--------------------|------------------------------|
-   | Platform Thread  | 52.2 % | 26.8 MiB – 137 MiB | 약 9~11초<br/>9s56ms, 10s922ms |
-   | Virtual Thread  | 42.8 % | 27.5 MiB – 190 MiB | 약 8~9초<br/>8s308ms, 8s832ms  |
+   |   | jdk.CPULoad <br/>JVM User | JVM Heap used      | Batch job compeleted       |
+          |---|---------------------------|--------------------|----------------------------|
+   | Platform Thread  | 52.2 % | 26.8 MiB – 137 MiB | 약 9~11초 (9s56ms, 10s922ms) |
+   | Virtual Thread  | 42.8 % | 27.5 MiB – 190 MiB | 약 8~9초 (8s308ms, 8s832ms)  |
 
 
 </details>
