@@ -4,7 +4,6 @@ import com.github.exception.AuthErrorCode;
 import com.github.exception.AuthException;
 import com.github.util.JwtTokenProvider;
 import com.github.util.UserDetailServiceImpl;
-import com.github.util.UserDetailsImpl;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,10 +17,6 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
 
-/**
-
-
- */
 @Slf4j
 @Component
 public class JwtAuthenticationFilter implements WebFilter {
@@ -37,7 +32,7 @@ public class JwtAuthenticationFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         // 로그인과 관련된 경로는 필터링하지 않음
         String path = exchange.getRequest().getURI().getPath();
-        if (path.startsWith("/v1/user/") || path.startsWith("/v1/info/top5/") || path.startsWith("/actuator") ) {
+        if (path.startsWith("/v1/user/") || path.startsWith("/v1/info/top5/") || path.startsWith("/actuator") || path.contains("/oauth2") ) {
 
             if (path.startsWith("/v1/video/")) {
                 // /v1/video/**

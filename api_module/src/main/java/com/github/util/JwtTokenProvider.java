@@ -13,11 +13,8 @@ import java.util.Date;
 @Service
 public class JwtTokenProvider {
     private static final String BEARER_PREFIX = "Bearer ";
-
     private int accessTokenExpiredTime;
-
     private int refreshTokenExpiredTime;
-
     private byte[] keyBytes;
 
 
@@ -31,15 +28,18 @@ public JwtTokenProvider (
     this.refreshTokenExpiredTime = Integer.parseInt(refreshTokenExpiredTime);
     }
 
+    public boolean isExpired(Claims c){
+        Date expiredDate = c.getExpiration();
+        return expiredDate.before(new Date()); //이전 날짜면 true 반환
+    }
     public String createAccessToken(String email){
-    return createToken(email, accessTokenExpiredTime, TokenType.ACCESS);
+        return createToken(email, accessTokenExpiredTime, TokenType.ACCESS);
     }
 
     public String createRefreshToken(String email){
         return createToken(email, refreshTokenExpiredTime, TokenType.REFRESH);
     }
-
-    private String createToken(String email, int expire, TokenType tokenType) {
+    public String createToken(String email, int expire, TokenType tokenType) {
         Claims claims = Jwts.claims();
         claims.put("email", email);
         claims.put("tokenType", tokenType.name());
@@ -48,17 +48,12 @@ public JwtTokenProvider (
         Date expireTime = new Date(now.getTime() + expire);
 
         String token = Jwts.builder()
-                    .setClaims(claims)
-                    .setIssuedAt(now)
-                    .setExpiration(expireTime)
-                    .signWith(getSigningkey(keyBytes))
-                    .compact();
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(expireTime)
+                .signWith(getSigningkey(keyBytes))
+                .compact();
         return BEARER_PREFIX + token;
-    }
-
-    public boolean isExpired(Claims c){
-        Date expiredDate = c.getExpiration();
-        return expiredDate.before(new Date()); //이전 날짜면 true 반환
     }
 
     public String getEmail(Claims claims) {
@@ -74,19 +69,8 @@ public JwtTokenProvider (
                 .build().parseClaimsJws(token).getBody();
     }
 
-    public Claims extractClaimsFromRefreshToken(String token){
-        return extractClaims(parseBearerToken(token));
-    }
-
     private Key getSigningkey(byte[] keyBytes){
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    private String parseBearerToken(final String inputString) {
-
-        if (inputString != null && inputString.startsWith("Bearer ")) {
-            return inputString.substring(7);
-        }
-        return null;
-    }
 }
