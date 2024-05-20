@@ -2,8 +2,7 @@
 [**📚 Notion**](https://foggy-unicorn-28d.notion.site/BillingProject-2024-0e94e88952b24e95a99bb799d2377008?pvs=4) |
 **Apr 2024 ~ May 2024**  
 
-<img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white">
-<img src="https://img.shields.io/badge/Spring Cloud-6DB33F?style=for-the-badge&logo=&logoColor=white">
+<img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white"> <img src="https://img.shields.io/badge/Spring Cloud-6DB33F?style=for-the-badge&logo= &logoColor=white"> 
 <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=MySQL&logoColor=white">
 <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=Redis&logoColor=white">
 <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=Docker&logoColor=white">
