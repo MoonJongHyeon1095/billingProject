@@ -12,6 +12,7 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.server.WebFilterExchange;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,7 +44,10 @@ public class OAuth2LoginSuccessHandlerTest {
 
     @BeforeEach
     void setUp() {
-        when(webFilterExchange.getExchange().getResponse()).thenReturn(response);
+        ServerWebExchange exchange = mock(ServerWebExchange.class);
+
+        when(webFilterExchange.getExchange()).thenReturn(exchange);
+        when(exchange.getResponse()).thenReturn(response);
         when(authentication.getPrincipal()).thenReturn(oAuth2User);
         when(oAuth2User.getAttribute("email")).thenReturn(EMAIL);
         when(jwtTokenProvider.createAccessToken(EMAIL)).thenReturn(ACCESS_TOKEN);
@@ -56,6 +60,7 @@ public class OAuth2LoginSuccessHandlerTest {
         when(response.setComplete()).thenReturn(Mono.empty());
 
         Mono<Void> result = successHandler.onAuthenticationSuccess(webFilterExchange, authentication);
+        // Block the current thread to ensure the Mono completes
         result.block();
 
         assertEquals(ACCESS_TOKEN, headers.getFirst("Authorization"));
