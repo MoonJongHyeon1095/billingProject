@@ -21,8 +21,10 @@ import org.springframework.context.annotation.Bean;
 public class CustomLoadBalancerConfig {
 
     @Bean
-    public ReactorLoadBalancer<ServiceInstance> roundRobinLoadBalancer(Environment environment,
-                                                                   LoadBalancerClientFactory loadBalancerClientFactory) {
+    public ReactorLoadBalancer<ServiceInstance> roundRobinLoadBalancer(
+            Environment environment,
+            LoadBalancerClientFactory loadBalancerClientFactory
+    ) {
         String name = environment.getProperty(LoadBalancerClientFactory.PROPERTY_NAME);
         return new RoundRobinLoadBalancer(loadBalancerClientFactory
                 .getLazyProvider(name, ServiceInstanceListSupplier.class), name);
